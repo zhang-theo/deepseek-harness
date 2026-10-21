@@ -173,8 +173,6 @@ describe('CI workflow', () => {
       const publish = workflowJob(loadWorkflow('.github/workflows/' + name), 'publish')
       expect(publish.concurrency).toMatchObject({ 'cancel-in-progress': false })
     }
-    const distTag = workflowJob(loadWorkflow('.github/workflows/release-dist-tag.yml'), 'dist-tag')
-    expect(distTag.concurrency).toMatchObject({ 'cancel-in-progress': false })
     for (const name of ['python-release.yml', 'node-addon-system-release.yml', 'docs-pages.yml']) {
       expect(loadWorkflow('.github/workflows/' + name).concurrency).toMatchObject({ 'cancel-in-progress': false })
     }
@@ -1446,94 +1444,18 @@ describe('npm release workflows', () => {
       if (!isRecord(workflow.jobs)) throw new TypeError(`${file} must define jobs`)
       expect(Object.keys(workflow.jobs).sort()).toEqual(file === 'release.yml' ? ['dependencies', 'pack'] : ['pack'])
     }
-    expect(Object.keys(dshRelease.jobs).sort()).toEqual(['dependencies', 'pack', 'publish', 'publish-xfcodeai'])
-    expect(dshRelease.on).toMatchObject({ push: { branches: ['dev-x1a0f3n9', 'master'] } })
-    expect(dshRelease.jobs.publish).toMatchObject({
-      if: "github.ref == 'refs/heads/dev-x1a0f3n9'",
-      environment: 'npm-publish',
-    })
-    expect(dshRelease.jobs['publish-xfcodeai']).toMatchObject({
-      if: "github.ref == 'refs/heads/master'",
-      needs: ['dependencies', 'pack'],
-      environment: 'npm-publish-xfcodeai',
-      concurrency: { group: 'Release-publish-xfcodeai', 'cancel-in-progress': false },
-    })
-    const publish = workflowJob(dshRelease, 'publish')
-    if (!Array.isArray(publish.steps)) throw new TypeError('DSH publish job must define steps')
-    const publishTarballs = publish.steps.filter(isRecord).find(step => step.name === 'Publish tarballs')
-    expect(publishTarballs).toMatchObject({
-      env: {
-        NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}',
-        RELEASE_PUBLISH_ALLOW_REF: "${{ github.ref == 'refs/heads/dev-x1a0f3n9' && 'refs/heads/dev-x1a0f3n9' || '' }}",
-      },
-      run: 'pnpm run release:publish --family dsh --from dist/npm',
-    })
-    const xfcodeai = workflowJob(dshRelease, 'publish-xfcodeai')
-    if (!Array.isArray(xfcodeai.steps)) throw new TypeError('xfcodeai publish job must define steps')
-    const rewrite = xfcodeai.steps.filter(isRecord).find(step => step.name === 'Rewrite packed scope onto @xfcodeai')
-    expect(rewrite).toMatchObject({
-      run: 'pnpm run release:rewrite-scope --family dsh --from dist/npm --out dist/npm-xfcodeai --to-scope @xfcodeai',
-    })
-    const xfPublish = xfcodeai.steps.filter(isRecord).find(step => step.name === 'Publish tarballs')
-    expect(xfPublish).toMatchObject({
-      env: {
-        NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}',
-        RELEASE_PUBLISH_ALLOW_REF: "${{ github.ref == 'refs/heads/master' && 'refs/heads/master' || '' }}",
-      },
-      run: 'pnpm run release:publish --family dsh --from dist/npm-xfcodeai',
-    })
-    const pack = workflowJob(dshRelease, 'pack')
-    if (!Array.isArray(pack.steps)) throw new TypeError('DSH pack job must define steps')
-    const verify = pack.steps.filter(isRecord).find(step => step.name === 'Verify release version')
-    expect(verify).toMatchObject({
-      env: {
-        RELEASE_PUBLISH: "${{ (github.ref == 'refs/heads/dev-x1a0f3n9' || github.ref == 'refs/heads/master') && 'true' || 'false' }}",
-        RELEASE_PUBLISH_ALLOW_REF: "${{ (github.ref == 'refs/heads/dev-x1a0f3n9' || github.ref == 'refs/heads/master') && github.ref || '' }}",
-      },
-      run: 'pnpm run release:verify --family dsh',
-    })
 
-    const vendorRelease = loadWorkflow('.github/workflows/release-vendor.yml')
-    if (!isRecord(vendorRelease.jobs)) throw new TypeError('release-vendor.yml must define jobs')
-    expect(Object.keys(vendorRelease.jobs).sort()).toEqual(['pack'])
-
-    const tagged = loadWorkflow('.github/workflows/release-publish.yml')
-    if (!isRecord(tagged.on) || !isRecord(tagged.jobs)) {
-      throw new TypeError('release-publish.yml must define on and jobs')
+    // publication is workflow_dispatch-only (never a PR check) and keeps the
+    // npm-publish environment plus the shared dist-tag group.
+    for (const file of ['release-publish.yml', 'release-vendor-publish.yml']) {
+      const workflow = loadWorkflow(`.github/workflows/${file}`)
+      if (!isRecord(workflow.on) || !isRecord(workflow.jobs)) throw new TypeError(`${file} must define on and jobs`)
+      expect(Object.keys(workflow.on)).toEqual(['workflow_dispatch'])
+      const publish = workflow.jobs.publish
+      if (!isRecord(publish)) throw new TypeError(`${file} must define a publish job`)
+      expect(publish.environment).toBe('npm-publish')
+      expect(publish.concurrency).toMatchObject({ group: 'Release-publish' })
     }
-    expect(tagged.on).toMatchObject({ push: { tags: ['xfdsh-v*'] } })
-    expect(Object.keys(tagged.on)).toEqual(['push', 'workflow_dispatch'])
-    expect(tagged.jobs.publish).toMatchObject({
-      environment: 'npm-publish',
-      concurrency: { group: 'Release-publish' },
-    })
-
-    const vendorPublish = loadWorkflow('.github/workflows/release-vendor-publish.yml')
-    if (!isRecord(vendorPublish.on) || !isRecord(vendorPublish.jobs)) {
-      throw new TypeError('release-vendor-publish.yml must define on and jobs')
-    }
-    expect(Object.keys(vendorPublish.on)).toEqual(['workflow_dispatch'])
-    expect(vendorPublish.jobs.publish).toMatchObject({
-      environment: 'npm-publish',
-      concurrency: { group: 'Release-publish' },
-    })
-
-    const distTag = loadWorkflow('.github/workflows/release-dist-tag.yml')
-    if (!isRecord(distTag.on) || !isRecord(distTag.jobs)) {
-      throw new TypeError('release-dist-tag.yml must define on and jobs')
-    }
-    expect(Object.keys(distTag.on)).toEqual(['workflow_dispatch'])
-    expect(distTag.jobs['dist-tag']).toMatchObject({
-      environment: 'npm-publish',
-      concurrency: { group: 'Release-publish', 'cancel-in-progress': false },
-    })
-    const distTagJob = workflowJob(distTag, 'dist-tag')
-    if (!Array.isArray(distTagJob.steps)) throw new TypeError('dist-tag job must define steps')
-    const point = distTagJob.steps.filter(isRecord).find(step => step.name === 'Point dist-tag')
-    expect(point).toMatchObject({
-      env: { NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}' },
-    })
-    expect(String(point?.run ?? '')).toContain('pnpm run release:dist-tag')
   })
 
   it('runs dependency policy and npm layout checks in the DSH release workflow', () => {

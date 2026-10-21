@@ -3,6 +3,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import Schema from '@deepseek-ai/schemastery'
+import { Context } from '@deepseek-ai/cordis'
 import { bindSnapshotSelector, RemoteError } from '@deepseek-ai/dsh-client-test-runtime'
 import type {
   CredentialInfo, RemoteResult, SettingsNamespaceView,
@@ -47,10 +48,10 @@ function capacityInputs(label: string): HTMLInputElement[] {
 const PiAiConfig = Schema.object({
   providers: Schema.dict(Schema.object({
     apiKeyEnv: Schema.string().role('credential-ref'),
+    api: Schema.union(['openai-completions', 'openai-responses', 'anthropic-messages']),
     baseURL: Schema.string(),
     reasoning: Schema.union(['off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max']),
     headers: Schema.dict(Schema.string()),
-    retryPolicy: RetryPolicyConfig,
   })),
 })
 
@@ -58,14 +59,12 @@ const DeepSeekConfig = Schema.object({
   apiKeyEnv: Schema.string().role('credential-ref'),
   baseURL: Schema.string().pattern(/^https:\/\//),
   reasoningEffort: Schema.union(['off', 'low', 'high', 'max']),
-  retryPolicy: RetryPolicyConfig,
   defaultContextWindow: Schema.number().step(1).min(1),
   models: Schema.array(Schema.object({
     id: Schema.string().required(),
     name: Schema.string(),
     description: Schema.string(),
     contextWindow: Schema.number().step(1).min(1),
-    inputModalities: Schema.array(Schema.string()),
   // The adapter declares its catalog as a schema default rather than a
   // composition entry, which is what the restore-defaults path has to read.
   })).default([
@@ -74,14 +73,12 @@ const DeepSeekConfig = Schema.object({
       name: 'DeepSeek-V4-Flash',
       description: '',
       contextWindow: 1_000_000,
-      inputModalities: [],
     },
     {
       id: 'deepseek-v4-pro',
       name: 'DeepSeek-V4-Pro',
       description: '',
       contextWindow: 1_000_000,
-      inputModalities: [],
     },
   ]),
 })
@@ -110,8 +107,7 @@ function wireNamespaces(): SettingsNamespaceView[] {
       },
       base: { defaultContextWindow: 1_000_000, maxTokens: 256_000, models: DEFAULT_DEEPSEEK_MODELS },
       user: { baseURL: 'https://base' },
-      autoGenerate: true,
-      applies: 'live',
+      autoGenerate: true, applies: 'live',
       secrets: [],
       revision: 0,
     },
@@ -121,8 +117,7 @@ function wireNamespaces(): SettingsNamespaceView[] {
         profiles: Schema.dict(Schema.object({ note: Schema.string() })),
       }).toJSON())) as JsonValue,
       value: {},
-      autoGenerate: true,
-      applies: 'live',
+      autoGenerate: true, applies: 'live',
       secrets: [],
       revision: 0,
     },
@@ -131,8 +126,7 @@ function wireNamespaces(): SettingsNamespaceView[] {
       schema: JSON.parse(JSON.stringify(PiAiConfig.toJSON())) as JsonValue,
       value: { providers: { openai: { apiKeyEnv: 'OPENAI_API_KEY', baseURL: 'https://proxy', headers: { 'X-Team': 'a' } }, zombie: {} } },
       user: { providers: { openai: { apiKeyEnv: 'OPENAI_API_KEY', baseURL: 'https://proxy', headers: { 'X-Team': 'a' } }, zombie: {} } },
-      autoGenerate: true,
-      applies: 'live',
+      autoGenerate: true, applies: 'live',
       secrets: [],
       revision: 0,
     },
@@ -140,10 +134,24 @@ function wireNamespaces(): SettingsNamespaceView[] {
       ns: 'subagent-model-selection',
       schema: JSON.parse(JSON.stringify(Schema.object({ enabled: Schema.boolean().default(false) }).toJSON())) as JsonValue,
       value: { enabled: false },
-      autoGenerate: true,
-      applies: 'live',
+      autoGenerate: true, applies: 'live',
       secrets: [],
       revision: 4,
+    },
+    {
+      ns: 'llm-deepseek-account',
+      schema: JSON.parse(JSON.stringify(DeepSeekConfig.toJSON())) as JsonValue,
+      value: {
+        baseURL: 'https://base',
+        defaultContextWindow: 1_000_000,
+        maxTokens: 256_000,
+        models: DEFAULT_DEEPSEEK_MODELS,
+      },
+      base: { defaultContextWindow: 1_000_000, maxTokens: 256_000, models: DEFAULT_DEEPSEEK_MODELS },
+      user: {},
+      autoGenerate: true, applies: 'live',
+      secrets: [],
+      revision: 0,
     },
   ]
 }
@@ -235,7 +243,9 @@ const contexts = new WeakMap<object, PageContext>()
 function ctxWith(face: object): PageContext {
   const existing = contexts.get(face)
   if (existing !== undefined) return existing
-  const ctx = { remote: face } as unknown as PageContext
+  const ctx = Object.assign(new Context(), { remote: { ...face,
+    session: { initializeDefaultModel: async () => ({ ok: true, value: undefined }) },
+  } })
   contexts.set(face, ctx)
   return ctx
 }
@@ -594,7 +604,6 @@ describe('ModelsSection', () => {
     scripted.face.settings.describe.mockResolvedValue(remoteOk({ writable: true, hasDocument: false, namespaces: [] }))
     await mountFace(scripted)
     expect(screen.queryByRole('button', { name: en.add })).toBeNull()
-    expect(screen.queryByRole('button', { name: en.customAdd })).toBeNull()
   })
 
   it('offers only providers whose settings namespace can open an editor', async () => {
@@ -604,8 +613,11 @@ describe('ModelsSection', () => {
       namespaces: wireNamespaces().filter(view => view.ns !== 'llm-pi-ai'),
     }))
     await mountFace(scripted)
-    expect(screen.queryByRole('button', { name: en.customAdd })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: en.add }))
+    // Without the pi-ai namespace nothing can be hand-declared, so the card
+    // is the catalog form alone: no mode switch, no custom panel.
+    expect(screen.queryByRole('tablist')).toBeNull()
+    expect(screen.queryByRole('textbox', { name: en.customRoute })).toBeNull()
     expect(screen.queryByRole('option', { name: 'anthropic' })).toBeNull()
     expect(screen.getByRole('option', { name: 'plain' })).toBeTruthy()
   })
@@ -621,7 +633,6 @@ describe('ModelsSection', () => {
     fireEvent.click(screen.getByRole('button', { name: openaiCopy(en.editProvider) }))
     expect(await screen.findByLabelText(en.keyInput)).toBeTruthy()
     expect(screen.getByRole('button', { name: en.add })).toBeTruthy()
-    expect(screen.getByRole('button', { name: en.customAdd })).toBeTruthy()
   })
 
   it('renders nothing before the slot injects its dependencies', () => {
@@ -892,59 +903,6 @@ describe('ModelsSection', () => {
     expect(onClose).toHaveBeenCalledWith(true)
   })
 
-  it('writes a custom retry policy as a path op and omits the adapter default', async () => {
-    const { mutate } = await mountDeepSeekCard({
-      mutate: vi.fn(() => Promise.resolve(remoteOk(wireNamespaces()[0]))),
-    })
-    fireEvent.click(screen.getByText(en.customized))
-    fireEvent.click(screen.getByRole('radio', { name: en.retryPolicyCustom }))
-    fireEvent.change(screen.getByLabelText(en.retryMaxRetries), { target: { value: '3' } })
-    fireEvent.change(screen.getByLabelText(en.retryInitialDelay), { target: { value: '250' } })
-    fireEvent.click(screen.getByText(en.apply))
-    await waitFor(() => { expect(mutate).toHaveBeenCalledTimes(1) })
-    expect(mutate.mock.calls[0]).toEqual([
-      'llm-deepseek',
-      [{
-        op: 'set',
-        path: ['retryPolicy'],
-        value: {
-          mode: 'normal',
-          maxRetries: 3,
-          backoff: { initialDelayMs: 250, maxDelayMs: 10_000 },
-        },
-      }],
-      0,
-    ])
-  })
-
-  it('unsets retryPolicy when returning from Custom to Default', async () => {
-    const { mutate } = await mountDeepSeekCard({
-      mutate: vi.fn(() => Promise.resolve(remoteOk(wireNamespaces()[0]))),
-    })
-    fireEvent.click(screen.getByText(en.customized))
-    fireEvent.click(screen.getByRole('radio', { name: en.retryPolicyCustom }))
-    fireEvent.click(screen.getByRole('radio', { name: en.retryPolicyNone }))
-    fireEvent.change(screen.getByLabelText<HTMLInputElement>(en.baseUrl), { target: { value: 'https://next2' } })
-    fireEvent.click(screen.getByText(en.apply))
-    await waitFor(() => { expect(mutate).toHaveBeenCalledTimes(1) })
-    expect(mutate.mock.calls[0]).toEqual([
-      'llm-deepseek',
-      [{ op: 'set', path: ['baseURL'], value: 'https://next2' }],
-      0,
-    ])
-  })
-
-  it('disables Apply when a custom retry count is blank', async () => {
-    const { mutate } = await mountDeepSeekCard()
-    fireEvent.click(screen.getByText(en.customized))
-    fireEvent.click(screen.getByRole('radio', { name: en.retryPolicyCustom }))
-    fireEvent.change(screen.getByLabelText(en.retryMaxRetries), { target: { value: '' } })
-    expect((screen.getByRole('button', { name: en.apply }) as HTMLButtonElement).disabled).toBe(true)
-    fireEvent.click(screen.getByText(en.apply))
-    expect(mutate).not.toHaveBeenCalled()
-    expect(screen.getByText(en.retryCountInvalid)).toBeTruthy()
-  })
-
   it('applies customized deepseek fields as path ops', async () => {
     const { mutate } = await mountDeepSeekCard({
       mutate: vi.fn(() => Promise.resolve(remoteOk(wireNamespaces()[0]))),
@@ -1001,11 +959,11 @@ describe('ModelsSection', () => {
     ])
   })
 
-  it('edits the shared DeepSeek card while preserving the YAML protocol selection', async () => {
+  it('edits the DeepSeek endpoint and credential without a protocol selection', async () => {
     const namespace: SettingsNamespaceView = {
       ...wireNamespaces()[0]!,
       ns: 'llm-deepseek',
-      value: { protocol: 'messages', apiKeyEnv: 'DEEPSEEK_API_KEY', models: DEFAULT_DEEPSEEK_MODELS },
+      value: { apiKeyEnv: 'DEEPSEEK_API_KEY', models: DEFAULT_DEEPSEEK_MODELS },
       user: {},
     }
     const { face, mutate, set } = scriptedFace({
@@ -1080,16 +1038,6 @@ describe('ModelsSection', () => {
     expect(validateDeepSeekModels([{ id: 'model', maxTokens: 0 }]))
       .toEqual({ index: 0, key: 'modelMaxTokensInvalid' })
     expect(validateDeepSeekModels([{ id: 'model', maxTokens: 8192 }])).toBeUndefined()
-    expect(validateDeepSeekModels([{ id: 'model', reasoningEfforts: false }])).toBeUndefined()
-    expect(validateDeepSeekModels([{ id: 'model', reasoningEfforts: {} }]))
-      .toEqual({ index: 0, key: 'modelReasoningEmpty' })
-    expect(validateDeepSeekModels([{ id: 'model', reasoningEfforts: { off: null } }]))
-      .toEqual({ index: 0, key: 'modelReasoningEmpty' })
-    expect(validateDeepSeekModels([{ id: 'model', reasoningEfforts: { high: '' } }]))
-      .toEqual({ index: 0, key: 'modelReasoningWireRequired' })
-    expect(validateDeepSeekModels([{ id: 'model', reasoningEfforts: { high: 'high' } }])).toBeUndefined()
-    expect(validateDeepSeekModels([{ id: 'model', reasoningEfforts: { off: null, high: 'xhigh' } }]))
-      .toBeUndefined()
   })
 
   it('reads context windows written as counts, thousands, or millions', () => {
@@ -1199,8 +1147,7 @@ describe('ModelsSection', () => {
       value: { ...stored, defaultContextWindow: 1_000_000 },
       ...base === undefined ? {} : { base },
       user: stored,
-      autoGenerate: true,
-      applies: 'live',
+      autoGenerate: true, applies: 'live',
       secrets: [],
       revision: 0,
     }
@@ -1373,42 +1320,6 @@ describe('ModelsSection', () => {
       .toBe(en.maxTokensPlaceholder)
   })
 
-  it('writes inputModalities [text, image] from the Supports images switch', async () => {
-    const { mutate } = await mountDeepSeekCard({
-      mutate: vi.fn(() => Promise.resolve(remoteOk(wireNamespaces()[0]))),
-    })
-    fireEvent.click(screen.getByText(en.customized))
-    expandRow(1)
-    const imageSwitch = screen.getByRole('switch', { name: `${en.modelSupportsImages} 1` })
-    expect(imageSwitch.getAttribute('aria-checked')).toBe('false')
-    fireEvent.click(imageSwitch)
-    fireEvent.click(screen.getByText(en.apply))
-    await waitFor(() => { expect(mutate).toHaveBeenCalledTimes(1) })
-    const models = (mutate.mock.calls[0] as [string, { op: string; path: string[]; value?: unknown }[]])[1]
-      .find(op => op.path[0] === 'models')?.value as Record<string, unknown>[]
-    expect(models[0]).toMatchObject({
-      id: 'deepseek-v4-flash',
-      inputModalities: ['text', 'image'],
-    })
-  })
-
-  it('drops inputModalities when the Supports images switch is turned off', () => {
-    const onChange = vi.fn()
-    render(<DeepSeekModelsEditor
-      models={[{ id: 'flash', inputModalities: ['text', 'image'] }]}
-      overridden={true}
-      defaultContextWindow={undefined}
-      defaultMaxTokens={undefined}
-      t={t}
-      disabled={false}
-      onChange={onChange}
-      onReset={vi.fn()}
-    />)
-    expandRow(1)
-    fireEvent.click(screen.getByRole('switch', { name: `${en.modelSupportsImages} 1` }))
-    expect(onChange).toHaveBeenCalledWith([{ id: 'flash' }])
-  })
-
   it('can empty and reset the model override, then clear optional fields without dropping hidden data', async () => {
     const { mutate } = await mountDeepSeekCard({
       mutate: vi.fn(() => Promise.resolve(remoteOk(wireNamespaces()[0]))),
@@ -1466,8 +1377,7 @@ describe('ModelsSection', () => {
       ns: 'llm-deepseek',
       schema: JSON.parse(JSON.stringify(DeepSeekConfig.toJSON())) as JsonValue,
       value: {},
-      autoGenerate: true,
-      applies: 'live',
+      autoGenerate: true, applies: 'live',
       secrets: [],
       revision: 0,
     }

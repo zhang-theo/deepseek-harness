@@ -130,7 +130,7 @@ function findCatalogEntry(ctx: Context, entryId: string): DshPluginCatalogEntry 
   const runtime = ctx.get('dshProfile')
   if (runtime === undefined) return undefined
   for (const layer of runtime.profile.layers) {
-    const found = layer.plugins?.find(plugin => plugin.entryId === entryId)
+    const found = layer.plugins?.find((plugin: DshPluginCatalogEntry) => plugin.entryId === entryId)
     if (found !== undefined) return found
   }
   return undefined

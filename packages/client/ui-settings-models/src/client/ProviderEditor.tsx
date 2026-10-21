@@ -11,14 +11,14 @@
  * display name and wire protocol of a pi-ai route the adapter does not ship —
  * the two fields the create card asked that route for, editable here for the
  * same reason).
- * Provider-scoped reasoning effort stays absent: it is a per-MODEL capability.
- * Each custom model row offers Default (none) or Custom `reasoningEfforts`.
- * Retry count and delay are provider-route fields on this card: Default omits
- * `retryPolicy`, and Custom writes a normal-mode policy with those two values.
- * Everything else stays owned by `settings.yaml`. Profile edits land as
- * minimal `settings.mutate` path ops against the stored section — the card
- * names only the fields it can see instead of rebuilding the whole subtree
- * from a partial descriptor.
+ * Reasoning effort is deliberately absent: it is a per-MODEL capability, and
+ * the models under one provider disagree about it, so a provider-scoped
+ * control can only be set to a value some of them reject. The composer's
+ * model picker offers each model its own levels; `cordis.patch.yml` keeps the
+ * profile field for a deployment that knows its route. Everything else stays
+ * owned by `cordis.patch.yml`. Profile edits land as minimal `settings.mutate`
+ * path ops against the stored section — the card names only the fields it can
+ * see instead of rebuilding the whole subtree from a partial descriptor.
  */
 
 import { useEffect, useMemo, useState } from 'react'
@@ -214,7 +214,7 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
   const setField = (key: string, next: string | undefined): void => {
     // A value of nothing but whitespace is cleared, not stored: `stringAt`
     // already reports it as absent, so the field would otherwise render empty
-    // while the draft still carried the spaces into `settings.yaml`, where
+    // while the draft still carried the spaces into `cordis.patch.yml`, where
     // both adapters would accept that non-empty string as a real value.
     const value = next === undefined || next.trim().length === 0 ? undefined : next
     setDraft(current => value === undefined
@@ -283,9 +283,6 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
       if (failure !== undefined) {
         return `${t('model')} ${String(failure.index + 1)}: ${t(failure.key)}`
       }
-      const retryFailure = validateRetryPolicy(schema.getPath(next, ['retryPolicy']))
-      /* v8 ignore next -- unreachable from the card: the same failure disables submit */
-      if (retryFailure !== undefined) return t(retryFailure)
     }
     /* v8 ignore next -- apply is only reachable from the rendered card, which required a resolved node */
     if (props.credentialOnly !== true && node !== undefined && settingsPath.length === 0) {
@@ -503,28 +500,17 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
                     onChange={(event) => { setField('api', event.target.value) }}
                   >
                     {/* A profile naming no protocol — hand-written into
-                        settings.yaml with no model to need one — selects
+                        cordis.patch.yml with no model to need one — selects
                         nothing rather than reading as if it had picked the
                         first choice. The option is named because a screen
                         reader announces it either way, and an empty one is
                         announced as a choice with no identity. */}
                     {probeApi === undefined ? <option value="">{t('customApiUnset')}</option> : null}
-                    {protocols.map(choice => <option key={choice} value={choice}>{choice}</option>)}
+                    {protocols.map(choice => <option key={choice} value={choice}>{protocolLabel(t, choice)}</option>)}
                   </select>
                 </div>
               )
               : null}
-            <RetryPolicyFields
-              value={schema.getPath(draft, ['retryPolicy'])}
-              onChange={(next) => {
-                setDraft(current => next === undefined
-                  ? schema.deletePath(current, ['retryPolicy'])
-                  : schema.setPath(current, ['retryPolicy'], next))
-              }}
-              t={t}
-              disabled={disabled}
-              name={`provider-retry-policy-${props.provider}`}
-            />
             {/* Both families edit the same rows through the same contract; only
                 the extras differ — DeepSeek's inherited capacities, pi-ai's
                 endpoint interrogation. */}
@@ -575,7 +561,7 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
       {props.credentialOnly === true || modelFailure === undefined
         ? null
         : (
-          <p className={styles['error']}>
+          <p className={styles['advancedHint']}>
             {`${t('model')} ${String(modelFailure.index + 1)}: ${t(modelFailure.key)}`}
           </p>
         )}
@@ -584,8 +570,6 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
         busy={busy}
         submitDisabled={disabled || layout === 'unknown'
           || (props.credentialOnly !== true && modelFailure !== undefined)
-          || (props.credentialOnly !== true
-            && validateRetryPolicy(schema.getPath(draft, ['retryPolicy'])) !== undefined)
           || shownKeyFailure !== undefined
           || (props.credentialRequired === true && keyValue.length === 0)}
         submitLabelKey={props.submitLabelKey ?? 'apply'}

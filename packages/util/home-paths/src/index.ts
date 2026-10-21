@@ -17,6 +17,9 @@ export const DEFAULT_DSH_HOME_DISPLAY = `~/${DSH_HOME_DIR_NAME}`
 /** Environment variable that overrides the default DeepSeek Harness home. */
 export const DSH_HOME_ENV = 'DSH_HOME'
 
+/** Environment variable that overrides the shared durable session-data home. */
+export const DSH_SESSION_HOME_ENV = 'DSH_SESSION_HOME'
+
 /** Directory name for the default shared agent configuration root under the OS home. */
 export const AGENTS_HOME_DIR_NAME = '.agents'
 

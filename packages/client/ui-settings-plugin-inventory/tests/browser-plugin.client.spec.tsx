@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { ClientModuleLoader } from '@deepseek-ai/dsh-client-modules/client'
 import { Context, Service } from '@deepseek-ai/cordis'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
 import { SlotRegistry } from '@deepseek-ai/dsh-client-ui-renderer/client'
@@ -21,6 +23,9 @@ type ListResult =
 
 async function bench() {
   const ctx = new Context()
+  onTestFinished(async () => { await ctx.fiber.dispose() })
+  const retryClient = vi.fn(async () => {})
+  ctx.provide('modules', { entries: { state: createSnapshotStore({ syncing: false, failures: [] }), retry: retryClient } } as unknown as ClientModuleLoader)
   await ctx.plugin(SlotRegistry).await()
   const locale = new LocaleRuntime(ctx)
   ctx.provide('locale', locale)
@@ -32,19 +37,14 @@ async function bench() {
   new RemoteService(ctx)
   const list = vi.fn<() => Promise<ListResult>>()
     .mockResolvedValue({ ok: true, value: EMPTY })
-  const setEnabled = vi.fn().mockResolvedValue({ ok: true, value: { enabled: true } })
-  const retryClient = vi.fn().mockResolvedValue(undefined)
-  ctx.provide('remote.pluginInventory', { list, setEnabled })
-  ctx.provide('modules', { entries: { state: { getSnapshot: () => ({ syncing: false, failures: [] }), subscribe: () => () => {} }, retry: retryClient } })
-  return { ctx, retryClient, slots: ctx.get('slots') as SlotRegistry, locale, list, setEnabled }
+  ctx.provide('remote.pluginInventory', { list })
+  return { ctx, retryClient, slots: ctx.get('slots') as SlotRegistry, locale, list }
 }
 
 function declare(slots: SlotRegistry): () => void {
   return slots.register({
     name: 'root',
-    children: {
-      'settings.plugins.tab': { kind: 'list', scope: 'root' },
-    },
+    children: { 'settings.plugins.tab': { kind: 'list', scope: 'root' } },
   } as never, () => null)
 }
 
@@ -54,7 +54,7 @@ describe('ui-settings-plugin-inventory browser plugin', () => {
   })
 
   it('declares only the services used by the Settings Remote contribution', () => {
-    expect(inject).toEqual(['slots', 'locale', 'remote', 'remote.pluginInventory'])
+    expect(inject).toEqual(['slots', 'locale', 'remote', 'remote.pluginInventory', 'modules'])
   })
 
   it('registers a localized tab without reading the Remote eagerly', async () => {
@@ -62,33 +62,29 @@ describe('ui-settings-plugin-inventory browser plugin', () => {
     declare(b.slots)
     await b.ctx.plugin({ inject: [...inject], apply }).await()
 
-    const tabs = b.slots.entries('settings.plugins.tab')
-    expect(tabs).toHaveLength(2)
-    const entry = tabs[0]!
-    const preset = tabs[1]!
+    const entry = b.slots.entries('settings.plugins.tab')[0]!
     expect(entry.component).toBe(PluginInventorySettingsTab)
-    expect(preset.component).toBe(PluginInventorySettingsTab)
     expect(entry.options).toMatchObject({ id: 'all', order: 10 })
-    expect(preset.options).toMatchObject({ id: 'xfdsh-presets', order: 15 })
     expect(entry.locale).toBe(NS)
-    expect(preset.locale).toBe(NS)
     expect(resolveSlotLabel(entry.options.label)).toBe('插件列表')
-    expect(resolveSlotLabel(preset.options.label)).toBe('xfdsh预置插件')
     expect(b.list).not.toHaveBeenCalled()
 
     const injected = (entry.inject as unknown as () => PluginInventorySettingsTabInjected)()
-    expect(injected.surface).toBe('inventory')
-    expect((preset.inject as unknown as () => PluginInventorySettingsTabInjected)().surface).toBe('catalog')
+    const text = { en: 'Local tools', zh: '本地工具' }
+    expect(injected.resolveText(text)).toBe('本地工具')
+    b.locale.setLocale('en')
+    expect(injected.resolveText(text)).toBe('Local tools')
+    b.locale.setLocale('zh')
+    injected.retryClient()
+    const retryError = vi.spyOn(b.ctx.logger, 'error').mockImplementation(() => {})
+    b.retryClient.mockRejectedValueOnce(new Error('retry unavailable'))
+    injected.retryClient()
+    await vi.waitFor(() => { expect(retryError).toHaveBeenCalled() })
+    retryError.mockRestore()
     await expect(injected.list()).resolves.toEqual(EMPTY)
     expect(b.list).toHaveBeenCalledOnce()
     b.list.mockResolvedValueOnce({ ok: false, error: { code: 'REMOTE_ERROR', message: 'unavailable' } })
     await expect(injected.list()).rejects.toThrow('pluginInventory.list failed: REMOTE_ERROR: unavailable')
-    await expect(injected.setEnabled({ entryId: 'ui-schedule' as never, enabled: true })).resolves.toEqual({ enabled: true })
-    expect(b.setEnabled).toHaveBeenCalledWith({ entryId: 'ui-schedule', enabled: true })
-    b.setEnabled.mockResolvedValueOnce({ ok: false, error: { code: 'REMOTE_ERROR', message: 'denied' } })
-    await expect(injected.setEnabled({ entryId: 'ui-schedule' as never, enabled: false })).rejects.toThrow(
-      'pluginInventory.setEnabled failed: REMOTE_ERROR: denied',
-    )
 
     // Shipped preset names resolve over the agent-preset dictionaries the
     // real plugin registers; user-authored metadata stays untranslated.
@@ -105,10 +101,9 @@ describe('ui-settings-plugin-inventory browser plugin', () => {
     expect(b.slots.entries('settings.plugins.tab')).toHaveLength(0)
 
     const stop = declare(b.slots)
-    await vi.waitFor(() => { expect(b.slots.entries('settings.plugins.tab')).toHaveLength(2) })
+    await vi.waitFor(() => { expect(b.slots.entries('settings.plugins.tab')).toHaveLength(1) })
     b.locale.setLocale('en')
     expect(resolveSlotLabel(b.slots.entries('settings.plugins.tab')[0]!.options.label)).toBe('Plugin list')
-    expect(resolveSlotLabel(b.slots.entries('settings.plugins.tab')[1]!.options.label)).toBe('xfdsh preset plugins')
 
     stop()
     expect(b.slots.entries('settings.plugins.tab')).toHaveLength(0)

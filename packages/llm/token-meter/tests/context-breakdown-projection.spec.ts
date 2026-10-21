@@ -7,14 +7,10 @@ import { createMessage, createSystemMessage, createUserMessage } from '@deepseek
 import type { ContentBlock, ToolSchema } from '@deepseek-ai/dsh-llm'
 import type { ContextFormed } from '@deepseek-ai/dsh-llm'
 import SessionStore, {
-  SESSION_FORMAT_VERSION,
-  SESSION_LIVE_WINDOW_EVENTS,
   Session,
-  SessionId,
   SessionLogOffset,
   SessionSeq,
 } from '@deepseek-ai/dsh-session'
-import type { SessionHeader } from '@deepseek-ai/dsh-session'
 import type { SessionEvent, SessionSeq as SessionSeqType } from '@deepseek-ai/dsh-session'
 
 import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'

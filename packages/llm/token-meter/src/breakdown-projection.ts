@@ -8,7 +8,7 @@
 
 import { z } from 'zod'
 import { canonicalHeader, deriveEventMessage, isSurfaceEvent, SessionSeq } from '@deepseek-ai/dsh-session'
-import type { SurfaceEvent } from '@deepseek-ai/dsh-session'
+import type { Session, SurfaceEvent } from '@deepseek-ai/dsh-session'
 import type { ProjectionDefinition } from '@deepseek-ai/dsh-session-projection'
 // Type-only: the `compaction/*` SessionEventMap merges (shadow-price events).
 import type {} from '@deepseek-ai/dsh-compaction'
@@ -147,6 +147,39 @@ function withoutClaim(state: ContextBreakdownState): ContextBreakdownState {
  * rewrite subtracts the retained price of the system node it replaces. Tools
  * are priced from the latest request header. No route pricing applies.
  */
+/**
+ * Rebuild breakdown state from the current retained surface of a windowed
+ * Session. Every surviving node is priced once; no dropped replace range is
+ * replayed.
+ * @param session - windowed Session whose current surface nodes remain live.
+ * @returns host state equivalent to folding the retained surface.
+ * @throws when a current surface node is missing from the live window.
+ */
+function bootstrapWindowedBreakdown(session: Session): ContextBreakdownState {
+  const systems: SystemNode[] = []
+  let surfaceTokens = 0
+  for (const seq of session.surface.nodes) {
+    const event = session.eventAt(seq)
+    if (event === undefined || !isSurfaceEvent(event)) {
+      throw new Error(`contextBreakdown cannot price surface node ${String(seq)} missing from the live window`)
+    }
+    const message = deriveEventMessage(event)
+    const tokens = message === null ? 0 : estimateMessage(message)
+    surfaceTokens += tokens
+    if (event.type === 'system/message' && tokens > 0) systems.push({ seq, tokens })
+  }
+  const systemTokens = systems.at(-1)?.tokens ?? 0
+  return {
+    systems,
+    surfaceTokens,
+    breakdown: {
+      systemTokens,
+      toolsTokens: estimateToolsTokens(session.requestHeader()),
+      messageTokens: surfaceTokens - systemTokens,
+    },
+  }
+}
+
 export const contextBreakdownProjectionDefinition = {
   key: 'contextBreakdown',
   stateVersion: 6,

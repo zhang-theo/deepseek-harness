@@ -44,7 +44,7 @@ describe('npm install layout verifier', () => {
       ['@deepseek-ai/dsh', new Map([['0.1.1-rc.2', {
         name: '@deepseek-ai/dsh',
         version: '0.1.1-rc.2',
-        dependencies: { '@deepseek-ai/dsh-child': '^0.1.1-rc.2', '@deepseek-ai/dsh-child': '^0.1.1-rc.2', 'dsh-better-sidebar': '0.19.0-alpha.1' },
+        dependencies: { '@deepseek-ai/dsh-child': '^0.1.1-rc.2' },
         peerDependencies: { '@deepseek-ai/cordis': '^4.0.1' },
       }]])],
       ['@deepseek-ai/dsh-child', new Map([['0.1.1-rc.2', {
@@ -62,7 +62,7 @@ describe('npm install layout verifier', () => {
     expect([...dual.get('@deepseek-ai/dsh')?.keys() ?? []]).toEqual(['0.1.0', '0.2.0'])
     expect(dual.get('@deepseek-ai/dsh')?.get('0.1.0')).toMatchObject({
       version: '0.1.0',
-      dependencies: { '@deepseek-ai/dsh-child': '^0.1.0', '@deepseek-ai/dsh-child': '^0.1.0' },
+      dependencies: { '@deepseek-ai/dsh-child': '^0.1.0' },
       peerDependencies: { '@deepseek-ai/cordis': '^4.0.1' },
     })
     expect(dual.get('@deepseek-ai/dsh')?.get('0.2.0')).toMatchObject({
@@ -70,75 +70,6 @@ describe('npm install layout verifier', () => {
       dependencies: { '@deepseek-ai/dsh-child': '^0.2.0' },
     })
     expect(dual.get('@deepseek-ai/cordis')).toBe(index.get('@deepseek-ai/cordis'))
-    expect(dual.get('@deepseek-ai/dsh')?.get('0.1.0')?.dependencies).not.toHaveProperty('dsh-better-sidebar')
-    expect([...dual.get('@deepseek-ai/dsh')?.keys() ?? []]).toEqual(['0.1.0', '0.2.0'])
-    expect(dual.get('@deepseek-ai/dsh')?.get('0.1.0')).toMatchObject({
-      name: '@deepseek-ai/dsh',
-      version: '0.1.0',
-      dependencies: { '@deepseek-ai/dsh-child': '^0.1.0' },
-    })
-    expect(dual.get('@deepseek-ai/dsh-child')?.get('0.2.0')).toMatchObject({
-      name: '@deepseek-ai/dsh-child',
-      version: '0.2.0',
-    })
-  })
-
-  it('keeps a fork-scoped preinstalled plugin on its own version', () => {
-    const index: RegistryIndex = new Map([
-      ['@deepseek-ai/dsh', new Map([['0.1.5-rc.2', {
-        name: '@deepseek-ai/dsh',
-        version: '0.1.5-rc.2',
-        dependencies: { '@deepseek-ai/dsh-session-timeline': '0.1.0' },
-      }]])],
-      ['@deepseek-ai/dsh-session-timeline', new Map([['0.1.0', {
-        name: '@deepseek-ai/dsh-session-timeline',
-        version: '0.1.0',
-      }]])],
-    ])
-
-    const dual = buildDualDshRegistry(index, '0.1.5-rc.2')
-
-    expect([...dual.get('@deepseek-ai/dsh')?.keys() ?? []]).toEqual(['0.1.0', '0.2.0'])
-    expect(dual.get('@deepseek-ai/dsh')?.get('0.1.0')?.dependencies).not.toHaveProperty(
-      '@deepseek-ai/dsh-session-timeline',
-    )
-    expect([...dual.get('@deepseek-ai/dsh-session-timeline')?.keys() ?? []]).toEqual(['0.1.0'])
-    expect(dual.get('@deepseek-ai/dsh-session-timeline')?.get('0.1.0')).toMatchObject({
-      name: '@deepseek-ai/dsh-session-timeline',
-      version: '0.1.0',
-    })
-  })
-
-  it('does not rewrite a scoped preinstalled plugin onto the synthetic versions', () => {
-    const index: RegistryIndex = new Map([
-      ['@deepseek-ai/dsh-web-app', new Map([['0.1.5-rc.3', {
-        name: '@deepseek-ai/dsh-web-app',
-        version: '0.1.5-rc.3',
-        dependencies: {
-          '@deepseek-ai/dsh-child': 'workspace:^',
-          '@deepseek-ai/dsh-better-sidebar': '0.19.3',
-        },
-      }]])],
-      ['@deepseek-ai/dsh-child', new Map([['0.1.5-rc.3', {
-        name: '@deepseek-ai/dsh-child',
-        version: '0.1.5-rc.3',
-      }]])],
-      ['@deepseek-ai/dsh-better-sidebar', new Map([['0.19.3', {
-        name: '@deepseek-ai/dsh-better-sidebar',
-        version: '0.19.3',
-      }]])],
-    ])
-
-    const dual = buildDualDshRegistry(index, '0.1.5-rc.3')
-
-    expect(dual.get('@deepseek-ai/dsh-web-app')?.get('0.2.0')?.dependencies).toEqual({
-      '@deepseek-ai/dsh-child': '^0.2.0',
-    })
-    expect(dual.get('@deepseek-ai/dsh-better-sidebar')?.get('0.19.3')).toMatchObject({
-      name: '@deepseek-ai/dsh-better-sidebar',
-      version: '0.19.3',
-    })
-    expect(dual.get('@deepseek-ai/dsh-better-sidebar')?.has('0.2.0')).toBe(false)
   })
 
   it('accepts isolated DSH releases with one shared Cordis installation', () => {

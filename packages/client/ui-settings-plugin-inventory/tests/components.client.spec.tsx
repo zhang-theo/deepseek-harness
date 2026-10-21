@@ -1,12 +1,18 @@
 // @vitest-environment jsdom
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { ClientEntryState } from '@deepseek-ai/dsh-client-modules/client'
+import type { PluginEntryId } from '@deepseek-ai/dsh-api-remotes/client'
+import { Context } from '@deepseek-ai/cordis'
+import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
+import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { PluginInventorySettingsTab } from '../src/client/PluginInventorySettingsTab.tsx'
 import type {
   PluginInventorySettingsTabInjected,
   PluginInventorySettingsTabProps,
 } from '../src/client/PluginInventorySettingsTab.tsx'
-import { en, type PluginInventoryLocaleKey } from '../src/client/locales.ts'
+import { en, zh, type PluginInventoryLocaleKey } from '../src/client/locales.ts'
 
 afterEach(cleanup)
 
@@ -20,16 +26,30 @@ const t = ((key: PluginInventoryLocaleKey, params?: Record<string, string>): str
 function props(
   list: PluginInventorySettingsTabInjected['list'],
   presetName: PluginInventorySettingsTabInjected['presetName'] = preset => preset.name ?? preset.id,
-  setEnabled: PluginInventorySettingsTabInjected['setEnabled'] = async request => ({ enabled: request.enabled }),
-  surface: PluginInventorySettingsTabInjected['surface'] = 'inventory',
+  resolveText: PluginInventorySettingsTabInjected['resolveText'] = text => typeof text === 'string' ? text : text.en,
 ): PluginInventorySettingsTabProps {
   return {
     t,
     list,
-    setEnabled,
     presetName,
-    surface,
+    resolveText,
+    useClientSync: bindSnapshotSelector(createSnapshotStore<ClientEntryState>({ syncing: false, failures: [] })),
+    retryClient: vi.fn(),
   } as PluginInventorySettingsTabProps
+}
+
+function localizedProps(list: PluginInventorySettingsTabInjected['list']) {
+  const ctx = new Context()
+  onTestFinished(async () => { await ctx.fiber.dispose() })
+  const locale = new LocaleRuntime(ctx)
+  ctx.effect(() => locale.register('settings.pluginInventory', 'en', en), 'test: English inventory dictionary')
+  ctx.effect(() => locale.register('settings.pluginInventory', 'zh', zh), 'test: Chinese inventory dictionary')
+  locale.setLocale('en')
+  const pageProps: PluginInventorySettingsTabProps = {
+    ...props(list, preset => preset.name ?? preset.id, text => locale.resolveText(text)),
+    t: locale.bind('settings.pluginInventory'),
+  }
+  return { locale, pageProps }
 }
 
 /** A deployment with a roster: one failed global row, two preset-provided rows. */
@@ -84,6 +104,7 @@ async function renderReady(snapshot: Snapshot = SNAPSHOT): Promise<ReturnType<ty
 
 const globalToggle = (): HTMLElement =>
   screen.getByRole('button', { name: (name: string) => name.startsWith(en.globalTitle) })
+const presetToggle = (): HTMLElement => screen.getByRole('button', { name: en.presetTitle })
 
 describe('PluginInventorySettingsTab', () => {
   it.each(['global', 'preset'])('shortens package and module name fallbacks in the %s inventory', async (scope) => {
@@ -134,170 +155,43 @@ describe('PluginInventorySettingsTab', () => {
         entryId: 'include:navigation' as PluginEntryId, moduleName: '@acme/dsh-navigation', enabled: true, fiberPhase: null,
         meta: { title: { en: 'dsh-Navigation', zh: 'dsh-导航' } },
       }],
-    } as unknown as Snapshot), undefined, setEnabled, 'catalog')} />)
+    }))
+    const view = render(<PluginInventorySettingsTab {...pageProps} />)
     await screen.findByRole('searchbox', { name: en.search })
-    expect(screen.getByText(en.catalogVersion.replace('{version}', '2.4.1'))).toBeTruthy()
-    const homepage = 'https://github.com/vectorize-io/hindsight/tree/main/hindsight-integrations/coding-agents'
-    const pkg = screen.getByRole('link', { name: en.openPackageGithub.replace('{name}', '@deepseek-ai/dsh-client-ui-schedule') })
-    expect(pkg.getAttribute('href')).toBe(homepage)
-    expect(pkg.getAttribute('target')).toBe('_blank')
-    expect(pkg.textContent).toBe('@deepseek-ai/dsh-client-ui-schedule')
-    expect(screen.queryByText('vectorize-io')).toBeNull()
-    expect(screen.queryByText('vectorize-io/hindsight')).toBeNull()
-    expect(screen.getAllByRole('link')).toHaveLength(1)
-    expect(pkg.getAttribute('href') ?? '').not.toContain('npmjs.com')
-    const toggle = screen.getByRole('switch', { name: en.disablePlugin.replace('{name}', 'Schedule') })
-    expect(toggle.getAttribute('aria-checked')).toBe('true')
-    fireEvent.click(toggle)
-    await waitFor(() => expect(setEnabled).toHaveBeenCalledWith({ entryId: 'schedule-entry', enabled: false }))
+    fireEvent.click(globalToggle())
+    expect(screen.getByRole('button', { name: 'dsh-Navigation, include:navigation, Enabled' })).toBeTruthy()
+    locale.setLocale('zh')
+    view.rerender(<PluginInventorySettingsTab {...pageProps} />)
+    expect(screen.getByRole('button', { name: 'dsh-导航, include:navigation, 已启用' })).toBeTruthy()
   })
 
-  it('keeps a package name as text when the catalog omits homepage', async () => {
-    render(<PluginInventorySettingsTab {...props(async () => ({
-      entries: [],
-      catalog: [{
-        id: 'timeline',
-        entryId: 'dsh-session-timeline',
-        packageName: '@deepseek-ai/dsh-session-timeline',
-        title: 'Session timeline',
-        author: 'LunFengChen',
-        required: false,
-        defaultEnabled: true,
-        installed: true,
-        enabled: true,
+  it('localizes global and preset metadata at render time while preserving identities and query state', async () => {
+    const globalError = 'locale/zh.json: invalid title'
+    const presetError = 'locale/fr.json: invalid description'
+    const snapshot: Snapshot = {
+      entries: [{
+        entryId: 'include:global-navigation' as PluginEntryId, moduleName: '@acme/navigation', enabled: true, fiberPhase: 'active',
+        meta: {
+          title: { en: 'Navigation', zh: '导航' },
+          description: { en: 'Global navigation controls', zh: '全局导航控件' },
+          error: globalError,
+        },
       }],
-    } as unknown as Snapshot), undefined, undefined, 'catalog')} />)
-    await screen.findByRole('searchbox', { name: en.search })
-    expect(screen.getByText('@deepseek-ai/dsh-session-timeline').closest('a')).toBeNull()
-    expect(screen.queryByRole('link')).toBeNull()
-    expect(screen.queryByText('LunFengChen')).toBeNull()
-  })
-
-  it('links the package name when homepage is GitHub without an owner/repo path', async () => {
-    render(<PluginInventorySettingsTab {...props(async () => ({
-      entries: [],
-      catalog: [{
-        id: 'market',
-        entryId: 'dsh-market',
-        packageName: 'dshmarket',
-        title: 'Plugin market',
-        author: 'LunFengChen',
-        homepage: 'https://github.com/LunFengChen',
-        required: false,
-        defaultEnabled: true,
-        installed: true,
-        enabled: true,
+      agentPresets: [{
+        id: 'custom', name: 'My preset', isDefault: true,
+        rows: [{
+          entryId: 'include:preset-runner', moduleName: '@acme/runner', enabled: true, fiberPhase: null,
+          meta: {
+            title: { en: 'Session runner', zh: '会话执行器' },
+            description: { en: 'Run per session', zh: '运行会话命令' },
+            error: presetError,
+          },
+        }],
       }],
-    } as unknown as Snapshot), undefined, undefined, 'catalog')} />)
-    await screen.findByRole('searchbox', { name: en.search })
-    const pkg = screen.getByRole('link', { name: en.openPackageGithub.replace('{name}', 'dshmarket') })
-    expect(pkg.getAttribute('href')).toBe('https://github.com/LunFengChen')
-    expect(pkg.textContent).toBe('dshmarket')
-    expect(screen.queryByText('LunFengChen')).toBeNull()
-    expect(screen.getAllByRole('link')).toHaveLength(1)
-  })
-
-  it('filters catalog cards by GitHub owner/repo', async () => {
-    render(<PluginInventorySettingsTab {...props(async () => ({
-      entries: [],
-      catalog: [{
-        id: 'context',
-        entryId: 'dsh-context',
-        packageName: 'dsh-context',
-        title: 'Context dashboard',
-        author: 'LunFengChen',
-        homepage: 'https://github.com/LunFengChen/dsh-context',
-        required: false,
-        defaultEnabled: true,
-        installed: true,
-        enabled: true,
-      }, {
-        id: 'sidebar',
-        entryId: 'better-sidebar',
-        packageName: 'dsh-better-sidebar',
-        title: 'Better sidebar',
-        author: 'LunFengChen',
-        homepage: 'https://github.com/LunFengChen/DSH-better-sidebar',
-        required: false,
-        defaultEnabled: true,
-        installed: true,
-        enabled: true,
-      }],
-    } as unknown as Snapshot), undefined, undefined, 'catalog')} />)
-    await screen.findByRole('searchbox', { name: en.search })
-    fireEvent.change(screen.getByRole('searchbox', { name: en.search }), { target: { value: 'LunFengChen/dsh-context' } })
-    expect(screen.getByText('Context dashboard')).toBeTruthy()
-    expect(screen.getByRole('link', { name: en.openPackageGithub.replace('{name}', 'dsh-context') })).toBeTruthy()
-    expect(screen.queryByText('Better sidebar')).toBeNull()
-    expect(screen.queryByText('LunFengChen/dsh-context')).toBeNull()
-  })
-
-  it('links declared homepages without inventing npmjs URLs', async () => {
-    render(<PluginInventorySettingsTab {...props(async () => ({
-      entries: [],
-      catalog: [
-        {
-          id: 'empty',
-          entryId: 'empty',
-          packageName: 'empty-home',
-          title: 'Empty homepage',
-          author: 'EmptyAuthor',
-          homepage: '',
-          required: false,
-          defaultEnabled: true,
-          installed: true,
-          enabled: true,
-        },
-        {
-          id: 'invalid',
-          entryId: 'invalid',
-          packageName: 'invalid-home',
-          title: 'Invalid homepage',
-          author: 'InvalidAuthor',
-          homepage: 'not a url',
-          required: false,
-          defaultEnabled: true,
-          installed: true,
-          enabled: true,
-        },
-        {
-          id: 'other',
-          entryId: 'other',
-          packageName: 'other-host',
-          title: 'Other host',
-          author: 'OtherAuthor',
-          homepage: 'https://example.com/acme/plugin',
-          required: false,
-          defaultEnabled: true,
-          installed: true,
-          enabled: true,
-        },
-        {
-          id: 'www',
-          entryId: 'www',
-          packageName: 'www-git',
-          title: 'WWW git',
-          author: 'WwwAuthor',
-          homepage: 'https://www.github.com/LunFengChen/dsh-market.git',
-          required: false,
-          defaultEnabled: true,
-          installed: true,
-          enabled: true,
-        },
-        {
-          id: 'dotgit',
-          entryId: 'dotgit',
-          packageName: 'dot-git-home',
-          title: 'Dot git homepage',
-          author: 'DotGitAuthor',
-          homepage: 'https://github.com/LunFengChen/.git',
-          required: false,
-          defaultEnabled: true,
-          installed: true,
-          enabled: true,
-        },
-      ],
-    } as unknown as Snapshot), undefined, undefined, 'catalog')} />)
+    }
+    const list = vi.fn(async () => snapshot)
+    const { locale, pageProps } = localizedProps(list)
+    const view = render(<PluginInventorySettingsTab {...pageProps} />)
     await screen.findByRole('searchbox', { name: en.search })
     expect(screen.getByText(en.presetSubtitle).textContent).toBe(en.presetSubtitle)
     expect(screen.getByText(en.globalSubtitle).textContent).toBe(en.globalSubtitle)
@@ -331,28 +225,39 @@ describe('PluginInventorySettingsTab', () => {
       expect(screen.getAllByRole('listitem')).toHaveLength(1)
       expect(screen.getByRole('button', { name: '导航, include:global-navigation, 已启用' })).toBeTruthy()
     }
-    fireEvent.change(screen.getByRole('searchbox', { name: en.search }), { target: { value: 'LunFengChen/dsh-market' } })
-    expect(screen.getByText('WWW git')).toBeTruthy()
-    expect(screen.queryByText('Empty homepage')).toBeNull()
-    expect(screen.queryByText('Dot git homepage')).toBeNull()
+    fireEvent.change(search, { target: { value: '运行会话命令' } })
+    expect(screen.getAllByRole('listitem')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: '会话执行器, include:preset-runner, 已启用' })).toBeTruthy()
+    fireEvent.change(search, { target: { value: 'Run per session' } })
+    expect(screen.getByText(zh.emptySearch)).toBeTruthy()
+    locale.setLocale('en')
+    view.rerender(<PluginInventorySettingsTab {...pageProps} />)
+    expect(screen.getByRole('button', { name: 'Session runner, include:preset-runner, Enabled' })).toBeTruthy()
+    expect(screen.getByRole('searchbox', { name: en.search })).toHaveProperty('value', 'Run per session')
+    expect(list).toHaveBeenCalledOnce()
   })
 
-  it('hides catalog cards when search matches none of them', async () => {
-    render(<PluginInventorySettingsTab {...props(async () => ({
-      entries: [],
-      catalog: [{
-        id: 'timeline',
-        entryId: 'dsh-session-timeline',
-        packageName: '@deepseek-ai/dsh-session-timeline',
-        title: 'Session timeline',
-        author: 'LunFengChen',
-        homepage: 'https://github.com/LunFengChen/deepseek-harness',
-        required: false,
-        defaultEnabled: true,
-        installed: true,
-        enabled: true,
-      }],
-    } as unknown as Snapshot), undefined, undefined, 'catalog')} />)
+  it.each(['global', 'preset'])('resolves each %s row field independently and hides empty English descriptions', async (scope) => {
+    const rows: Snapshot['entries'] = [
+      {
+        entryId: 'include:navigation' as PluginEntryId, moduleName: '@acme/dsh-sidebar/navigation', enabled: true, fiberPhase: null,
+        meta: { description: { en: 'Navigation description.' } },
+      },
+      {
+        entryId: 'include:commands' as PluginEntryId, moduleName: '@acme/dsh-sidebar/commands', enabled: true, fiberPhase: null,
+        meta: { title: { en: 'English title' }, description: { en: 'Package description.', zh: '中文命令说明。' } },
+      },
+      {
+        entryId: 'include:theme' as PluginEntryId, moduleName: '@acme/dsh-theme/client', enabled: true, fiberPhase: null,
+        meta: { title: { en: '@acme/dsh-theme', zh: '主题插件' }, description: { en: '', zh: '中文主题说明。' } },
+      },
+    ]
+    const snapshot: Snapshot = scope === 'global'
+      ? { entries: rows }
+      : { entries: [], agentPresets: [{ id: 'custom', isDefault: true, rows }] }
+    const list = vi.fn(async () => snapshot)
+    const { locale, pageProps } = localizedProps(list)
+    const view = render(<PluginInventorySettingsTab {...pageProps} />)
     await screen.findByRole('searchbox', { name: en.search })
     if (scope === 'global') fireEvent.click(globalToggle())
     expect(screen.getByRole('button', { name: 'sidebar/navigation, include:navigation, Enabled' })).toBeTruthy()
@@ -384,40 +289,18 @@ describe('PluginInventorySettingsTab', () => {
     locale.setLocale('en')
     view.rerender(<PluginInventorySettingsTab {...pageProps} />)
     expect(screen.getByText(en.emptySearch)).toBeTruthy()
-    expect(screen.queryByText('Session timeline')).toBeNull()
+    fireEvent.change(screen.getByRole('searchbox', { name: en.search }), { target: { value: '@acme/dsh-theme/client' } })
+    expect(screen.getAllByRole('listitem')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: '@acme/dsh-theme, include:theme, Enabled' }).getAttribute('aria-describedby')).toBeNull()
+    expect(list).toHaveBeenCalledOnce()
   })
 
-  it('ignores clicks on required catalog plugins and plugins already saving', async () => {
-    const setEnabled = vi.fn().mockImplementation(() => new Promise(() => {}))
-    render(<PluginInventorySettingsTab {...props(async () => ({
-      entries: [],
-      catalog: [{
-        id: 'required',
-        entryId: 'required-entry',
-        packageName: 'required-plugin',
-        title: 'Required plugin',
-        required: true,
-        defaultEnabled: true,
-        installed: true,
-        enabled: true,
-      }, {
-        id: 'saving',
-        entryId: 'saving-entry',
-        packageName: 'saving-plugin',
-        title: 'Saving plugin',
-        required: false,
-        defaultEnabled: true,
-        installed: true,
-        enabled: true,
-      }, {
-        id: 'other',
-        entryId: 'other-entry',
-        packageName: 'other-plugin',
-        title: 'Other plugin',
-        required: false,
-        defaultEnabled: true,
-        installed: true,
-        enabled: true,
+  it('keeps metadata-error-only rows inspectable by their full module specifier', async () => {
+    const error = 'locale/zh.json: invalid title'
+    await renderReady({
+      entries: [{
+        entryId: 'include:legacy' as PluginEntryId, moduleName: '@acme/dsh-legacy', enabled: false, fiberPhase: null,
+        meta: { error },
       }],
     })
     fireEvent.click(globalToggle())
@@ -583,7 +466,7 @@ describe('PluginInventorySettingsTab', () => {
     expect(screen.getByText('Failed to start')).toBeTruthy()
 
     // An enabled entry with no live fiber says so in its details, dot-free.
-    fireEvent.click(screen.getByRole('button', { name: 'unobserved-name, Enabled' }))
+    fireEvent.click(screen.getByRole('button', { name: 'unobserved-name, unobserved, Enabled' }))
     expect(screen.getByText('Not running')).toBeTruthy()
 
     // A disabled row outside every preset stays plainly disabled.
@@ -615,7 +498,7 @@ describe('PluginInventorySettingsTab', () => {
 
   it('folds the preset group on demand and reopens it for a search', async () => {
     const view = await renderReady()
-    const toggle = screen.getByRole('button', { name: en.presetTitle })
+    const toggle = presetToggle()
 
     expect(toggle.getAttribute('aria-expanded')).toBe('true')
     expect(view.container.querySelectorAll('[data-plugin-scope="preset"] li')).toHaveLength(6)
@@ -691,7 +574,7 @@ describe('PluginInventorySettingsTab', () => {
     expect(screen.queryAllByRole('listitem')).toHaveLength(0)
   })
 
-  it('renders a rosterless deployment as one expanded global list', async () => {
+  it('renders a rosterless deployment as one global list, folded until opened', async () => {
     const view = await renderReady({
       entries: [
         { entryId: 'hmr', moduleName: '@deepseek-ai/cordis-plugin-hmr', enabled: true, fiberPhase: 'active' },
@@ -700,6 +583,9 @@ describe('PluginInventorySettingsTab', () => {
     } as unknown as Snapshot)
 
     expect(screen.queryByRole('button', { name: en.switcherLabel })).toBeNull()
+    expect(globalToggle().getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryAllByRole('listitem')).toHaveLength(0)
+    fireEvent.click(globalToggle())
     expect(globalToggle().getAttribute('aria-expanded')).toBe('true')
     expect(screen.getAllByRole('listitem')).toHaveLength(2)
 
@@ -732,7 +618,7 @@ describe('PluginInventorySettingsTab', () => {
       .mockResolvedValueOnce({ entries: [] })
     render(<PluginInventorySettingsTab {...props(list)} />)
 
-    expect((await screen.findByRole('alert')).textContent).toBe(en.error)
+    expect((await screen.findByRole('alert')).querySelector('[data-state="error"]')).not.toBeNull()
     expect(screen.queryByText('private transport detail')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: en.retry }))
     await waitFor(() => { expect(list).toHaveBeenCalledTimes(2) })
@@ -757,4 +643,21 @@ describe('PluginInventorySettingsTab', () => {
     pendingFailure.unmount()
     await act(async () => { deferredFailure.reject(new Error('late failure')) })
   })
+})
+
+it('shows current-page sync errors and retries without re-reading Host inventory', async () => {
+  const list = vi.fn(async () => ({ entries: [] }))
+  const sync = createSnapshotStore<ClientEntryState>({ syncing: true, failures: [] })
+  const retryClient = vi.fn()
+  render(<PluginInventorySettingsTab {...props(list)} useClientSync={bindSnapshotSelector(sync)} retryClient={retryClient} />)
+  expect(screen.getByText(en.clientSyncing).closest('[role="status"]')?.querySelector('[data-state="ongoing"]')).not.toBeNull()
+  await waitFor(() => { expect(list).toHaveBeenCalledOnce() })
+  act(() => { sync.set({ syncing: false, failures: [{ id: 'client-addon', message: 'download failed' }] }) })
+  expect(screen.getByRole('alert').querySelector('[data-state="error"]')).not.toBeNull()
+  expect(screen.getByText('client-addon: download failed')).toBeTruthy()
+  fireEvent.click(screen.getByRole('button', { name: 'Retry this page' }))
+  expect(retryClient).toHaveBeenCalledOnce()
+  expect(list).toHaveBeenCalledOnce()
+  act(() => { sync.set({ syncing: false, failures: [] }) })
+  expect(screen.queryByRole('alert')).toBeNull()
 })

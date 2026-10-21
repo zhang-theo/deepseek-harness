@@ -12,7 +12,7 @@ import {
   SessionFormatUnsupportedError,
   SessionPersistenceNotFoundError,
 } from '@deepseek-ai/dsh-session-persistence'
-import JsonlSessionPersistence from '@deepseek-ai/dsh-session-persistence-jsonl'
+import * as JsonlSessionPersistence from '@deepseek-ai/dsh-session-persistence-jsonl'
 import * as format from '../src/format.ts'
 import { eventLines, generationLogPath, toHeaderLine } from '../src/format.ts'
 import { readJsonlHistorySuffix, readJsonlHistorySuffixFromPath } from '../src/history-suffix.ts'

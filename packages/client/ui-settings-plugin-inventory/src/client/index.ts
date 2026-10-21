@@ -1,4 +1,4 @@
-/** Host plugin inventory and xfdsh preset-plugin settings in Web Settings. */
+/** Read-only Host plugin inventory registered into Web Settings. */
 
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-modules/client'
@@ -13,16 +13,12 @@ import { presetDisplayText } from '@deepseek-ai/dsh-agent-preset-registry/displa
 import { PluginInventorySettingsTab, type PluginInventorySettingsTabInjected } from './PluginInventorySettingsTab.tsx'
 import { en, zh, type PluginInventoryLocaleKey } from './locales.ts'
 
-export type {
-  PluginInventorySettingsTabInjected,
-  PluginInventorySettingsTabProps,
-  PluginInventorySurface,
-} from './PluginInventorySettingsTab.tsx'
+export type { PluginInventorySettingsTabInjected, PluginInventorySettingsTabProps } from './PluginInventorySettingsTab.tsx'
 export type { PluginInventoryLocaleKey } from './locales.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
-    /** Host plugin inventory and profile feature settings copy. */
+    /** Read-only Host plugin inventory copy. */
     'settings.pluginInventory': PluginInventoryLocaleKey
   }
 }
@@ -31,9 +27,9 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 export const NS = 'settings.pluginInventory'
 
 /** Services required by the Settings registration and generated Remote face. */
-export const inject = ['slots', 'locale', 'remote', 'remote.pluginInventory']
+export const inject = ['slots', 'locale', 'remote', 'remote.pluginInventory', 'modules']
 
-/** Contribute the inventory and xfdsh preset-plugin tabs to the Plugins settings section. */
+/** Contribute the lazy inventory tab to the Plugins settings section. */
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-settings-plugin-inventory: dictionaries')
 
@@ -45,37 +41,24 @@ export function apply(ctx: ClientContext): void {
     }
     return result.value
   }
-  const setEnabled: PluginInventorySettingsTabInjected['setEnabled'] = async (request) => {
-    const result = await ctx.remote.pluginInventory.setEnabled(request)
-    if (!result.ok) {
-      throw new Error(`pluginInventory.setEnabled failed: ${result.error.code}: ${result.error.message}`)
-    }
-    return result.value
-  }
   // Resolved per call over ui-agent-preset's dictionaries, so a language
   // switch re-resolves shipped names; user-authored metadata passes through.
   const agentPresetCopy = ctx.locale.bind('settings.agentPreset')
   const presetName: PluginInventorySettingsTabInjected['presetName'] = preset =>
     presetDisplayText(preset, agentPresetCopy).name
-  const injected = (surface: PluginInventorySettingsTabInjected['surface']): PluginInventorySettingsTabInjected => ({
-    list, setEnabled, presetName, surface,
+  const injected = (): PluginInventorySettingsTabInjected => ({
+    list, presetName,
+    resolveText: text => ctx.locale.resolveText(text),
     hooks: { clientSync: ctx.modules.entries.state },
     retryClient: () => { void ctx.modules.entries.retry().catch((error: unknown) => { ctx.logger.error(error) }) },
   })
+
   ctx.slots.inject('settings.plugins.tab', () => ctx.slots.register({
     name: 'settings.plugins.tab',
     id: 'all',
     order: 10,
     label: () => t('tab'),
     locale: NS,
-    inject: () => injected('inventory'),
-  }, PluginInventorySettingsTab))
-  ctx.slots.inject('settings.plugins.tab', () => ctx.slots.register({
-    name: 'settings.plugins.tab',
-    id: 'xfdsh-presets',
-    order: 15,
-    label: () => t('presetTab'),
-    locale: NS,
-    inject: () => injected('catalog'),
+    inject: injected,
   }, PluginInventorySettingsTab))
 }

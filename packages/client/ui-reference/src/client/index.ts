@@ -166,8 +166,7 @@ export function apply(ctx: ClientContext): void {
       const path = ref.startsWith('@"') ? ref.slice(2, -1) : ref.slice(1)
       const cwd = sessions.list.getSnapshot().byId[session.sessionId]?.cwd
       const url = fileAddressFor(session.sessionId, cwd, path)
-      if (appearance === 'folder') ctx.sidebarRight.openResource(url, { params: { directory: true } })
-      else ctx.sidebarRight.openResource(url)
+      ctx.sidebarRight.openResource(url)
       return true
     },
     codec: {

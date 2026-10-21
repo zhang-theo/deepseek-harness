@@ -49,6 +49,12 @@ declare module '@deepseek-ai/cordis' {
 export interface WebRuntimeConfig {
   /** Explicit search provider id. Omitted = auto-select when exactly one usable. */
   readonly searchProvider: Volatile<string | undefined>
+  /**
+   * Ordered search-provider ids used when no explicit provider is pinned.
+   * Unusable ids are skipped; if none are usable, search fails instead of
+   * selecting an unlisted provider.
+   */
+  readonly searchProviderOrder: Volatile<string[] | undefined>
   /** Explicit fetch provider id. Omitted = auto-select when exactly one usable. */
   readonly fetchProvider: Volatile<string | undefined>
 }
@@ -76,6 +82,7 @@ export class WebRuntime extends Service {
    */
   static Config = z.object({
     searchProvider: z.string().volatile(),
+    searchProviderOrder: z.array(z.string()).volatile(),
     fetchProvider: z.string().volatile(),
   })
 
@@ -136,9 +143,11 @@ export class WebRuntime extends Service {
    */
   async search(request: WebSearchRequest, signal?: AbortSignal): Promise<WebSearchResult> {
     const configuredId = this.config.searchProvider.get() ?? this.searchProviderEnv
+    const preferredIds = this.config.searchProviderOrder?.get()
     const provider = resolveProvider({
       providers: this.searchProviders,
       ...configuredId !== undefined ? { configuredId } : {},
+      ...preferredIds !== undefined && preferredIds.length > 0 ? { preferredIds } : {},
     })
     const result = await provider.search(request, signal)
     return capSources(result, request.maxResults)

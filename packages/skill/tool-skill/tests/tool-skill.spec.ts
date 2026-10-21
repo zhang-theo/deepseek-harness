@@ -8,7 +8,7 @@ import { createUserMessage, ToolCallId, type Message } from '@deepseek-ai/dsh-ll
 import type { ContextFormed, MessageSource } from '@deepseek-ai/dsh-llm'
 import { createScope, type Scope } from '@deepseek-ai/dsh-scope'
 import {
-  SESSION_FORMAT_VERSION, Session, SessionId, type SessionEvent, type UserMessage,
+  SESSION_FORMAT_VERSION, Session, SessionId, SessionSeq, type SessionEvent, type UserMessage,
 } from '@deepseek-ai/dsh-session'
 import SystemPrompt, { renderPrompt } from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime, { defineContentToolFixture } from '@deepseek-ai/dsh-tools'

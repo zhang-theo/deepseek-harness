@@ -14,24 +14,15 @@
  * rows the user can still fill in by hand.
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { LlmDiscoveredModel } from '@deepseek-ai/dsh-api-remotes/client'
-import {
-  Button, IconChevronDownOutlineRegular, IconChevronRightOutlineRegular, IconTrashOutlineRegular, Modal, Switch,
-} from '@deepseek-ai/dsh-client-ui-primitives'
-import { IMAGE_INPUT, acceptsImages, withImageInput } from './image-input.ts'
+import { Button, IconPlusOutlineRegular, Modal } from '@deepseek-ai/dsh-client-ui-primitives'
 import { formatCapacity, parseCapacity } from './DeepSeekModelsEditor.tsx'
 import type { ModelsOperations } from './operations.ts'
 import type { DeepSeekModelDraft } from './DeepSeekModelsEditor.tsx'
 import type { en } from './locales.ts'
-import {
-  REASONING_EFFORT_LEVELS,
-  hasCustomReasoningEfforts,
-  reasoningEffortsMap,
-  validateReasoningEfforts,
-} from './reasoning-efforts.ts'
-import type { ReasoningEffortLevel, ReasoningEffortsMap } from './reasoning-efforts.ts'
+import { ModelRow } from './ModelRow.tsx'
 import styles from './ModelsSection.module.css'
 
 /**
@@ -107,9 +98,11 @@ export interface ModelListEditorProps {
   disabled: boolean
   /**
    * Called once per change with whether an endpoint interrogation is in
-   * flight.
+   * flight. The owning card folds it into its own busy state so the surface
+   * around the card — a mode switch, say — can refuse to move while the
+   * answer, and the picker it opens, is still bound for this list.
    */
-  onBusyChange?: (busy: boolean) => void
+  onBusyChange: (busy: boolean) => void
 }
 
 /** The two token counts edited as K/M-suffixed text behind a row's disclosure. */
@@ -142,21 +135,15 @@ function capacitySpelling(value: number | undefined): string {
   return value === undefined ? '' : formatCapacity(value)
 }
 
-/** Adopt a candidate, keeping whatever capacities the provider disclosed. */
+/** Adopt a candidate, preserving disclosed capacities and input types. */
 function adopt(candidate: LlmDiscoveredModel): ModelDraft {
   return {
     id: candidate.id,
     ...candidate.name === undefined ? {} : { name: candidate.name },
     ...candidate.contextWindow === undefined ? {} : { contextWindow: candidate.contextWindow },
     ...candidate.maxTokens === undefined ? {} : { maxTokens: candidate.maxTokens },
-    ...acceptsImages(candidate.inputModalities) ? { input: [...IMAGE_INPUT] } : {},
+    ...candidate.inputModalities === undefined ? {} : { input: [...candidate.inputModalities] },
   }
-}
-
-/** Row-local copy for a custom reasoning map the adapter will refuse. */
-function reasoningFailureCopy(model: ModelDraft, t: ModelListEditorProps['t']): ReactNode {
-  const reasoning = validateReasoningEfforts(model['reasoningEfforts'])
-  return reasoning === undefined ? null : <p className={styles['error']}>{t(reasoning)}</p>
 }
 
 /**
@@ -165,15 +152,30 @@ function reasoningFailureCopy(model: ModelDraft, t: ModelListEditorProps['t']): 
  * @returns the model-list editor.
  */
 export function ModelListEditor(props: ModelListEditorProps): ReactNode {
-  const { models, onChange, probe, operations, t, disabled } = props
+  const { models, onChange, probe, operations, t, disabled, onBusyChange } = props
+  const { catalogProvider } = props
   const [busy, setBusy] = useState(false)
-  useEffect(() => { props.onBusyChange?.(busy) }, [busy, props.onBusyChange])
+  useEffect(() => { onBusyChange(busy) }, [busy, onBusyChange])
   const [failure, setFailure] = useState<string | undefined>(undefined)
+  const [inheritedCatalog, setInheritedCatalog] = useState<{
+    provider: string
+    models: readonly LlmDiscoveredModel[]
+  } | undefined>(undefined)
+  useEffect(() => {
+    if (catalogProvider === undefined) return
+    let current = true
+    void operations.discoverModels(probe.settingsNs, { provider: catalogProvider }).then((answer) => {
+      if (!current) return
+      setInheritedCatalog({ provider: catalogProvider, models: answer.kind === 'found' ? answer.models : [] })
+      setFailure(answer.kind === 'refused' ? answer.message : undefined)
+    })
+    return () => { current = false }
+  }, [catalogProvider, operations, probe.settingsNs])
+  const catalog = inheritedCatalog?.provider === catalogProvider ? inheritedCatalog?.models : undefined
+  const inputDefaults = useMemo(() => new Map(catalog?.map(model => [model.id, model.inputModalities])), [catalog])
   const [candidates, setCandidates] = useState<readonly LlmDiscoveredModel[] | undefined>(undefined)
   const [picked, setPicked] = useState<ReadonlySet<string>>(new Set())
   const [candidateQuery, setCandidateQuery] = useState('')
-  // Rows carry an id and a name; capacities are the exception, so they stay
-  // folded until asked for rather than crowding every row with four inputs.
   const [expanded, setExpanded] = useState<ReadonlySet<number>>(new Set())
   // Capacities are edited as text, so a field's keystrokes are held here rather
   // than re-derived from the parsed count on every change — that would rewrite
@@ -182,15 +184,6 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
   // FIELD: a single buffer would be displaced by editing any other field, and
   // the abandoned one would render its stored NaN as the literal `NaN`.
   const [editing, setEditing] = useState<ReadonlyMap<string, string>>(new Map())
-  // Custom is a radio choice, not the stored map: a row can be Custom with
-  // every level still unchecked, and that must not look like Default (none).
-  const [customizing, setCustomizing] = useState<ReadonlySet<number>>(() => new Set(
-    models.flatMap((model, index) => {
-      const value = model['reasoningEfforts']
-      if (hasCustomReasoningEfforts(value)) return [index]
-      return typeof value === 'object' && value !== null && !Array.isArray(value) ? [index] : []
-    }),
-  ))
 
   /** Buffer key for one capacity field; the row half moves when rows do. */
   const bufferKey = (index: number, field: CapacityField): string => `${String(index)}:${field}`
@@ -244,45 +237,6 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
     }))
   }
 
-  const setImageInput = (index: number, enabled: boolean): void => {
-    onChange(models.map((model, at) => at === index ? withImageInput(model, 'input', enabled) : model))
-  }
-
-  const setEfforts = (index: number, efforts: ReasoningEffortsMap | undefined): void => {
-    const stored = efforts === undefined || Object.keys(efforts).length === 0 ? undefined : efforts
-    onChange(models.map((model, at) => {
-      if (at !== index) return model
-      const copy = { ...model }
-      if (stored === undefined) Reflect.deleteProperty(copy, 'reasoningEfforts')
-      else copy['reasoningEfforts'] = stored
-      return copy
-    }))
-  }
-
-  const setCustomMode = (index: number, custom: boolean): void => {
-    setCustomizing((current) => {
-      const next = new Set(current)
-      if (custom) next.add(index)
-      else next.delete(index)
-      return next
-    })
-    if (!custom) setEfforts(index, undefined)
-  }
-
-  const toggleLevel = (index: number, model: ModelDraft, level: ReasoningEffortLevel, checked: boolean): void => {
-    const current = { ...reasoningEffortsMap(model['reasoningEfforts']) ?? {} }
-    if (checked) current[level] = level === 'off' ? null : level
-    else Reflect.deleteProperty(current, level)
-    setEfforts(index, current)
-  }
-
-  const editWire = (index: number, model: ModelDraft, level: ReasoningEffortLevel, text: string): void => {
-    const current = { ...reasoningEffortsMap(model['reasoningEfforts']) ?? {} }
-    const trimmed = text.trim()
-    current[level] = trimmed.length === 0 ? (level === 'off' ? null : '') : trimmed
-    setEfforts(index, current)
-  }
-
   const fetchModels = async (): Promise<void> => {
     setBusy(true)
     setFailure(undefined)
@@ -298,6 +252,7 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
         return
       }
       const found = answer.models
+      if (catalogProvider !== undefined) setInheritedCatalog({ provider: catalogProvider, models: found })
       if (found.length === 0) {
         setFailure(t('fetchEmpty'))
         return
@@ -451,6 +406,7 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
         disabled={disabled}
         onClick={() => { onChange([...models, { id: '' }]) }}
       >
+        <IconPlusOutlineRegular size={14} />
         {t('addModel')}
       </button>
       {failure !== undefined ? <p className={styles['error']}>{failure}</p> : null}
@@ -498,10 +454,9 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
                       checked={picked.has(candidate.id)}
                       onChange={() => { toggle(candidate.id) }}
                     />
-                    {/* The id alone: it is the string adoption writes, and the
-                        capacities the endpoint reported are adopted with it and
-                        editable in the row that appears. */}
-                    <span className={styles['candidateId']}>{candidate.id}</span>
+                    <span className={styles['candidateId']} title={candidate.name ?? candidate.id}>
+                      {candidate.id}
+                    </span>
                   </label>
                 </li>
               ))}

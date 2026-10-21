@@ -189,7 +189,7 @@
       inject: [webStartup]
       config:
         host: !!js ctx.webStartup.host ?? '127.0.0.1'
-        port: !!js ctx.webStartup.port ?? 3080
+        port: !!js ctx.webStartup.port ?? Number(process.env.DSH_WEB_DEFAULT_PORT ?? '7777')
         tls: !!js ctx.webStartup.tls
         compression: gzip
         compressionLevel: 1
@@ -467,32 +467,32 @@
 
     # Fork convenience plugins. Disable from Settings.
     - id: dsh-session-timeline
-      name: '@deepseek-ai/dsh-session-timeline'
+      name: '@x1a0f3n9/dsh-session-timeline'
       config:
         dshHome: !!js dshSessionPath()
 
     - id: dsh-market
-      name: '@deepseek-ai/dshmarket'
+      name: '@x1a0f3n9/dshmarket'
 
     - id: reasoning-effort
-      name: '@deepseek-ai/dsh-reasoning-effort'
+      name: '@x1a0f3n9/dsh-reasoning-effort'
 
     - id: dsh-context
-      name: '@deepseek-ai/dsh-context'
+      name: '@x1a0f3n9/dsh-context'
 
     - id: better-sidebar
-      name: '@deepseek-ai/dsh-better-sidebar'
+      name: '@x1a0f3n9/dsh-better-sidebar'
 
     # xfdsh defaults HINDSIGHT_SERVER_MODE=daemon (local embed on 127.0.0.1:9077).
     # ~/.hindsight/coding-agent.json still wins for cloud or a self-hosted URL.
     - id: hindsight
-      name: '@deepseek-ai/hindsight-coding-agents/dsh'
+      name: '@x1a0f3n9/hindsight-coding-agents/dsh'
 
     - id: dsh-failover-queue
-      name: '@deepseek-ai/dsh-failover-queue'
+      name: '@x1a0f3n9/dsh-failover-queue'
 
     - id: skills-manager
-      name: '@deepseek-ai/dsh-skills-manager'
+      name: '@x1a0f3n9/dsh-skills-manager'
 
     - id: web-search-pool
       name: '@deepseek-ai/dsh-web-search-pool'

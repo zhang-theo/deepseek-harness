@@ -31,6 +31,12 @@ import {
 } from '@deepseek-ai/dsh-storage-domain'
 import { titleProjectionDefinition } from '@deepseek-ai/dsh-session-title'
 import SessionProjectionCache from '../src/index.ts'
+
+declare module '@deepseek-ai/dsh-session/types' {
+  interface SessionEventMap {
+    'fixtures-test/set-title': { title: string }
+  }
+}
 import { checkpointRow, projectionCacheDomainSpec } from '../src/spec.ts'
 
 const FIXTURES = fileURLToPath(new URL('./fixtures/', import.meta.url))

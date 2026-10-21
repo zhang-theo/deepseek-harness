@@ -313,51 +313,9 @@ export const UserMessageNodeView = memo(function UserMessageNodeView({
           time={data.time}
           clock="start"
           className={css.actions}
-          extraActions={extraActions}
           t={t}
         />
       )}
-    />
-  )
-}
-
-/**
- * User or admitted-steering bubble without the user-actions list slot.
- * ChatNodeSeat uses this when the keyed `conversation.chat.node` renderer is absent.
- * @param props - durable node payload and Chat owner seats.
- * @returns the right-aligned user bubble, including copy actions.
- */
-export function UserMessageFallbackView({
-  node, renderMessageImages, openFile, openSkill, t,
-}: {
-  node: ChatNode<'user' | 'steering'>
-  renderMessageImages: ChatNodeOwnerProps['renderMessageImages']
-  openFile: ChatNodeOwnerProps['openFile']
-  openSkill: ChatNodeOwnerProps['openSkill']
-  t: ChatViewSlotProps['t']
-}): ReactNode {
-  return (
-    <UserMessageBubble
-      data={node.data}
-      renderMessageImages={renderMessageImages}
-      openFile={openFile}
-      openSkill={openSkill}
-      t={t}
-    />
-  )
-}
-
-/** User and admitted-steering keyed Chat renderer. */
-export const UserMessageNodeView = memo(function UserMessageNodeView({
-  node, renderMessageImages, openFile, openSkill, t,
-}: ChatNodeViewProps<'user' | 'steering'>) {
-  return (
-    <UserMessageBubble
-      data={node.data}
-      renderMessageImages={renderMessageImages}
-      openFile={openFile}
-      openSkill={openSkill}
-      t={t}
     />
   )
 })

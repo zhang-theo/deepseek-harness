@@ -61,7 +61,7 @@ import { idleWatchdog, timeoutOf } from '@deepseek-ai/dsh-timeout'
 import type { ResolvedPiAiProviderProfile } from './config.ts'
 import { requestImageTarget, toPiContext } from './context.ts'
 import { conversationUpdates, createModels, getSupportedThinkingLevels } from './models.ts'
-import { toStreamChunks } from './stream.ts'
+import { toStreamChunks, type PiAiStreamDiagnostics } from './stream.ts'
 
 /**
  * Initially active declaration added to an Anthropic request whose projected

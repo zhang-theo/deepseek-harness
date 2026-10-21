@@ -107,7 +107,6 @@ export function CustomProviderCard(props: CustomProviderCardProps): ReactNode {
   const [protocol, setProtocol] = useState(protocols[0] ?? '')
   const [keyDraft, setKeyDraft] = useState('')
   const [models, setModels] = useState<readonly ModelDraft[]>([])
-  const [retryPolicy, setRetryPolicy] = useState<unknown>(undefined)
   const [busy, setBusy] = useState(false)
   const [listBusy, setListBusy] = useState(false)
   useEffect(() => { onBusyChange?.(busy || listBusy) }, [busy, listBusy, onBusyChange])
@@ -136,10 +135,9 @@ export function CustomProviderCard(props: CustomProviderCardProps): ReactNode {
   // string, which the create path reads as "no key supplied" — a route may
   // legitimately authenticate through the provider's own ambient discovery.
   const keyValue = keyDraft.trim()
-  const retryFailure = validateRetryPolicy(retryPolicy)
   const ready = route.length > 0 && !routeInvalid && !routeTaken
     && normalizedBaseURL.length > 0 && !baseUrlInvalid && models.length > 0 && modelFailure === undefined
-    && keyFailure === undefined && retryFailure === undefined
+    && keyFailure === undefined
   // The one blocked gate worth a line under the form. A satisfied card says
   // nothing at all rather than printing an empty paragraph.
   const hint = failure !== undefined || ready
@@ -163,8 +161,6 @@ export function CustomProviderCard(props: CustomProviderCardProps): ReactNode {
     const keyRef = deriveKeyRef(route)
     const storesKey = keyValue.length > 0
     if (!committed) {
-      /* v8 ignore next -- unreachable from the card: the same failure disables submit */
-      if (retryFailure !== undefined) return t(retryFailure)
       const profile = {
         ...displayName.length === 0 ? {} : { displayName },
         // The profile names the conventional reference only when this card is
@@ -175,7 +171,6 @@ export function CustomProviderCard(props: CustomProviderCardProps): ReactNode {
         api: protocol,
         baseURL: normalizedBaseURL,
         models: models.map(model => ({ ...model })),
-        ...retryPolicy === undefined ? {} : { retryPolicy: retryPolicy as JsonValue },
       }
       // `taken` is a snapshot too, so the id check alone cannot see a route
       // declared after this card opened; the revision makes that race a
@@ -294,13 +289,6 @@ export function CustomProviderCard(props: CustomProviderCardProps): ReactNode {
           ? null
           : <p className={styles['error']}>{t(keyFailure === 'keyBlank' ? 'keyBlankNew' : keyFailure)}</p>}
       </div>
-      <RetryPolicyFields
-        value={retryPolicy}
-        onChange={setRetryPolicy}
-        t={t}
-        disabled={profileDisabled}
-        name="provider-retry-policy-new"
-      />
       <ModelListEditor
         models={models}
         onChange={setModels}

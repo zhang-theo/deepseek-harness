@@ -20,8 +20,7 @@ import {
   type SessionIdInjected, type WorkspaceViewStoreHandle,
 } from '../src/client/contract/slots.ts'
 import { WorkspaceBrowser } from '../src/client/rows/WorkspaceBrowser.tsx'
-import { ArchiveSessionMenuItem, SessionArchiveConfirmDialog } from '../src/client/session-actions/ArchiveSession.tsx'
-import { CopySessionIdMenuItem } from '../src/client/session-actions/CopySessionId.tsx'
+import { ArchiveSessionMenuItem, ArchiveSessionRowButton, SessionArchiveConfirmDialog } from '../src/client/session-actions/ArchiveSession.tsx'
 import { ForkSessionMenuItem } from '../src/client/session-actions/ForkSession.tsx'
 import { PinSessionMenuItem, PinSessionRowButton } from '../src/client/session-actions/PinSession.tsx'
 import { RenameSessionMenuItem, SessionRenameDialog } from '../src/client/session-actions/RenameSession.tsx'
@@ -292,6 +291,7 @@ describe('ui-workspace apply', () => {
       ['session-id', 450, SessionIdMenuItem, 'workspace'],
     ])
     expect(rows(ROW_ACTION)).toEqual([
+      ['archive', 100, ArchiveSessionRowButton, 'workspace'],
       ['pin', 200, PinSessionRowButton, 'workspace'],
     ])
     expect(rows('shell.overlay')).toEqual([
@@ -320,8 +320,8 @@ describe('ui-workspace apply', () => {
     // Each share raises its own notices inside its callbacks.
     for (const id of ['pin', 'archive']) {
       expect(faceOf(entry(b.slots, MENU_ITEM, id))).not.toHaveProperty('notify')
+      expect(faceOf(entry(b.slots, ROW_ACTION, id))).not.toHaveProperty('notify')
     }
-    expect(faceOf(entry(b.slots, ROW_ACTION, 'pin'))).not.toHaveProperty('notify')
   })
 
   it.each([true, false])('copies an ID directly without loading its Session (clipboard accepted: %s)', async (accepted) => {
@@ -402,7 +402,7 @@ describe('ui-workspace apply', () => {
     await b.ctx.plugin({ inject: [...inject], apply }).await()
     const pin = faceOf(entry(b.slots, MENU_ITEM, 'pin')) as PinSessionInjected
     const pinButton = faceOf(entry(b.slots, ROW_ACTION, 'pin')) as PinSessionInjected
-    const archive = faceOf(entry(b.slots, MENU_ITEM, 'archive')) as ArchiveSessionInjected
+    const archive = faceOf(entry(b.slots, ROW_ACTION, 'archive')) as ArchiveSessionInjected
     const pinned = pin.hooks.pinned.getSnapshot()
     const archived = pin.hooks.archived.getSnapshot()
     expect(pinned).toEqual(new Set(['one']))
@@ -483,25 +483,20 @@ describe('ui-workspace apply', () => {
     expect(view.getSnapshot().sessionOrderByAccount).toEqual({})
   })
 
-  it('opens archive confirmation without calling the Host, then archives on confirm; Host rejections surface from the hop', async () => {
+  it('archives through the navigation service and raises the archived notice; Host rejections are console diagnostics', async () => {
     const b = await bench()
     declare(b.slots, 'sidebar.workspaces', 'shell.overlay')
     await b.ctx.plugin({ inject: [...inject], apply }).await()
     const archiveSession = vi.spyOn(b.ctx.uiWorkspace, 'archiveSession').mockResolvedValue(undefined)
     const unarchiveSession = vi.spyOn(b.ctx.uiWorkspace, 'unarchiveSession').mockResolvedValue(undefined)
     const toast = faceOf(entry(b.slots, 'shell.overlay', 'workspace.row-toast')) as RowToastInjected
-    const archive = faceOf(entry(b.slots, MENU_ITEM, 'archive')) as ArchiveSessionInjected
-    const confirm = faceOf(entry(b.slots, 'shell.overlay', 'workspace.session-archive')) as SessionArchiveConfirmInjected
+    const archive = faceOf(entry(b.slots, ROW_ACTION, 'archive')) as ArchiveSessionInjected
 
     archive.archiveSession(sid('one'))
-    expect(archiveSession).not.toHaveBeenCalled()
-    expect(confirm.hooks.archiveRequest.getSnapshot()).toEqual({ sessionId: 'one', displayTitle: 'one', activity: [] })
-    expect(toast.hooks.toast.getSnapshot()).toBeNull()
-
-    await expect(confirm.archiveSession(sid('one'))).resolves.toBe('archived')
     expect(archiveSession).toHaveBeenCalledWith('one')
-    expect(toast.hooks.toast.getSnapshot()).toEqual({ kind: 'archived', sessionId: 'one', seq: 1 })
-
+    await vi.waitFor(() => {
+      expect(toast.hooks.toast.getSnapshot()).toEqual({ kind: 'archived', sessionId: 'one', seq: 1 })
+    })
     // The menu row's face is the same behavior; a restore raises no notice.
     const archiveRow = faceOf(entry(b.slots, MENU_ITEM, 'archive')) as ArchiveSessionInjected
     archiveRow.unarchiveSession(sid('one'))
@@ -515,7 +510,8 @@ describe('ui-workspace apply', () => {
     unarchiveSession.mockRejectedValueOnce(unarchiveRejection)
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     try {
-      await expect(confirm.archiveSession(sid('two'))).rejects.toBe(archiveRejection)
+      archive.archiveSession(sid('two'))
+      await vi.waitFor(() => { expect(warn).toHaveBeenCalledWith('session archive rejected:', archiveRejection) })
       archive.unarchiveSession(sid('two'))
       await vi.waitFor(() => { expect(warn).toHaveBeenCalledWith('session unarchive rejected:', unarchiveRejection) })
     } finally {
@@ -538,29 +534,29 @@ describe('ui-workspace apply', () => {
     const archiveSession = vi.spyOn(b.ctx.uiWorkspace, 'archiveSession')
       .mockRejectedValueOnce(refusal)
       .mockResolvedValueOnce(undefined)
-    const archive = faceOf(entry(b.slots, MENU_ITEM, 'archive')) as ArchiveSessionInjected
+    const archive = faceOf(entry(b.slots, ROW_ACTION, 'archive')) as ArchiveSessionInjected
     const confirm = faceOf(entry(b.slots, 'shell.overlay', 'workspace.session-archive')) as SessionArchiveConfirmInjected
     const toast = faceOf(entry(b.slots, 'shell.overlay', 'workspace.row-toast')) as RowToastInjected
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      archive.archiveSession(sid('busy'))
+      await vi.waitFor(() => {
+        expect(confirm.hooks.archiveRequest.getSnapshot()).toEqual({ sessionId: 'busy', displayTitle: 'Busy session', activity })
+      })
+      // The refusal is a question, not a diagnostic, and nothing is archived yet.
+      expect(warn).not.toHaveBeenCalled()
+      expect(toast.hooks.toast.getSnapshot()).toBeNull()
+      expect(archiveSession).toHaveBeenCalledWith('busy')
 
-    archive.archiveSession(sid('busy'))
-    expect(confirm.hooks.archiveRequest.getSnapshot()).toEqual({
-      sessionId: 'busy', displayTitle: 'Busy session', activity: [],
-    })
-    expect(archiveSession).not.toHaveBeenCalled()
-    expect(toast.hooks.toast.getSnapshot()).toBeNull()
-
-    await expect(confirm.archiveSession(sid('busy'))).resolves.toBe('needs-stop')
-    expect(archiveSession).toHaveBeenCalledWith('busy')
-    expect(confirm.hooks.archiveRequest.getSnapshot()).toEqual({
-      sessionId: 'busy', displayTitle: 'Busy session', activity,
-    })
-    expect(toast.hooks.toast.getSnapshot()).toBeNull()
-
-    confirm.settleSessionArchive()
-    expect(confirm.hooks.archiveRequest.getSnapshot()).toBeNull()
-    await confirm.stopAndArchiveSession(sid('busy'))
-    expect(archiveSession).toHaveBeenLastCalledWith('busy', { stopActivity: true })
-    expect(toast.hooks.toast.getSnapshot()).toEqual({ kind: 'stoppedAndArchived', sessionId: 'busy', seq: 1 })
+      // Cancelling settles the request; confirming asks the Host to stop the work.
+      confirm.settleSessionArchive()
+      expect(confirm.hooks.archiveRequest.getSnapshot()).toBeNull()
+      await confirm.stopAndArchiveSession(sid('busy'))
+      expect(archiveSession).toHaveBeenLastCalledWith('busy', { stopActivity: true })
+      expect(toast.hooks.toast.getSnapshot()).toEqual({ kind: 'stoppedAndArchived', sessionId: 'busy', seq: 1 })
+    } finally {
+      warn.mockRestore()
+    }
   })
 
   it('the notice share takes the notice down, undoes an archive, and shows the archived rows', async () => {

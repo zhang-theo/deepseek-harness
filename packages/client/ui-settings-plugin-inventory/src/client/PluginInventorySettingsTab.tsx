@@ -1,12 +1,8 @@
 import { useEffect, useId, useMemo, useState, type ReactNode } from 'react'
 import type { ClientEntryState } from '@deepseek-ai/dsh-client-modules/client'
 import type { ObservableSnapshot } from '@deepseek-ai/dsh-client-store'
-import type {
-  PluginInventoryCatalogEntry,
-  PluginInventorySetEnabledRequest,
-  PluginInventorySetEnabledValue,
-  PluginInventorySnapshot,
-} from '@deepseek-ai/dsh-api-remotes/client'
+import type { PluginInventorySnapshot } from '@deepseek-ai/dsh-api-remotes/client'
+import type { LocalizedText } from '@deepseek-ai/dsh-package-manifest'
 import {
   IconChevronDownOutlineRegular,
   IconSearchOutlineRegular,
@@ -23,26 +19,21 @@ type PluginInventoryEntry = PluginInventorySnapshot['entries'][number]
 type AgentPresetGroup = NonNullable<PluginInventorySnapshot['agentPresets']>[number]
 type AgentPresetRow = AgentPresetGroup['rows'][number]
 
-/** Which Plugins tab this contribution renders. */
-export type PluginInventorySurface = 'inventory' | 'catalog'
-
 /** Registration-side Remote face used by the section. */
 export interface PluginInventorySettingsTabInjected {
+  /** Resolve local package text in the current Client locale at render time. */
+  resolveText: (text: LocalizedText) => string
   /** Page-local module synchronization, independent from the Host inventory. */
   hooks: { clientSync: ObservableSnapshot<ClientEntryState> }
   /** Retry the latest client graph without changing the Host composition. */
   retryClient: () => void
   /** Read a current Host inventory snapshot. */
   list: () => Promise<PluginInventorySnapshot>
-  /** Persist enablement for one prebundled catalog entry. */
-  setEnabled: (request: PluginInventorySetEnabledRequest) => Promise<PluginInventorySetEnabledValue>
   /**
    * Display name for one preset: shipped presets resolve through the
    * agent-preset dictionaries, user-authored ones keep their own metadata.
    */
   presetName: (preset: AgentPresetGroup) => string
-  /** Inventory is session/global Loader rows; catalog is xfdsh preset plugins. */
-  surface: PluginInventorySurface
 }
 type PluginFiberPhase = PluginInventoryEntry['fiberPhase']
 
@@ -75,7 +66,7 @@ function phaseLabel(phase: PluginFiberPhase, t: Translate): string {
   return phase === null ? t('unobserved') : t(PHASE_KEYS[phase])
 }
 
-/** Compact a module specifier without guessing whether its Loader id was generated. */
+/** Compact technical names for Settings without changing their module identity. */
 function moduleShortName(moduleName: string): string {
   const unscoped = moduleName.startsWith('@') ? moduleName.slice(moduleName.indexOf('/') + 1) : moduleName
   return unscoped
@@ -111,53 +102,9 @@ function pluginText(row: PluginInventoryEntry | AgentPresetRow, resolveText: Plu
 /** Match translated text alongside the row's technical module and entry identities. */
 function matches(row: PluginInventoryEntry | AgentPresetRow, normalizedQuery: string, resolveText: PluginInventorySettingsTabInjected['resolveText']): boolean {
   if (normalizedQuery.length === 0) return true
-  return [moduleName, ...entryId === null ? [] : [entryId]]
-    .some(value => value.toLocaleLowerCase().includes(normalizedQuery))
-}
-
-/** `owner/repo` when homepage is a GitHub repository URL; used only for catalog search. */
-function githubOwnerRepo(homepage: string | undefined): string | undefined {
-  if (homepage === undefined || homepage.length === 0) return undefined
-  let url: URL
-  try {
-    url = new URL(homepage)
-  } catch (_invalidUrl) {
-    return undefined
-  }
-  if (url.hostname !== 'github.com' && url.hostname !== 'www.github.com') return undefined
-  const segments = url.pathname.split('/').filter(segment => segment.length > 0)
-  const owner = segments[0]
-  const repo = segments[1]?.replace(/\.git$/u, '')
-  if (owner === undefined || repo === undefined || repo.length === 0) return undefined
-  return `${owner}/${repo}`
-}
-
-/** Whether a prebundled catalog row matches the current search query. */
-function catalogMatches(entry: PluginInventoryCatalogEntry, normalizedQuery: string): boolean {
-  if (normalizedQuery.length === 0) return true
-  return [
-    entry.id,
-    entry.entryId,
-    entry.packageName,
-    entry.version,
-    entry.title,
-    entry.description,
-    entry.author,
-    githubOwnerRepo(entry.homepage),
-  ]
-    .filter((value): value is string => value !== undefined)
-    .some(value => value.toLocaleLowerCase().includes(normalizedQuery))
-}
-
-/** Whether a global Loader row is one of the profile's prebundled catalog plugins. */
-function isPrebundled(
-  moduleName: string,
-  entryId: string,
-  catalog: readonly PluginInventoryCatalogEntry[],
-): boolean {
-  return catalog.some(item => item.packageName === moduleName
-    || entryId === item.entryId
-    || entryId.endsWith(`:${item.entryId}`))
+  const { title, description } = pluginText(row, resolveText)
+  return [row.moduleName, row.entryId, title, description]
+    .some(value => value?.toLocaleLowerCase().includes(normalizedQuery))
 }
 
 /** The roster row shown when the preset switcher has no explicit choice. */
@@ -174,9 +121,14 @@ function presetLabel(preset: AgentPresetGroup, t: Translate, presetName: (preset
 }
 
 /** One expandable plugin card; the caller owns the trailing status content. */
-function PluginCard({ rowKey, moduleName, entryId, trailing, ariaLabel, failed, expanded, onToggle, children }: {
+function PluginCard({
+  rowKey, moduleName, title, description, metadataError, entryId, trailing, ariaLabel, failed, expanded, onToggle, children,
+}: {
   readonly rowKey: string
   readonly moduleName: string
+  readonly title: string
+  readonly description: string | undefined
+  readonly metadataError: string | undefined
   readonly entryId: string | null
   readonly trailing: ReactNode
   readonly ariaLabel: string
@@ -187,6 +139,7 @@ function PluginCard({ rowKey, moduleName, entryId, trailing, ariaLabel, failed, 
 }): ReactNode {
   const open = expanded === rowKey
   const detailId = `plugin-details-${encodeURIComponent(rowKey)}`
+  const descriptionId = useId()
   return (
     <li
       className={css.card}
@@ -201,12 +154,15 @@ function PluginCard({ rowKey, moduleName, entryId, trailing, ariaLabel, failed, 
         aria-expanded={open}
         aria-controls={detailId}
         aria-label={ariaLabel}
+        aria-describedby={description === undefined ? undefined : descriptionId}
         onClick={() => { onToggle(rowKey) }}
       >
-        <strong className={css.cardTitle} title={moduleName}>{moduleShortName(moduleName)}</strong>
-        <span className={css.cardTrailing}>
-          {trailing}
-          <IconChevronDownOutlineRegular className={css.chevron} size={12} aria-hidden="true" />
+        <span className={css.cardMainRow}>
+          <strong className={css.cardTitle} title={moduleName}>{title}</strong>
+          <span className={css.cardTrailing}>
+            {trailing}
+            <IconChevronDownOutlineRegular className={css.chevron} size={12} aria-hidden="true" />
+          </span>
         </span>
         {description === undefined ? null : <span className={css.cardDescription} id={descriptionId}>{description}</span>}
         {idAddsToTitle(entryId, title) ? (
@@ -215,6 +171,7 @@ function PluginCard({ rowKey, moduleName, entryId, trailing, ariaLabel, failed, 
           </span>
         ) : null}
       </button>
+      {metadataError === undefined ? null : <p className={css.brokenNote} role="status" data-package-meta-error>{metadataError}</p>}
       {open ? <div className={css.cardDetails} id={detailId}>{children}</div> : null}
     </li>
   )
@@ -246,7 +203,7 @@ function CardFacts({ moduleName, moduleLabel, entryId, facts }: {
   )
 }
 
-/* `pending` is the only phase with no work under way. `loading` and
+/* `pending` is the only dotted phase with no work under way. `loading` and
  * `unloading` are both live transitions the Host is running — an async
  * disposer can hold `unloading` for a while — so both animate. `active` and
  * `failed` carry no dot: a settled enabled row needs no marker, and a failed
@@ -254,10 +211,8 @@ function CardFacts({ moduleName, moduleLabel, entryId, facts }: {
 const PHASE_DOT_STATES = {
   pending: 'idle',
   loading: 'ongoing',
-  active: 'done',
-  failed: 'error',
   unloading: 'ongoing',
-} as const satisfies Record<NonNullable<PluginFiberPhase>, StateDotState>
+} as const satisfies Partial<Record<NonNullable<PluginFiberPhase>, StateDotState>>
 
 /** A live root-fiber phase the row marks with a dot. */
 type DotPhase = keyof typeof PHASE_DOT_STATES
@@ -293,10 +248,10 @@ function StateTag({ kind, label }: { readonly kind: EnablementKind; readonly lab
   return kind === 'enabled' ? null : <Tag tone={TAG_TONES[kind]}>{label}</Tag>
 }
 
-/** Render the plugin inventory or the xfdsh preset-plugin catalog, depending on `surface`. */
-export function PluginInventorySettingsTab({
-  list, setEnabled, presetName, t, surface = 'inventory', useClientSync, retryClient,
-}: PluginInventorySettingsTabProps): ReactNode {
+/** Render the read-only plugin inventory: agent presets first, then the global plane. */
+export function PluginInventorySettingsTab(
+  { list, presetName, resolveText, t, useClientSync, retryClient }: PluginInventorySettingsTabProps,
+): ReactNode {
   const clientSync = useClientSync(snapshot => snapshot)
   const sectionId = useId()
   const [request, setRequest] = useState(0)
@@ -307,8 +262,6 @@ export function PluginInventorySettingsTab({
   const [presetOpen, setPresetOpen] = useState<boolean | null>(null)
   const [globalOpen, setGlobalOpen] = useState<boolean | null>(null)
   const [state, setState] = useState<ViewState>({ status: 'loading' })
-  const [updatingEntry, setUpdatingEntry] = useState<string | null>(null)
-  const [updateFailed, setUpdateFailed] = useState<string | null>(null)
 
   useEffect(() => {
     let current = true
@@ -322,7 +275,7 @@ export function PluginInventorySettingsTab({
   const normalizedQuery = query.trim().toLocaleLowerCase()
   const searching = normalizedQuery.length > 0
   const snapshot = state.status === 'ready' ? state.snapshot : undefined
-  const presets = surface === 'catalog' ? [] : (snapshot?.agentPresets ?? [])
+  const presets = snapshot?.agentPresets ?? []
   const selected = presets.find(preset => preset.id === chosenPreset) ?? fallbackPreset(presets)
 
   /** Presets that actually enable a module, keyed by module name. */
@@ -339,14 +292,7 @@ export function PluginInventorySettingsTab({
     return found
   }, [presets])
 
-  const catalog = snapshot?.catalog ?? []
-  const showCatalog = surface === 'catalog'
-  const entries = showCatalog
-    ? []
-    : (snapshot?.entries ?? []).filter(entry => !isPrebundled(entry.moduleName, entry.entryId, catalog))
-  const filteredCatalog = showCatalog
-    ? catalog.filter(entry => catalogMatches(entry, normalizedQuery))
-    : []
+  const entries = snapshot?.entries ?? []
   const failedEntries: PluginInventoryEntry[] = []
   const regularEntries: PluginInventoryEntry[] = []
   for (const entry of entries) {
@@ -354,8 +300,8 @@ export function PluginInventorySettingsTab({
     else regularEntries.push(entry)
   }
 
-  const entryMatch = (entry: PluginInventoryEntry): boolean => matches(entry.moduleName, entry.entryId, normalizedQuery)
-  const rowMatch = (row: AgentPresetRow): boolean => matches(row.moduleName, row.entryId, normalizedQuery)
+  const entryMatch = (entry: PluginInventoryEntry): boolean => matches(entry, normalizedQuery, resolveText)
+  const rowMatch = (row: AgentPresetRow): boolean => matches(row, normalizedQuery, resolveText)
   const filteredFailed = failedEntries.filter(entryMatch)
   const filteredRegular = regularEntries.filter(entryMatch)
   const globalCount = filteredFailed.length + filteredRegular.length
@@ -380,36 +326,10 @@ export function PluginInventorySettingsTab({
     setExpanded(current => current === key ? null : key)
   }
 
-  const toggleCatalogEntry = async (entry: PluginInventoryCatalogEntry): Promise<void> => {
-    if (entry.required || updatingEntry !== null) return
-    const enabled = !entry.enabled
-    setUpdatingEntry(entry.entryId)
-    setUpdateFailed(null)
-    try {
-      const result = await setEnabled({ entryId: entry.entryId, enabled })
-      setState(current => current.status !== 'ready' || current.snapshot.catalog === undefined
-        ? current
-        : {
-          status: 'ready',
-          snapshot: {
-            ...current.snapshot,
-            catalog: current.snapshot.catalog.map(candidate => candidate.entryId === entry.entryId
-              ? { ...candidate, enabled: result.enabled }
-              : candidate),
-          },
-        })
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      setUpdateFailed(message.length > 0 ? message : entry.entryId)
-    } finally {
-      setUpdatingEntry(null)
-    }
-  }
-
   /** Trailing status and detail facts for one row of the selected preset. */
   const presetRowCard = (preset: AgentPresetGroup, row: AgentPresetRow, index: number): ReactNode => {
     const key = `preset:${preset.id}:${String(index)}`
-    const title = moduleShortName(row.moduleName)
+    const { title, description } = pluginText(row, resolveText)
     const failed = row.fiberPhase === 'failed'
     const stateText = failed
       ? t('failedTag')
@@ -420,6 +340,9 @@ export function PluginInventorySettingsTab({
         key={key}
         rowKey={key}
         moduleName={row.moduleName}
+        title={title}
+        description={description}
+        metadataError={row.meta?.error === undefined ? undefined : t('metadataError', { error: row.meta.error })}
         entryId={row.entryId}
         failed={failed}
         expanded={expanded}
@@ -427,7 +350,7 @@ export function PluginInventorySettingsTab({
         ariaLabel={cardLabel(title, row.entryId, stateText)}
         trailing={(
           <>
-            {row.enabled === true && !failed && row.fiberPhase !== null
+            {row.enabled === true && showsPhaseDot(row.fiberPhase)
               ? <PhaseDot phase={row.fiberPhase} t={t} />
               : null}
             <StateTag kind={kind} label={stateText} />
@@ -455,7 +378,7 @@ export function PluginInventorySettingsTab({
     providers?: readonly [AgentPresetGroup, ...AgentPresetGroup[]],
   ): ReactNode => {
     const key = `global:${entry.entryId}`
-    const title = moduleShortName(entry.moduleName)
+    const { title, description } = pluginText(entry, resolveText)
     const failed = entry.fiberPhase === 'failed'
     const stateText = failed
       ? t('failedTag')
@@ -466,6 +389,9 @@ export function PluginInventorySettingsTab({
         key={key}
         rowKey={key}
         moduleName={entry.moduleName}
+        title={title}
+        description={description}
+        metadataError={entry.meta?.error === undefined ? undefined : t('metadataError', { error: entry.meta.error })}
         entryId={entry.entryId}
         failed={failed}
         expanded={expanded}
@@ -473,7 +399,7 @@ export function PluginInventorySettingsTab({
         ariaLabel={cardLabel(title, entry.entryId, stateText)}
         trailing={(
           <>
-            {entry.enabled && !failed && entry.fiberPhase !== null
+            {entry.enabled && showsPhaseDot(entry.fiberPhase)
               ? <PhaseDot phase={entry.fiberPhase} t={t} />
               : null}
             <StateTag kind={kind} label={stateText} />
@@ -500,10 +426,16 @@ export function PluginInventorySettingsTab({
 
   return (
     <div className={css.section} aria-busy={state.status === 'loading'}>
-      {clientSync.syncing ? <p className={css.status} role="status">{t('clientSyncing')}</p> : null}
+      {clientSync.syncing ? (
+        <p className={`${css.status} ${css.statusWithDot}`} role="status">
+          <StateDot state="ongoing" />{t('clientSyncing')}
+        </p>
+      ) : null}
       {clientSync.failures.length === 0 ? null : (
         <div className={css.failure} data-client-sync-failure>
-          <p role="alert">{t('clientSyncFailed')}</p>
+          <p className={css.statusWithDot} role="alert">
+            <StateDot state="error" />{t('clientSyncFailed')}
+          </p>
           <ul>{clientSync.failures.map(failure => <li key={failure.id}>{failure.id}: {failure.message}</li>)}</ul>
           <button type="button" disabled={clientSync.syncing} onClick={retryClient}>{t('clientSyncRetry')}</button>
         </div>
@@ -521,7 +453,9 @@ export function PluginInventorySettingsTab({
       ) : null}
       {state.status === 'error' ? (
         <div className={css.failure}>
-          <p role="alert">{t('error')}</p>
+          <p className={css.statusWithDot} role="alert">
+            <StateDot state="error" />{t('error')}
+          </p>
           <button type="button" onClick={retry}>{t('retry')}</button>
         </div>
       ) : null}
@@ -538,75 +472,8 @@ export function PluginInventorySettingsTab({
               onChange={(event) => { setQuery(event.currentTarget.value) }}
             />
           </label>
-          {(showCatalog ? catalog.length === 0 : entries.length === 0 && presets.length === 0)
-            ? <p className={css.status}>{t('empty')}</p>
-            : null}
+          {entries.length === 0 && presets.length === 0 ? <p className={css.status}>{t('empty')}</p> : null}
           {nothingMatches ? <p className={css.status}>{t('emptySearch')}</p> : null}
-
-          {showCatalog && catalog.length > 0 ? (
-            <section className={css.group} data-plugin-scope="catalog">
-              <div className={css.groupTitleRow}>
-                <div className={css.groupTitle}>{t('catalogTitle')}</div>
-              </div>
-              <p className={css.groupSub}>
-                {t('catalogSubtitle')}
-                <span data-plugin-catalog-count={filteredCatalog.length}>
-                  {` · ${String(filteredCatalog.length)} ${t('countUnit')}`}
-                </span>
-              </p>
-              {updateFailed !== null ? <p className={css.updateFailure} role="alert">{t('updateError', { message: updateFailed })}</p> : null}
-              {filteredCatalog.length > 0 ? (
-                <ul className={css.catalogCards}>
-                  {filteredCatalog.map((entry) => {
-                    const title = entry.title ?? moduleShortName(entry.packageName)
-                    const busy = updatingEntry === entry.entryId
-                    const stateText = entry.enabled ? t('enabledTag') : t('disabledTag')
-                    return (
-                      <li key={entry.entryId} className={css.catalogCard} data-plugin-entry={entry.entryId}>
-                        <div className={css.catalogMain}>
-                          <strong className={css.catalogTitle} title={entry.packageName}>{title}</strong>
-                          <div className={css.catalogMeta}>
-                            {entry.homepage !== undefined && entry.homepage.length > 0 ? (
-                              <a
-                                className={css.catalogPackageLink}
-                                href={entry.homepage}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label={t('openPackageGithub', { name: entry.packageName })}
-                              >
-                                <code className={css.catalogPackage}>{entry.packageName}</code>
-                              </a>
-                            ) : (
-                              <code className={css.catalogPackage}>{entry.packageName}</code>
-                            )}
-                            {entry.version !== undefined ? <span className={css.catalogVersion}>{t('catalogVersion', { version: entry.version })}</span> : null}
-                          </div>
-                          {entry.description !== undefined ? <p className={css.catalogDescription}>{entry.description}</p> : null}
-                        </div>
-                        <div className={css.catalogAction}>
-                          {entry.required ? <StateTag kind="enabled" label={t('requiredTag')} /> : null}
-                          <button
-                            type="button"
-                            role="switch"
-                            className={css.pluginSwitch}
-                            aria-checked={entry.enabled}
-                            aria-label={entry.enabled
-                              ? t('disablePlugin', { name: title })
-                              : t('enablePlugin', { name: title })}
-                            disabled={entry.required || busy}
-                            onClick={() => { void toggleCatalogEntry(entry) }}
-                          >
-                            <span className={css.pluginSwitchThumb} />
-                            <span className={css.visuallyHidden}>{stateText}</span>
-                          </button>
-                        </div>
-                      </li>
-                    )
-                  })}
-                </ul>
-              ) : null}
-            </section>
-          ) : null}
 
           {selected !== undefined ? (
             <section className={css.group} data-plugin-scope="preset" data-preset-id={selected.id}>
