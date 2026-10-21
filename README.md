@@ -5,6 +5,16 @@ English | [中文](README.zh.md)
 This repository is **xfdsh**, a fork of [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`).
 The published command is `xfdsh`. Official `dsh` can stay installed.
 
+## Merge status
+
+This branch (`merge/upstream-0.2.1-rc.2`) merges xfdsh onto official DeepSeek Harness 0.2.1-rc.2 (`687f282e86`).
+
+- Source packages use the official `@deepseek-ai/*` scopes so the tree tracks upstream. External prebundled plugins keep their `@x1a0f3n9/*` pins.
+- Kept: the `xfdsh` command, `~/.xfdsh` profiles/plugins, shared `~/.dsh` history, port 7777, the web search pool/free providers, the prebundled plugin catalog, session memory bounds, and the raised goal round cap.
+- Reverted where the fork and 0.2.1 conflicted: the chat scroll view, the settings model editor's retry UI, the plugin-inventory UI, and the fork release pipeline. Upstream implementations now win.
+- Verification: typecheck and build pass; 195 targeted fork-feature tests pass; 3263 of 3304 affected-package tests pass. The 39 failures are upstream tests that assert event counts without the fork's pre-turn `agent/inbox/spliced` event; one further failure needs the optional Hindsight package installed.
+- External prebundled plugins are not installed in a fresh source profile. Install them with `xfdsh plugin --profile web add <package>`; startup logs unresolved rows and continues.
+
 ## Use this fork
 
 Install Node.js, then start the Web UI at `http://127.0.0.1:7777`.

@@ -5,6 +5,16 @@
 这个仓库是 **xfdsh**，[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（`dsh`）的 fork。
 发布出来的命令是 `xfdsh`。官方 `dsh` 可以继续装着。
 
+## 合并状态
+
+本分支（`merge/upstream-0.2.1-rc.2`）把 xfdsh 合并到官方 DeepSeek Harness 0.2.1-rc.2（`687f282e86`）。
+
+- 源码包改回官方 `@deepseek-ai/*` scope，方便继续跟上游；外部预置插件仍使用 `@x1a0f3n9/*` 固定版本。
+- 保留：`xfdsh` 命令、`~/.xfdsh` 插件/profile、共用 `~/.dsh` 历史、7777 端口、Web 搜索池/免费搜索、预置插件目录、会话内存上限和 goal 轮次上限。
+- 与 0.2.1 冲突的部分回退到上游：聊天滚动视图、模型设置里的重试 UI、插件清单 UI，以及 fork 的发布流水线。
+- 验证：typecheck 和构建通过；195 个 fork 功能定向测试通过；受影响包的 3304 个测试中 3263 个通过。39 个失败是上游测试按“turn 开始前不应有事件”计数，而 fork 在 `inbox.append` 时立即写入 `agent/inbox/spliced`；另有 1 个需要安装可选 Hindsight 包。
+- 全新源码 profile 不会自动安装外部预置插件；可用 `xfdsh plugin --profile web add <package>` 安装，启动时会记录未解析的条目并继续。
+
 ## 使用这个 fork
 
 安装 Node.js，然后在 `http://127.0.0.1:7777` 打开 Web UI。
