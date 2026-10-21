@@ -60,7 +60,7 @@ describe('desktop package-set selection', () => {
     expect(() => selectDesktopPackageClosure(available)).toThrow(/unpacked package/u)
     expect(() => selectDesktopPackageClosure(new Map([
       ['@deepseek-ai/dsh', packed('@deepseek-ai/dsh')],
-    ]))).toThrow(/omit @x1a0f3n9\/dsh-desktop-host/u)
+    ]))).toThrow(/omit @deepseek-ai\/dsh-desktop-host/u)
   })
 
   it('leaves independently published Office packages to npm resolution', () => {
