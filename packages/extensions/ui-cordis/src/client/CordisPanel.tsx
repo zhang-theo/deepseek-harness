@@ -6,11 +6,11 @@ import {
   IconCheckOutlineRegular, IconCloseOutlineRegular, IconCordisPluginOutlineRegular, IconPlayOutlineRegular,
   IconStopFillRegular, IconTrashOutlineRegular, StateDot, Tooltip, useDismissOnOutsidePointer,
   type StateDotState,
-} from '@x1a0f3n9/dsh-client-ui-primitives'
-import type { InjectFace, PropsLocale, PropsRuntime } from '@x1a0f3n9/dsh-client-ui-slots'
-import type {} from '@x1a0f3n9/dsh-client-ui-sidebar/client'
-import type { CordisRunActivity } from '@x1a0f3n9/dsh-cordis-client-runner/client'
-import type { SessionId } from '@x1a0f3n9/dsh-api-remotes/client'
+} from '@deepseek-ai/dsh-client-ui-primitives'
+import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
+import type { CordisRunActivity } from '@deepseek-ai/dsh-cordis-client-runner/client'
+import type { SessionId } from '@deepseek-ai/dsh-api-remotes/client'
 import type { CordisInventoryRow } from './dynamic-port.ts'
 import type { CordisPanelFace } from './slots.ts'
 import type { CordisKey } from './locales.ts'

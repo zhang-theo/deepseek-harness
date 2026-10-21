@@ -10,7 +10,7 @@ Status: implemented
 
 ## Decision
 
-`v0.1.12` 默认 `immediateCodes` 是 `AUTH`、`RATE_LIMIT`、`NO_ADAPTER`、`SERVER`、`TIMEOUT`、`TRANSPORT`。这些码会跳过同一条路由剩下的重试，第一次就打开熔断并重试下一档。`EMPTY_RESPONSE` 仍留在同一条路由的 `llm-retry`。xfdsh 钉 `@x1a0f3n9/dsh-failover-queue@0.1.12`。`cooldownMs` 之后的探活回切不变，见 [failover-queue 会探活切回 P1](2026-09-19-failover-queue-circuit-failback.zh.md)。
+`v0.1.12` 默认 `immediateCodes` 是 `AUTH`、`RATE_LIMIT`、`NO_ADAPTER`、`SERVER`、`TIMEOUT`、`TRANSPORT`。这些码会跳过同一条路由剩下的重试，第一次就打开熔断并重试下一档。`EMPTY_RESPONSE` 仍留在同一条路由的 `llm-retry`。xfdsh 钉 `@deepseek-ai/dsh-failover-queue@0.1.12`。`cooldownMs` 之后的探活回切不变，见 [failover-queue 会探活切回 P1](2026-09-19-failover-queue-circuit-failback.zh.md)。
 
 ## Verification
 

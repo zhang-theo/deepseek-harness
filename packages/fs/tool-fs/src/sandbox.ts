@@ -2,20 +2,20 @@
  * The sandbox-escalation API shared by the `write` and `edit` tools: the
  * per-call policy resolution, the advertised escalation fields, and the denial-marker
  * mapping — all delegating the vocabulary and the fail-closed approval
- * sequence to `@x1a0f3n9/dsh-sandbox` (the same pieces `@x1a0f3n9/dsh-tool-bash`
+ * sequence to `@deepseek-ai/dsh-sandbox` (the same pieces `@deepseek-ai/dsh-tool-bash`
  * uses), so bash and fs escalate identically. Built ONCE per plugin from
  * `ctx.fs.sandboxMode` (the capability fact — is a confining backend mounted?)
  * and shared by both mutating tools.
  *
- * @module @x1a0f3n9/dsh-tool-fs/sandbox
+ * @module @deepseek-ai/dsh-tool-fs/sandbox
  */
 
 import type { Context } from '@deepseek-ai/cordis'
-import type { ToolExecution } from '@x1a0f3n9/dsh-tools'
-import type { SandboxExecutionPolicy, SandboxMode } from '@x1a0f3n9/dsh-sandbox'
-import { ESCALATION_TARGETS, approveEscalation, escalationHintMarker, sandboxDenialMarker, sandboxPermissionsDescription, validateEscalationArgs } from '@x1a0f3n9/dsh-sandbox'
-import type { SandboxPolicyService } from '@x1a0f3n9/dsh-sandbox-policy'
-import { FsError } from '@x1a0f3n9/dsh-fs'
+import type { ToolExecution } from '@deepseek-ai/dsh-tools'
+import type { SandboxExecutionPolicy, SandboxMode } from '@deepseek-ai/dsh-sandbox'
+import { ESCALATION_TARGETS, approveEscalation, escalationHintMarker, sandboxDenialMarker, sandboxPermissionsDescription, validateEscalationArgs } from '@deepseek-ai/dsh-sandbox'
+import type { SandboxPolicyService } from '@deepseek-ai/dsh-sandbox-policy'
+import { FsError } from '@deepseek-ai/dsh-fs'
 
 /** The two escalation arguments a mutating tool may carry (advertised only under a confining backend). */
 export interface FsEscalationArgs {
@@ -74,9 +74,9 @@ export class FsSandboxController {
   /**
    * The policy to stamp onto this mutation: an approved escalation grant (a
    * strictly wider retry resolved through `ctx.approval` before anything
-   * executes), else the session's standing mode. Repeating the standing mode
-   * requires no approval. The calling session's cwd is
-   * always carried as the workspace root. Validates the escalation argument
+   * executes), else the Session's standing mode. Repeating the standing mode
+   * requires no approval. The workspace root is the original Session
+   * directory, or the deployment fallback when absent. Validates the escalation argument
    * pairing first.
    * @param toolName - the mutating tool's name, for the approval audit trail.
    * @param args - the call's escalation arguments.

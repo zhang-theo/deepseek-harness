@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { SettingsNamespaceView } from '@x1a0f3n9/dsh-api-remotes/client'
-import { RemoteError } from '@x1a0f3n9/dsh-client-test-runtime'
+import type { SettingsNamespaceView } from '@deepseek-ai/dsh-api-remotes/client'
+import { RemoteError } from '@deepseek-ai/dsh-client-test-runtime'
 import { SettingsDescribeMirror, type SettingsDescribeView } from '../src/client/settings-mirror.ts'
 
 /** What a Remote call answers with: no carrier envelope, and a typed failure. */
@@ -92,15 +92,6 @@ describe('SettingsDescribeMirror', () => {
     await mirror.ensure()
     await mirror.ensure()
     expect(describeCall).toHaveBeenCalledTimes(1)
-  })
-
-  it('memory persistence is terminally unavailable and never touches the wire', async () => {
-    const describeCall = vi.fn()
-    const mirror = new SettingsDescribeMirror(ctxWith(describeCall), 'memory')
-    await mirror.ensure()
-    await mirror.load()
-    expect(mirror.getSnapshot()).toEqual({ status: 'unavailable', view: undefined, error: null })
-    expect(describeCall).not.toHaveBeenCalled()
   })
 
   it('acceptView folds one write answer into the held view without a wire read', async () => {

@@ -20,10 +20,10 @@
 /x1a0f3n9-dsh-client-ui-sidebar-browser/use-this-package/when-to-choose-it:
   en: fb79cb7d59bc01af
   zh: 5f6202d8b0b62d7d
-/x1a0f3n9-dsh-client-ui-sidebar-browser/use-this-package/minimal-configuration:
-  en: 32511e10645b4154
-  zh: ce0e0efd60dda336
-/x1a0f3n9-dsh-client-ui-sidebar-browser/understand-the-implementation:
+/deepseek-ai-dsh-client-ui-sidebar-browser/use-this-package/minimal-configuration:
+  en: abf28ea63777e2a8
+  zh: 1b68bdf5729de71e
+/deepseek-ai-dsh-client-ui-sidebar-browser/understand-the-implementation:
   en: 42b15ac6321706aa
   zh: e15901d8462ec7c7
 /x1a0f3n9-dsh-client-ui-sidebar-browser/understand-the-implementation/protocol-policy:
@@ -47,6 +47,6 @@
 /x1a0f3n9-dsh-client-ui-sidebar-browser/known-limitations-and-deferred-work:
   en: 307604babbe74f38
   zh: 7d7a5aa4b99964d0
-/x1a0f3n9-dsh-client-ui-sidebar-browser/known-limitations-and-deferred-work/dev-note:
-  en: 945685f7066eda81
-  zh: da888e0d3f785bd5
+/deepseek-ai-dsh-client-ui-sidebar-browser/known-limitations-and-deferred-work/dev-note:
+  en: e67f633dc6fe7773
+  zh: e88aeb617ffb74ea

@@ -1,17 +1,17 @@
 // @vitest-environment jsdom
 /** Terminal views, copy, and tab retention follow the plugin lifetime. */
 import { createElement } from 'react'
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { cleanup, render, waitFor } from '@testing-library/react'
 import { Context } from '@deepseek-ai/cordis'
-import type { ShortcutCommand } from '@x1a0f3n9/dsh-client-shortcuts/client'
+import type { ShortcutCommand } from '@deepseek-ai/dsh-client-shortcuts/client'
 import { afterEach, expect, it, vi } from 'vitest'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { WebTerminalId, WebTerminalInfo } from '@x1a0f3n9/dsh-api-terminal-controller/types'
-import { SidebarRightTabRegistry } from '@x1a0f3n9/dsh-client-ui-sidebar-right/src/client/tab-registry.ts'
-import type { SidebarRightCloseHandler } from '@x1a0f3n9/dsh-client-ui-sidebar-right/client'
-import type { SidebarRightOpenTab } from '@x1a0f3n9/dsh-client-ui-sidebar-right/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { WebTerminalId, WebTerminalInfo } from '@deepseek-ai/dsh-api-terminal-controller/types'
+import { SidebarRightTabRegistry } from '@deepseek-ai/dsh-client-ui-sidebar-right/src/client/tab-registry.ts'
+import type { SidebarRightCloseHandler } from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
+import type { SidebarRightOpenTab } from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import { apply, inject } from '../src/client/index.ts'
 import { apply as hostApply } from '../src/index.ts'
 import { TerminalGuide, type TerminalGuideInjected } from '../src/client/TerminalGuide.tsx'
@@ -72,7 +72,7 @@ async function mountPlugin() {
     bind: () => (key: string) => key,
     register: (name: string, values: unknown) => { dictionaries.set(name, values); return () => { dictionaries.delete(name) } },
   } as never)
-  const theme = { preference: 'light' as const, fontSize: 14, active: { id: 'light', colorScheme: 'light' as const, tokens: {} }, themes: [], revision: 0 }
+  const theme = { preference: 'light' as const, fontSizes: { text: 14, code: 11, terminal: 13 }, fontFamilies: { text: '', code: '', terminal: '' }, active: { id: 'light', colorScheme: 'light' as const, tokens: {} }, themes: [], revision: 0 }
   ctx.provide('theme', { getTheme: () => theme } as never)
   const fiber = await ctx.plugin({ inject, apply })
   return {

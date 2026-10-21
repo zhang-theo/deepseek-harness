@@ -7,7 +7,7 @@ import {
   type RetentionNotice,
   TextRetainer,
   truncateWithoutSplittingSurrogatePair,
-} from '@x1a0f3n9/dsh-output-retention'
+} from '@deepseek-ai/dsh-output-retention'
 
 /** Decode a RetainedText via a round-trip helper for readable UTF-8 assertions. */
 const utf8 = (s: string): Uint8Array => new TextEncoder().encode(s)

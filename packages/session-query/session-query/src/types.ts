@@ -2,7 +2,7 @@
  * Public records for exact reads and relationship traces over the
  * live-preferred logical session corpus.
  *
- * @module @x1a0f3n9/dsh-session-query/types
+ * @module @deepseek-ai/dsh-session-query/types
  */
 
 import type {
@@ -14,8 +14,8 @@ import type {
   SessionSeq,
   OptionalSessionSeq,
   SurfaceEvent,
-} from '@x1a0f3n9/dsh-session'
-import type { SessionTitleSnapshot } from '@x1a0f3n9/dsh-session-title'
+} from '@deepseek-ai/dsh-session'
+import type { SessionTitleSnapshot } from '@deepseek-ai/dsh-session-title'
 import type { SessionSearchCursor } from './cursor.ts'
 
 export type { SessionSearchCursor } from './cursor.ts'
@@ -31,6 +31,8 @@ export interface SessionRecord {
   live: boolean
   /** Whether the active persistence backend currently lists the id, including a created-but-unmaterialized session it already observes. */
   persisted: boolean
+  /** Current for live Sessions; otherwise the persistence format status when reported. */
+  formatStatus?: 'current' | 'migration-required'
 }
 
 /** One atomic live-preferred observation of a session's current model surface. */

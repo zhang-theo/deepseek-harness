@@ -2,9 +2,9 @@
 /** Account take-over of the frame-wide quota notice, and its generic fallback. */
 import { act, cleanup, render, fireEvent, screen } from '@testing-library/react'
 import { afterEach, expect, it, vi, type Mock } from 'vitest'
-import type { GlobalStandardProps } from '@x1a0f3n9/dsh-client-ui-slots'
-import type { QuotaNoticeOwnerProps } from '@x1a0f3n9/dsh-client-ui-chat/client'
-import type { AccountView } from '@x1a0f3n9/dsh-deepseek-account/types'
+import type { GlobalStandardProps } from '@deepseek-ai/dsh-client-ui-slots'
+import type { QuotaNoticeOwnerProps } from '@deepseek-ai/dsh-client-ui-chat/client'
+import type { AccountView } from '@deepseek-ai/dsh-deepseek-account/types'
 import type { AccountSnapshot } from '../src/client/AccountSection.tsx'
 import type {} from '../src/client/index.ts'
 import { AccountQuotaNotice } from '../src/client/AccountQuotaNotice.tsx'
@@ -26,7 +26,7 @@ const noticeMessage = 'Request quota exhausted.'
 
 function snapshot(status?: 'signed-out' | 'credential-stored'): AccountSnapshot {
   const view: AccountView = { status: status ?? 'signed-out', attempt: null, links: { usageUrl: '', topUpUrl: '' } }
-  return { view: status === undefined ? undefined : view, details: undefined, failed: false }
+  return { view: status === undefined ? undefined : view, details: undefined, avatar: undefined, failed: false }
 }
 
 /** The live page request channel with its acquisition order retained for ordering assertions. */

@@ -1,25 +1,25 @@
 /**
  * Service Definition for the approval capability seam, covering requests, cancellation, audit, and per-session policy. Missing
  * answerers fail closed; grants apply only to the requested action.
- * @module @x1a0f3n9/dsh-user-approval
+ * @module @deepseek-ai/dsh-user-approval
  */
 
 import { randomUUID } from 'node:crypto'
 import { Context, Service } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import { createUserMessage, type ToolCallId } from '@x1a0f3n9/dsh-llm'
-import type { ContextFormed } from '@x1a0f3n9/dsh-llm'
-declare module '@x1a0f3n9/dsh-llm' {
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import { createUserMessage, type ToolCallId } from '@deepseek-ai/dsh-llm'
+import type { ContextFormed } from '@deepseek-ai/dsh-llm'
+declare module '@deepseek-ai/dsh-llm' {
   interface MessageSourceMap {
     'user-approval': { kind: 'user-approval' } & ContextFormed
   }
 }
 
-import { scopeTarget } from '@x1a0f3n9/dsh-scope'
-import type { Session } from '@x1a0f3n9/dsh-session'
-import { SessionSeq } from '@x1a0f3n9/dsh-session'
-import type {} from '@x1a0f3n9/dsh-system-prompt'
+import { scopeTarget } from '@deepseek-ai/dsh-scope'
+import type { Session } from '@deepseek-ai/dsh-session'
+import { SessionSeq } from '@deepseek-ai/dsh-session'
+import type {} from '@deepseek-ai/dsh-system-prompt'
 
 declare module '@deepseek-ai/cordis' {
   interface Context {
@@ -27,7 +27,7 @@ declare module '@deepseek-ai/cordis' {
   }
 }
 
-declare module '@x1a0f3n9/dsh-session/types' {
+declare module '@deepseek-ai/dsh-session/types' {
   interface SessionEventMap {
     /**
      * The session's approval policy was switched — log-only, durable,

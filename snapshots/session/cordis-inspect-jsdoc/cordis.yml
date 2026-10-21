@@ -1,39 +1,38 @@
-# Add PTC mode and Cordis tools to the base spawn/workflow stack, exercising
-# all four boundaries in one ACP snapshot.
+# Native Cordis inspection alongside the base spawn and workflow capabilities.
 - id: agent-default-model
-  name: '@x1a0f3n9/dsh-agent-default-model'
+  name: '@deepseek-ai/dsh-agent-default-model'
   config:
     provider: deepseek-official
     model: deepseek-v4-pro
 
 - id: session-persistence-jsonl
-  name: '@x1a0f3n9/dsh-session-persistence-jsonl'
+  name: '@deepseek-ai/dsh-session-persistence-jsonl'
   config:
     root: !!js dshHomePath('sessions')
     compression: !!js 'process.env.DSH_SNAPSHOT === undefined ? ''zstd'' : ''none'''
 
 - id: agent-instructions
-  name: '@x1a0f3n9/dsh-agent-instructions'
+  name: '@deepseek-ai/dsh-agent-instructions'
   config:
     maxBytes: 65536
 
 - id: tools
-  name: '@x1a0f3n9/dsh-tools'
+  name: '@deepseek-ai/dsh-tools'
   config:
-    mode: both
+    mode: native
 
 - id: system-prompt
-  name: '@x1a0f3n9/dsh-system-prompt'
+  name: '@deepseek-ai/dsh-system-prompt'
   config:
     personaPrefix: |
-      You are a coding assistant powered by the {{model}} model. Your working directory is {{cwd}}.
+      You are a coding assistant powered by the {{model}} model.
 
       Verify your work by running the code or tests. Keep answers brief and factual.
 
 - insert:
     - id: cordis-host-runner
-      name: '@x1a0f3n9/dsh-cordis-host-runner'
+      name: '@deepseek-ai/dsh-cordis-host-runner'
     - id: cordis-inspect-providers
-      name: '@x1a0f3n9/dsh-tool-cordis/host'
+      name: '@deepseek-ai/dsh-tool-cordis/host'
     - id: tool-cordis
-      name: '@x1a0f3n9/dsh-tool-cordis'
+      name: '@deepseek-ai/dsh-tool-cordis'

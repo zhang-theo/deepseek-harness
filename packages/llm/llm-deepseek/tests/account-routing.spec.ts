@@ -1,24 +1,31 @@
 /** Account route cancellation uses the real loop, registry, and tool lifecycle. */
 import { afterEach, expect, it, vi } from 'vitest'
-import { installAccountTaskCancellation, type DeepSeekAccount } from '@x1a0f3n9/dsh-deepseek-account'
+import { installAccountTaskCancellation, type DeepSeekAccount } from '@deepseek-ai/dsh-deepseek-account'
 import { Context } from '@deepseek-ai/cordis'
-import LlmRuntime, { createUserMessage, LlmAdapter, type GenerateOptions, type StreamChunk, ToolCallId } from '@x1a0f3n9/dsh-llm'
-import AgentRegistry, { type Agent } from '@x1a0f3n9/dsh-agent'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import ToolRuntime, { defineContentToolFixture } from '@x1a0f3n9/dsh-tools'
-import * as DeepSeek from '@x1a0f3n9/dsh-llm-deepseek-api-key'
-import * as AccountProvider from '@x1a0f3n9/dsh-llm-deepseek-account'
+import LlmRuntime, { createUserMessage, LlmAdapter, type GenerateOptions, type StreamChunk, ToolCallId } from '@deepseek-ai/dsh-llm'
+import AgentRegistry, { type Agent } from '@deepseek-ai/dsh-agent'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import ToolRuntime, { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
+import * as DeepSeek from '@deepseek-ai/dsh-llm-deepseek-api-key'
+import * as AccountProvider from '@deepseek-ai/dsh-llm-deepseek-account'
 import { assemble } from './assemble.ts'
 
 const contexts: Context[] = []
 afterEach(async () => {
   vi.restoreAllMocks()
   vi.unstubAllEnvs()
+  vi.unstubAllGlobals()
   for (const ctx of contexts.splice(0)) await ctx.fiber.dispose()
 })
+
+/** Fail the account listing request fast, so the route serves its bundled catalog and fetch mocks see only Messages traffic. */
+function listingRequest(input: string | URL | Request): Response | undefined {
+  const url = new URL(input instanceof Request ? input.url : input)
+  return url.pathname === '/models' ? new Response(null, { status: 404 }) : undefined
+}
 
 async function harness() {
   const ctx = new Context()
@@ -176,7 +183,9 @@ it('propagates account sign-out to the HTTP request signal', async () => {
   const ctx = await harness()
   ctx.provide('deepseekAccount', { resolveToken: async (_url: string) => 'fixture-account-token' } as DeepSeekAccount)
   const started = Promise.withResolvers<AbortSignal>()
-  vi.spyOn(globalThis, 'fetch').mockImplementation(async (_url, init) => {
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
+    const listed = listingRequest(url)
+    if (listed !== undefined) return listed
     const signal = init!.signal!
     expect(new Headers(init!.headers).get('x-dsh-auth-token')).toBe('fixture-account-token')
     started.resolve(signal)
@@ -220,16 +229,17 @@ it('cancels an account child without stopping its API-key parent', async () => {
   await parent.whenIdle()
 })
 
-it('hides signed-out account models while retaining the official catalog without an API key', async () => {
+it('lists each DeepSeek route only when its own credential is present', async () => {
   vi.stubEnv('DEEPSEEK_API_KEY', '')
+  vi.stubGlobal('fetch', vi.fn((input: string | URL | Request) => Promise.resolve(listingRequest(input) ?? new Response(null, { status: 500 }))))
   const ctx = await harness()
   let token: string | undefined
   ctx.provide('deepseekAccount', { resolveToken: async (url: string) => new URL(url).origin === 'https://api.deepseek.com' ? token : undefined } as DeepSeekAccount)
   expect(await ctx.llm.listModels('deepseek-account')).toEqual([])
-  expect(await ctx.llm.listModels('deepseek-official')).not.toHaveLength(0)
+  expect(await ctx.llm.listModels('deepseek-official')).toEqual([])
   token = 'fixture-account-token'
   expect(await ctx.llm.listModels('deepseek-account')).not.toHaveLength(0)
-  expect(await ctx.llm.listModels('deepseek-official')).not.toHaveLength(0)
+  expect(await ctx.llm.listModels('deepseek-official')).toEqual([])
   vi.stubEnv('DEEPSEEK_API_KEY', 'fixture-key')
   expect(await ctx.llm.listModels('deepseek-official')).not.toHaveLength(0)
   token = undefined

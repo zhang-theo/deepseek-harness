@@ -1,13 +1,14 @@
 /** Mandatory-update policy, independent of local business traffic and updater artifacts. */
 
 import { valid } from 'semver'
-import { platformClientHeaders, type AccountClientMetadata } from '@x1a0f3n9/dsh-deepseek-account'
+import { platformClientHeaders, type AccountClientMetadata } from '@deepseek-ai/dsh-deepseek-account'
 
 /** Installed release identity; no field is supplied by a renderer. */
 export interface DesktopPolicyIdentity {
   readonly platform: 'win32' | 'darwin'
   readonly bundledDshVersion: string
   readonly arch: 'x64' | 'arm64'
+  readonly channel: 'nightly' | 'latest'
 }
 
 /** Validated deployment choices; test authentication is explicitly enabled, never inferred from a redirect. */
@@ -158,7 +159,7 @@ export class DesktopMandatoryUpdatePolicy {
   private requestHeaders(): Record<string, string> {
     return {
       ...platformClientHeaders(this.identity.platform, this.client()),
-      'x-client-arch': this.identity.arch, 'x-client-update-channel': 'nightly',
+      'x-client-arch': this.identity.arch, 'x-client-update-channel': this.identity.channel,
       'x-client-bundled-dsh-version': this.identity.bundledDshVersion,
     }
   }

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { WebError } from '@x1a0f3n9/dsh-web'
+import { WebError } from '@deepseek-ai/dsh-web'
 import {
   BRAVE_DEFAULT_BASE_URL,
   JINA_DEFAULT_BASE_URL,
@@ -8,7 +8,7 @@ import {
   parseJinaMarkdown,
   searchWithAdapter,
   SearchPoolHttpError,
-} from '@x1a0f3n9/dsh-web-search-pool'
+} from '@deepseek-ai/dsh-web-search-pool'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' }, ...init })

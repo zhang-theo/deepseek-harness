@@ -4,7 +4,7 @@
  * `null` is the one pnpm's own configuration names. This module runs in the
  * browser too, through the package's `./registry` entry, so the dialog and
  * the Host follow one rule.
- * @module @x1a0f3n9/dsh-plugin-manager/registry
+ * @module @deepseek-ai/dsh-plugin-manager/registry
  */
 
 import type { ParsedInstallSpec } from './install-spec.ts'

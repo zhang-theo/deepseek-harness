@@ -5,22 +5,22 @@
  * It lives in its own leaf because the package root and `./types` both reach
  * `dsh-agent` through the owner and listener signatures, which a Client program
  * cannot resolve even as a type. A browser-safe consumer imports the id here;
- * `Branded<B>` itself comes from the zero-dependency `@x1a0f3n9/dsh-brand`.
+ * `Branded<B>` itself comes from the zero-dependency `@deepseek-ai/dsh-brand`.
  *
- * @module @x1a0f3n9/dsh-jobs/brand
+ * @module @deepseek-ai/dsh-jobs/brand
  */
 
-import type { Branded } from '@x1a0f3n9/dsh-brand'
+import type { Branded } from '@deepseek-ai/dsh-brand'
 
 /**
- * Identifies a background job. The registry generates `<kind>-N`; predictable
- * ids rely on owner authorization rather than secrecy.
+ * Identifies one job across registry lifetimes. The registry generates `<kind>-<short-uuid>`;
+ * access still requires owner authorization.
  */
 export type JobId = Branded<'JobId'>
 
 /**
  * Brand a string as a {@link JobId}.
- * @param id - the raw job-id string (the registry generates `<kind>-N`).
+ * @param id - the raw job-id string (the registry generates 16 UUID hex characters after the kind).
  * @returns the same string, branded; no validation is performed.
  */
 export function JobId(id: string): JobId {

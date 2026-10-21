@@ -8,7 +8,6 @@
 
 - id: system-prompt
   config:
-    personaSuffix: Your working directory is {{cwd}}.
     personaPrefix: >-
       You are a coding agent powered by the {{model}} model.
 
@@ -19,11 +18,11 @@
 
 - insert:
     - id: headless-startup
-      name: '@x1a0f3n9/dsh-headless/startup'
+      name: '@deepseek-ai/dsh-headless/startup'
 
     # Reads its task and run options from the ordinary headlessStartup provider.
     - id: headless-runner
-      name: '@x1a0f3n9/dsh-headless'
+      name: '@deepseek-ai/dsh-headless'
       inject: [headlessStartup]
       config:
         task: !!js ctx.headlessStartup.task
@@ -31,4 +30,14 @@
         json: !!js ctx.headlessStartup.json
 
 - id: hmr
+  disabled: true
+
+# One-shot jobs use launch-time credentials instead of the interactive store.
+- id: credentials
+  disabled: true
+
+- id: authorization
+  disabled: true
+
+- id: deepseek-account
   disabled: true

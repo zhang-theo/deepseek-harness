@@ -5,7 +5,7 @@ import {
   RemoteSnapshotStream,
   RemoteStreamCarrierError,
   type ClientRemote,
-} from '@x1a0f3n9/dsh-api-gateway/client'
+} from '@deepseek-ai/dsh-api-gateway/client'
 import type { WorkspaceFollowFrame, WorkspaceFollowIncrement } from '../types.ts'
 import type { WorkspaceFollowSink } from './model.ts'
 import { ClientWorkspaceModel } from './model.ts'
@@ -98,6 +98,9 @@ export function createWorkspaceStateStream(
 
 function acceptIncrement(accept: WorkspaceFollowSink, frame: WorkspaceFollowIncrement): void {
   switch (frame.type) {
+    case 'replace':
+      accept.replaceBaseline(frame.value)
+      return
     case 'upsert':
       accept.upsertView(frame.workspace)
       return

@@ -1,12 +1,12 @@
 /**
  * Workflow guest inputs and the child callbacks consumed by its VM helpers.
  * PTC transfers initialization data, requests and results as lossless JSON.
- * @module @x1a0f3n9/dsh-workflow-ptc/types
+ * @module @deepseek-ai/dsh-workflow-ptc/types
  */
 
-import type { ContentBlock } from '@x1a0f3n9/dsh-llm'
-import type { ObjectJsonSchema } from '@x1a0f3n9/dsh-tools'
-import type { WorkflowMeta } from '@x1a0f3n9/dsh-workflow'
+import type { ContentBlock } from '@deepseek-ai/dsh-llm'
+import type { ObjectJsonSchema } from '@deepseek-ai/dsh-tools'
+import type { WorkflowMeta } from '@deepseek-ai/dsh-workflow'
 
 /**
  * Ordinary script limits enforced by the guest helpers.

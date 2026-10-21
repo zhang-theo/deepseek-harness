@@ -3,7 +3,7 @@ description: "面向用户与维护者的本地工作区 @file 补全提供方�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-file-reference-local
+# @deepseek-ai/dsh-file-reference-local
 
 [English](README.md) | 中文
 
@@ -25,14 +25,16 @@ agent（智能体）及宿主 UI 可以用各 agent 本地工作区中经过排�
 <a id="use-this-package"></a>
 ## 使用本包
 
-当 `@file` 补全应发现 Harness 宿主自身的文件系统——即随附 `read` 工具所操作的命名空间——时，挂载此提供方。每个 agent 的工作区从该会话的工作目录开始建立索引；会话没有工作目录时回退到宿主进程目录。
+切换 Session 工作目录后，旧目录的搜索索引会被丢弃；下一次补全会搜索新目录。
+
+当 `@file` 补全应发现 Harness 宿主自身的文件系统——即随附 `read` 工具所操作的命名空间——时，挂载此提供方。每个 agent 的工作区从其 Session 当前工作目录开始建立索引。
 
 ### 启用提供方
 
 默认设置适合典型工作区，因此最小挂载无需任何配置：
 
 ```yaml
-- name: '@x1a0f3n9/dsh-file-reference-local'
+- name: '@deepseek-ai/dsh-file-reference-local'
   config:
     maxResults: 20
 ```
@@ -71,7 +73,6 @@ agent（智能体）及宿主 UI 可以用各 agent 本地工作区中经过排�
 |---|---|
 | [`src/index.ts`](src/index.ts) | `LocalFileReferenceService`：配置校验、按 agent 搜索、提示词安装 |
 | [`src/search.ts`](src/search.ts) | `WorkspaceFileSearch`：遍历、排序、排除、陈旧标记与后台重建 |
-| — | 不发布运行时不变式伴生入口；按 agent 的 index 是私有 advisory cache，其失效与 dispose 行为通过服务测试直接观察。 |
 
 ### 主要流程
 

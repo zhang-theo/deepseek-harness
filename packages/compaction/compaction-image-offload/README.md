@@ -3,7 +3,7 @@ description: "The image offload executor for deployments composing compaction: w
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-compaction-image-offload
+# @deepseek-ai/dsh-compaction-image-offload
 
 English | [中文](README.zh.md)
 
@@ -30,7 +30,7 @@ Mount this plugin in every composition that runs the agent loop with an image-ca
 ### Minimal configuration
 
 ```yaml
-- name: '@x1a0f3n9/dsh-compaction-image-offload'
+- name: '@deepseek-ai/dsh-compaction-image-offload'
 ```
 
 ### What you can observe
@@ -39,7 +39,7 @@ Each decision appends one `image/offload` event identifying the selected occurre
 
 ### Failures and recovery
 
-The plugin acts only on `IMAGE_OFFLOAD_REQUIRED` failures that carry `offloadImages`. It walks the surface in model request order, skips assistant nodes and images already marked, and marks that many occurrences. When nothing remains to offload it delegates on the `agent/request-error` waterfall, so downstream recovery or the ordinary turn error applies. The retry spends no provider retry budget and logs no `llm/retry` event.
+The plugin acts only on `IMAGE_OFFLOAD_REQUIRED` failures that carry `offloadImages`. It walks the surface in model request order, skips assistant nodes and images already marked, and marks that many occurrences. When nothing remains to offload it delegates on the `agent/request-error` waterfall, so downstream recovery or the ordinary turn error applies. The retry spends no provider retry budget and logs no `llm/retry` event. Cancellation before recording a selection delegates without adding an `image/offload` event; cancellation after a committed selection stops retry but preserves the omission.
 
 -----
 
@@ -53,7 +53,7 @@ This package owns the event declaration, reference validation, immutable image p
 
 Summary failures use the synchronous `compaction/summary-error` waterfall. The plugin selects only the supplied summary region and returns true after recording an omission. The compaction backend re-derives and re-prices that region before retrying; each retry omits additional retained occurrences, so recovery ends when none remain. Cancellation and unrelated selection changes reject the summary. Recorded omissions survive later failure or cancellation.
 
-No runtime invariant companion is published: the pure projection rejects invalid or repeated image references before Session commits the event, and this executor retains no separate mutable offload state.
+The pure projection rejects invalid or repeated image references before Session commits the event, and this executor retains no separate mutable offload state.
 
 </details>
 

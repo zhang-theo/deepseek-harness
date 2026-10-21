@@ -1,7 +1,7 @@
 /** Shell facts and lookup failures retain remote execution semantics. */
 import { Context } from '@deepseek-ai/cordis'
-import { SubprocessExecutableNotFoundError } from '@x1a0f3n9/dsh-subprocess'
-import { RemoteOperationError } from '@x1a0f3n9/dsh-ssh/protocol'
+import { SubprocessExecutableNotFoundError } from '@deepseek-ai/dsh-subprocess'
+import { RemoteOperationError } from '@deepseek-ai/dsh-ssh/protocol'
 import { expect, it, vi } from 'vitest'
 import { z } from 'zod'
 import { SshSubprocessRuntime } from '../src/index.ts'

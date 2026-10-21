@@ -2,7 +2,7 @@
 
 [English](goal.md) | 中文
 
-事件溯源目标服务及其策略消费方共享的类型。[目标领域 Agent Note](../../.agents/notes/implemented/feature/2026-07-19-persisted-same-session-goal-domain.zh.md) 负责记录持久化与激活决策；本页记录 [`packages/goal/goal/src/types.ts`](../../packages/goal/goal/src/types.ts) 中的确切字段和变体。
+事件溯源目标服务及其策略消费方共享的类型。[目标领域 参考](../../packages/goal/goal/README.zh.md) 负责记录持久化与激活决策；本页记录 [`packages/goal/goal/src/types.ts`](../../packages/goal/goal/src/types.ts) 中的确切字段和变体。
 
 ## 标识与生命周期
 
@@ -293,18 +293,18 @@ Source: [`packages/goal/goal/src/types.ts`](../../packages/goal/goal/src/types.t
 
 #### `goal/changed` — emit
 
-Goal mutation accepted by one live agent. The matching `goal/change` session event has already committed. Listener failures are contained. Scope-filtered dispatch (`@x1a0f3n9/dsh-scope`): agent-scoped listeners receive only that agent.
+Goal mutation accepted by one live agent. The matching `goal/change` session event has already committed. Listener failures are contained. Scope-filtered dispatch (`@deepseek-ai/dsh-scope`): agent-scoped listeners receive only that agent.
 
 ```ts cordis-catalog
 /**
  * Goal mutation accepted by one live agent. The matching `goal/change`
  * session event has already committed. Listener failures are contained.
- * Scope-filtered dispatch (`@x1a0f3n9/dsh-scope`): agent-scoped listeners receive only that agent.
+ * Scope-filtered dispatch (`@deepseek-ai/dsh-scope`): agent-scoped listeners receive only that agent.
  * @param payload.agent - agent whose session owns the goal.
  * @param payload.change - fresh current projection or clear tombstone.
  * @mode emit
  */
-'goal/changed'(this: import('@x1a0f3n9/dsh-scope').Scoped<Agent>, payload: { agent: Agent; change: GoalChanged }): void
+'goal/changed'(this: import('@deepseek-ai/dsh-scope').Scoped<Agent>, payload: { agent: Agent; change: GoalChanged }): void
 ```
 
 Types: [Agent](core.zh.md) · [Scoped](scope.zh.md)

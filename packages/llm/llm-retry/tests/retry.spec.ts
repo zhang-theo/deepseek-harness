@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import type { Fiber } from '@deepseek-ai/cordis'
-import LlmRuntime, { createUserMessage, ToolCallId, EMPTY_RESPONSE_CODE, LlmAdapter, LlmError, expandAssistantStream, resolveRetryPolicy  } from '@x1a0f3n9/dsh-llm'
+import LlmRuntime, { createUserMessage, ToolCallId, EMPTY_RESPONSE_CODE, LlmAdapter, LlmError, expandAssistantStream, resolveRetryPolicy  } from '@deepseek-ai/dsh-llm'
 import type {
   AlwaysRetryPolicyConfig,
   BackoffConfig,
@@ -10,16 +10,16 @@ import type {
   ResolvedRetryPolicy,
   RetryPolicyConfig,
   StreamChunk,
-} from '@x1a0f3n9/dsh-llm'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import type { SessionEvent, SessionEventMap } from '@x1a0f3n9/dsh-session'
-import type { LlmRetryEventData } from '@x1a0f3n9/dsh-llm-retry/types'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import ToolRuntime, { defineContentToolFixture } from '@x1a0f3n9/dsh-tools'
-import AgentRegistry from '@x1a0f3n9/dsh-agent'
-import type { Agent, RequestErrorAction } from '@x1a0f3n9/dsh-agent'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
+} from '@deepseek-ai/dsh-llm'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import type { SessionEvent, SessionEventMap } from '@deepseek-ai/dsh-session'
+import type { LlmRetryEventData } from '@deepseek-ai/dsh-llm-retry/types'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import ToolRuntime, { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import type { Agent, RequestErrorAction } from '@deepseek-ai/dsh-agent'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
 import * as retry from '../src/index.ts'
 
 type ScriptEntry = Error | Iterable<StreamChunk> | AsyncIterable<StreamChunk>
@@ -172,6 +172,30 @@ afterEach(async () => {
   vi.useRealTimers()
   await context?.fiber.dispose()
   context = undefined
+})
+
+describe('retry projection', () => {
+  it('keeps the same state when a recorded retry is applied again', async () => {
+    type Definition = { key: string; apply(state: object, event: SessionEvent): object }
+    const definitions: Definition[] = []
+    const { ctx } = await harness(new ScriptedAdapter([]), undefined, (inner) => {
+      const projections = inner.sessionProjections
+      const register = projections.register.bind(projections)
+      projections.register = (spec: Definition) => {
+        definitions.push(spec)
+        return register(spec as never)
+      }
+    })
+    const definition = definitions.find(spec => spec.key === 'llmRetry')!
+    const event: SessionEvent = {
+      type: 'llm/retry',
+      data: { provider: 'mock', policyKey: 'policy', retry: 1, retryId: 'retry-1' },
+    } as never
+    const state = definition.apply({}, event)
+
+    expect(definition.apply(state, event)).toBe(state)
+    await ctx.fiber.dispose()
+  })
 })
 
 describe('provider-routed retry policy', () => {

@@ -27,7 +27,7 @@
  *   web bodies). `head` / `tail` / `headTail`, preserving UTF-8 boundaries at
  *   {@link TextRetainer.finish}.
  *
- * @module @x1a0f3n9/dsh-output-retention
+ * @module @deepseek-ai/dsh-output-retention
  */
 
 /**

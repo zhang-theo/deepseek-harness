@@ -6,13 +6,13 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { SESSION_FORMAT_VERSION, SessionId, SessionSeq } from '@x1a0f3n9/dsh-session'
-import type { SessionEvent, SessionHeader } from '@x1a0f3n9/dsh-session'
+import { SESSION_FORMAT_VERSION, SessionId, SessionSeq } from '@deepseek-ai/dsh-session'
+import type { SessionEvent, SessionHeader } from '@deepseek-ai/dsh-session'
 import {
   SessionFormatUnsupportedError,
   SessionPersistenceNotFoundError,
-} from '@x1a0f3n9/dsh-session-persistence'
-import JsonlSessionPersistence from '@x1a0f3n9/dsh-session-persistence-jsonl'
+} from '@deepseek-ai/dsh-session-persistence'
+import JsonlSessionPersistence from '@deepseek-ai/dsh-session-persistence-jsonl'
 import * as format from '../src/format.ts'
 import { eventLines, generationLogPath, toHeaderLine } from '../src/format.ts'
 import { readJsonlHistorySuffix, readJsonlHistorySuffixFromPath } from '../src/history-suffix.ts'
@@ -408,7 +408,7 @@ describe('readJsonlHistorySuffix', () => {
         turn: 1, step: 1,
         message: {
           id: 'system', role: 'system',
-          source: { kind: 'plugin', plugin: '@x1a0f3n9/dsh-system-prompt' },
+          source: { kind: 'plugin', plugin: '@deepseek-ai/dsh-system-prompt' },
           content: [],
         },
       },

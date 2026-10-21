@@ -1,5 +1,5 @@
 /** Session-owned memory of pending plans already opened automatically. */
-import { defineStore, type EngineStoreHandle } from '@x1a0f3n9/dsh-client-store'
+import { defineStore, type EngineStoreHandle } from '@deepseek-ai/dsh-client-store'
 
 interface PlanReviewState {
   opened: Partial<Record<string, true>>

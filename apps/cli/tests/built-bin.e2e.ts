@@ -11,8 +11,8 @@ import {
   PROTOCOL_VERSION,
   type SessionNotification,
 } from '@agentclientprotocol/sdk'
-import { withFileLock, writeFileAtomic } from '@x1a0f3n9/dsh-atomic-write'
-import { startMockLlmServer } from '@x1a0f3n9/dsh-llm-mock-server'
+import { withFileLock, writeFileAtomic } from '@deepseek-ai/dsh-atomic-write'
+import { startMockLlmServer } from '@deepseek-ai/dsh-llm-mock-server'
 import { entryListSchema } from '@deepseek-ai/cordis-plugin-include'
 import { execa } from 'execa'
 import * as yaml from 'js-yaml'
@@ -119,7 +119,7 @@ function createProfileLifecycleFixture(): ProfileLifecycleFixture {
     '    - id: hmr-timer',
     "      name: '@deepseek-ai/cordis-plugin-timer'",
     '    - id: hmr',
-    "      name: '@x1a0f3n9/dsh-hmr'",
+    "      name: '@deepseek-ai/dsh-hmr'",
     '      config:',
     '        root: []',
     '    - id: profile-lifecycle-fixture',
@@ -212,7 +212,7 @@ function createEnvironmentProbeProfile(home: string, project: string): void {
     name: 'dsh-profile-environment-probe',
     private: true,
     dependencies: {},
-    dsh: { profile: { bundles: ['@x1a0f3n9/dsh-base'] } },
+    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base'] } },
   }, undefined, 2))
   writeFileSync(join(profileDir, 'cordis.patch.yml'), [
     '- insert:',
@@ -235,7 +235,7 @@ interface StartupFixture {
  * A custom profile whose ordinary provider plugin injects `cmdlineArgs`, plus
  * a row that reads its app-owned service through a `!!js` config expression.
  * Both plugin modules resolve
- * `@x1a0f3n9/dsh-cmdline` and `commander` through the profile module
+ * `@deepseek-ai/dsh-cmdline` and `commander` through the profile module
  * fallback, exactly as an installed out-of-tree bundle does.
  */
 function createStartupFixture(): StartupFixture {
@@ -248,7 +248,7 @@ function createStartupFixture(): StartupFixture {
   mkdirSync(bundleDir, { recursive: true })
   writeFileSync(join(bundleDir, 'startup.mjs'), [
     "import { Command } from 'commander'",
-    "import { parseCmdline } from '@x1a0f3n9/dsh-cmdline'",
+    "import { parseCmdline } from '@deepseek-ai/dsh-cmdline'",
     "export const name = 'fixture-startup'",
     "export const inject = ['cmdlineArgs']",
     'export function apply(ctx) {',
@@ -289,7 +289,7 @@ function createStartupFixture(): StartupFixture {
     '    - id: hmr-timer',
     "      name: '@deepseek-ai/cordis-plugin-timer'",
     '    - id: hmr',
-    "      name: '@x1a0f3n9/dsh-hmr'",
+    "      name: '@deepseek-ai/dsh-hmr'",
     '      config:',
     '        root: []',
     '    - id: startup-fixture',
@@ -372,6 +372,7 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
       expect(web.stderr).toBe('')
       expect(web.stdout).toContain('Usage: dsh --profile web')
       expect(web.stdout).toContain('--port <port>')
+      expect(web.stdout).toContain('--public-url <url>')
       expect(web.stdout).not.toContain('dsh web: http://')
 
       const wildcardHost = await runBuiltBin(['web', '--host', '0.0.0.0'], {
@@ -380,7 +381,6 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
       })
       expect(wildcardHost.code).toBe(1)
       expect(wildcardHost.stdout).toBe('')
-      expect(wildcardHost.stderr).toContain('--host 0.0.0.0 is intentionally not supported yet for safety: it would expose remote code execution to the network; use 127.0.0.1 instead')
       expect(wildcardHost.stderr).not.toContain('dsh web: http://')
 
       const headlessHelp = await runBuiltBin(['headless', '--help'], {
@@ -424,7 +424,7 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
     writeFileSync(patch, [
       '- insert:',
       '    - id: missing-sdk-startup-plugin',
-      '      name: "@x1a0f3n9/dsh-missing-sdk-startup-plugin"',
+      '      name: "@deepseek-ai/dsh-missing-sdk-startup-plugin"',
       '',
     ].join('\n'))
     try {
@@ -436,7 +436,7 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
       expect(result.code).toBe(0)
       expect(result.stdout).toBe('')
       expect(result.stderr).toContain('warning: 1 entry did not activate')
-      expect(result.stderr).toContain('@x1a0f3n9/dsh-missing-sdk-startup-plugin')
+      expect(result.stderr).toContain('@deepseek-ai/dsh-missing-sdk-startup-plugin')
     } finally {
       rmSync(home, { recursive: true, force: true })
     }
@@ -666,7 +666,7 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
     }
   }, SPAWN_TIMEOUT_MS + 30_000)
 
-  it('creates a custom profile from the shipped web template before booting it', async () => {
+  it('creates and then replaces a custom profile from the shipped web template before booting it', async () => {
     const home = mkdtempSync(join(tmpdir(), 'dsh-from-default-profile-'))
     try {
       const created = await runBuiltBin(
@@ -684,19 +684,19 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
       }
       expect(manifest.dependencies).toEqual({})
       expect(manifest.dsh.profile).toEqual({
-        bundles: ['@x1a0f3n9/dsh-base', '@x1a0f3n9/dsh-web-app'],
+        bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app'],
       })
       expect(readFileSync(join(dir, 'cordis.patch.yml'), 'utf8')).toContain('[]')
       expect(readFileSync(join(dir, 'pnpm-workspace.yaml'), 'utf8')).toContain('nodeLinker: hoisted')
 
+      writeFileSync(join(dir, 'cordis.patch.yml'), '- id: local-change\n  disabled: true\n')
       const repeated = await runBuiltBin(
         ['rescue', '--from-default-profile', 'web', '--help'],
         { DSH_HOME: home, DSH_TELEMETRY_DISABLED: '1' },
       )
-      expect(repeated.code).toBe(1)
-      expect(repeated.stdout).toBe('')
-      expect(repeated.stderr).toContain('profile "rescue" already exists')
-      expect(repeated.stderr).toContain('omit --from-default-profile to use it')
+      expect(repeated.code).toBe(0)
+      expect(repeated.stderr).toBe('')
+      expect(readFileSync(join(dir, 'cordis.patch.yml'), 'utf8')).not.toContain('local-change')
 
       const reopened = await runBuiltBin(
         ['rescue', '--help'],
@@ -1126,14 +1126,14 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
         dsh: { profile: { bundles: string[] } }
       }
       expect(Object.keys(installed.dependencies).sort()).toEqual(['bundle-alias', 'ordinary-library'])
-      expect(installed.dsh.profile.bundles).toEqual(['@x1a0f3n9/dsh-base', 'bundle-alias'])
-      installed.dsh.profile.bundles = ['@x1a0f3n9/dsh-base']
+      expect(installed.dsh.profile.bundles).toEqual(['@deepseek-ai/dsh-base', 'bundle-alias'])
+      installed.dsh.profile.bundles = ['@deepseek-ai/dsh-base']
       writeFileSync(manifestPath, JSON.stringify(installed))
       const refreshed = await runBuiltBin(['plugin', '--profile', 'alias', 'root'], { DSH_HOME: home }, home)
       expect(refreshed.code).toBe(0)
       expect(refreshed.stderr).not.toContain('declares no dsh.bundle')
       const active = JSON.parse(readFileSync(manifestPath, 'utf8')) as { dsh: { profile: { bundles: string[] } } }
-      expect(active.dsh.profile.bundles).toEqual(['@x1a0f3n9/dsh-base'])
+      expect(active.dsh.profile.bundles).toEqual(['@deepseek-ai/dsh-base'])
       const removed = await runBuiltBin(['plugin', '--profile', 'alias', 'remove', 'bundle-alias'], { DSH_HOME: home }, home)
       expect(removed.code).toBe(0)
       const remaining = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
@@ -1141,7 +1141,7 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
         dsh: { profile: { bundles: string[] } }
       }
       expect(Object.keys(remaining.dependencies)).toEqual(['ordinary-library'])
-      expect(remaining.dsh.profile.bundles).toEqual(['@x1a0f3n9/dsh-base'])
+      expect(remaining.dsh.profile.bundles).toEqual(['@deepseek-ai/dsh-base'])
     } finally {
       rmSync(home, { recursive: true, force: true })
     }
@@ -1157,7 +1157,7 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
         name: 'dsh-profile-up',
         private: true,
         dependencies: { 'late-bundle': 'file:./late-bundle' },
-        dsh: { profile: { bundles: ['@x1a0f3n9/dsh-base'] } },
+        dsh: { profile: { bundles: ['@deepseek-ai/dsh-base'] } },
       }))
       writeFileSync(join(profileDir, 'cordis.patch.yml'), '[]\n')
       // v1: no dsh manifest — a plain dependency.
@@ -1165,7 +1165,7 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
       const first = await runBuiltBin(['plugin', '--profile', 'up', 'root'], { DSH_HOME: home })
       expect(first.code).toBe(0)
       let manifest = JSON.parse(readFileSync(join(profileDir, 'package.json'), 'utf8')) as { dsh: { profile: { bundles: string[] } } }
-      expect(manifest.dsh.profile.bundles).toEqual(['@x1a0f3n9/dsh-base'])
+      expect(manifest.dsh.profile.bundles).toEqual(['@deepseek-ai/dsh-base'])
       // v2: the installed package now declares dsh.bundle (an update landed).
       writeFileSync(join(installed, 'package.json'), JSON.stringify({
         name: 'late-bundle', version: '2.0.0', dsh: { bundle: { patch: './cordis.patch.yml' } },
@@ -1174,7 +1174,7 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
       const second = await runBuiltBin(['plugin', '--profile', 'up', 'root'], { DSH_HOME: home })
       expect(second.code).toBe(0)
       manifest = JSON.parse(readFileSync(join(profileDir, 'package.json'), 'utf8')) as { dsh: { profile: { bundles: string[] } } }
-      expect(manifest.dsh.profile.bundles).toEqual(['@x1a0f3n9/dsh-base'])
+      expect(manifest.dsh.profile.bundles).toEqual(['@deepseek-ai/dsh-base'])
     } finally {
       rmSync(home, { recursive: true, force: true })
     }
@@ -1189,10 +1189,10 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
       const { stdout, code, stderr } = await runBuiltBin(['web', '--dump-default-config'], { DSH_HOME: home })
       expect(code).toBe(0)
       expect(stderr).toBe('')
-      expect(stdout).toContain("name: '@x1a0f3n9/dsh-agent-loop'")
+      expect(stdout).toContain("name: '@deepseek-ai/dsh-agent-loop'")
       expect(stdout).toContain('agents: []')
-      expect(stdout).toContain('# == @x1a0f3n9/dsh-base')
-      expect(stdout).toContain("name: '@x1a0f3n9/dsh-host-webserver'")
+      expect(stdout).toContain('# == @deepseek-ai/dsh-base')
+      expect(stdout).toContain("name: '@deepseek-ai/dsh-host-webserver'")
       expect(existsSync(join(home, 'profiles', 'node_modules'))).toBe(false)
     }, SPAWN_TIMEOUT_MS + 30_000)
 
@@ -1203,7 +1203,7 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
       )
       expect(code).toBe(0)
       expect(stderr).toBe('')
-      expect(stdout).toContain('# == @x1a0f3n9/dsh-web-app')
+      expect(stdout).toContain('# == @deepseek-ai/dsh-web-app')
       expect(existsSync(join(home, 'profiles', 'rescue', 'package.json'))).toBe(true)
     }, SPAWN_TIMEOUT_MS + 30_000)
 
@@ -1226,9 +1226,9 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
       )
       expect(code).toBe(0)
       expect(stderr).toBe('')
-      expect(stdout).toContain("name: '@x1a0f3n9/dsh-headless'")
+      expect(stdout).toContain("name: '@deepseek-ai/dsh-headless'")
       expect(stdout).not.toMatch(/name: '@x1a0f3n9\/dsh-host-/)
-      expect(stdout).not.toContain("name: '@x1a0f3n9/dsh-web-app'")
+      expect(stdout).not.toContain("name: '@deepseek-ai/dsh-web-app'")
       expect(stdout).not.toMatch(/name: '@x1a0f3n9\/dsh-client-/)
     }, SPAWN_TIMEOUT_MS + 30_000)
 
@@ -1241,42 +1241,45 @@ describe.skipIf(!existsSync(dshBin))('dsh BUILT bin (node lib/bin.js, no tsx)', 
       expect(stderr).toBe('')
       const rows = yaml.load(stdout, { schema: entryListSchema }) as Array<{ id?: string; name?: string }>
       expect(rows.map(row => [row.id, row.name])).toEqual([
-        ['sdk-app-startup', '@x1a0f3n9/dsh-sdk-app'],
-        ['sdk-jsonrpc-server', '@x1a0f3n9/dsh-sdk-jsonrpc-server'],
-        ['deepseek-llm-api-extensions', '@x1a0f3n9/dsh-deepseek-llm-api-extensions'],
-        ['session-log-deepseek', '@x1a0f3n9/dsh-session-log-deepseek'],
-        ['plugin-package-inventory-deepseek', '@x1a0f3n9/dsh-plugin-package-inventory-deepseek'],
-        ['llm-deepseek', '@x1a0f3n9/dsh-llm-deepseek-api-key'],
-        ['sandbox', '@x1a0f3n9/dsh-sandbox-local'],
-        ['session-projection', '@x1a0f3n9/dsh-session-projection'],
-        ['sandbox-policy', '@x1a0f3n9/dsh-sandbox-policy'],
-        ['subprocess', '@x1a0f3n9/dsh-subprocess-local'],
-        ['pty', '@x1a0f3n9/dsh-terminal'],
-        ['terminal-bash', '@x1a0f3n9/dsh-terminal-bash'],
-        ['terminal-pwsh', '@x1a0f3n9/dsh-terminal-bash'],
+        ['sdk-app-startup', '@deepseek-ai/dsh-sdk-app'],
+        ['sdk-jsonrpc-server', '@deepseek-ai/dsh-sdk-jsonrpc-server'],
+        ['deepseek-llm-api-extensions', '@deepseek-ai/dsh-deepseek-llm-api-extensions'],
+        ['session-log-deepseek', '@deepseek-ai/dsh-session-log-deepseek'],
+        ['plugin-package-inventory-deepseek', '@deepseek-ai/dsh-plugin-package-inventory-deepseek'],
+        ['llm-deepseek', '@deepseek-ai/dsh-llm-deepseek-api-key'],
+        ['sandbox', '@deepseek-ai/dsh-sandbox-local'],
+        ['filesystem', '@deepseek-ai/dsh-fs-local'],
+        ['attachment-local', '@deepseek-ai/dsh-attachment-local'],
+        ['tool-fs', '@deepseek-ai/dsh-tool-fs'],
+        ['working-directory', '@deepseek-ai/dsh-working-directory'],
+        ['tool-working-directory', '@deepseek-ai/dsh-tool-working-directory'],
+        ['session-projection', '@deepseek-ai/dsh-session-projection'],
+        ['token-meter', '@deepseek-ai/dsh-token-meter'],
+        ['compaction-basic', '@deepseek-ai/dsh-compaction-basic'],
+        ['image-offload', '@deepseek-ai/dsh-compaction-image-offload'],
+        ['sandbox-policy', '@deepseek-ai/dsh-sandbox-policy'],
+        ['subprocess', '@deepseek-ai/dsh-subprocess-local'],
+        ['pty', '@deepseek-ai/dsh-terminal'],
+        ['terminal-bash', '@deepseek-ai/dsh-terminal-bash'],
+        ['terminal-pwsh', '@deepseek-ai/dsh-terminal-bash'],
         ['timer', '@deepseek-ai/cordis-plugin-timer'],
-        ['llm', '@x1a0f3n9/dsh-llm'],
-        ['session', '@x1a0f3n9/dsh-session'],
-        ['session-title', '@x1a0f3n9/dsh-session-title'],
-        ['system-prompt', '@x1a0f3n9/dsh-system-prompt'],
-        ['tools', '@x1a0f3n9/dsh-tools'],
-        ['mcp-resources', '@x1a0f3n9/dsh-mcp-resources'],
-        ['agent', '@x1a0f3n9/dsh-agent'],
-        ['llm-retry', '@x1a0f3n9/dsh-llm-retry'],
-        ['jobs', '@x1a0f3n9/dsh-jobs-local'],
-        ['invariants', '@x1a0f3n9/dsh-invariants'],
-        ['session-invariant', '@x1a0f3n9/dsh-session/invariant'],
-        ['agent-invariant', '@x1a0f3n9/dsh-agent/invariant'],
-        ['scope-invariant', '@x1a0f3n9/dsh-scope/invariant'],
-        ['agent-loop-invariant', '@x1a0f3n9/dsh-agent-loop/invariant'],
-        ['agent-loop', '@x1a0f3n9/dsh-agent-loop'],
-        ['persistent-bash', '@x1a0f3n9/dsh-tool-bash-persistent'],
-        ['persistent-pwsh', '@x1a0f3n9/dsh-tool-pwsh-persistent'],
-        ['sessions', '@x1a0f3n9/dsh-session-persistence-jsonl'],
+        ['llm', '@deepseek-ai/dsh-llm'],
+        ['session', '@deepseek-ai/dsh-session'],
+        ['session-title', '@deepseek-ai/dsh-session-title'],
+        ['system-prompt', '@deepseek-ai/dsh-system-prompt'],
+        ['tools', '@deepseek-ai/dsh-tools'],
+        ['mcp-resources', '@deepseek-ai/dsh-mcp-resources'],
+        ['agent', '@deepseek-ai/dsh-agent'],
+        ['llm-retry', '@deepseek-ai/dsh-llm-retry'],
+        ['jobs', '@deepseek-ai/dsh-jobs-local'],
+        ['agent-loop', '@deepseek-ai/dsh-agent-loop'],
+        ['persistent-bash', '@deepseek-ai/dsh-tool-bash-persistent'],
+        ['persistent-pwsh', '@deepseek-ai/dsh-tool-pwsh-persistent'],
+        ['sessions', '@deepseek-ai/dsh-session-persistence-jsonl'],
       ])
-      expect(stdout).toContain('# == @x1a0f3n9/dsh-sdk-minimal')
-      expect(stdout).not.toContain('@x1a0f3n9/dsh-base')
-      expect(stdout).not.toContain('@x1a0f3n9/dsh-web-app')
+      expect(stdout).toContain('# == @deepseek-ai/dsh-sdk-minimal')
+      expect(stdout).not.toContain('@deepseek-ai/dsh-base')
+      expect(stdout).not.toContain('@deepseek-ai/dsh-web-app')
     }, SPAWN_TIMEOUT_MS * 2 + 30_000)
 
     it('composes the profile user layer and a --patch overlay in order', async () => {

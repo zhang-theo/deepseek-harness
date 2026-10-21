@@ -1,5 +1,5 @@
 /**
- * @x1a0f3n9/dsh-headless — one-shot direct Agent driver. The bundle patch
+ * @deepseek-ai/dsh-headless — one-shot direct Agent driver. The bundle patch
  * rides over dsh-base without Host, HTTP, or browser plugins; this runner
  * creates one Agent through the core registry (or adopts the exact Session a
  * `--session-id` names), drives the task to quiescence, streams provider
@@ -7,28 +7,29 @@
  * stdout, and exits. With `--json` it projects the run as newline-delimited
  * events instead of the final text.
  *
- * @module @x1a0f3n9/dsh-headless
+ * @module @deepseek-ai/dsh-headless
  */
 
 import { randomUUID } from 'node:crypto'
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { brandString } from '@x1a0f3n9/dsh-brand'
-import { installModelSelection } from '@x1a0f3n9/dsh-agent'
-import type { Agent, ModelSelectionRef } from '@x1a0f3n9/dsh-agent'
-import type {} from '@x1a0f3n9/dsh-agent-default-model'
-import type {} from '@x1a0f3n9/dsh-fs'
-import { createUserMessage } from '@x1a0f3n9/dsh-llm'
-import { assertNever } from '@x1a0f3n9/dsh-util-values'
-import { SessionSeq } from '@x1a0f3n9/dsh-session'
-import type { Session, SessionEvent, SessionId, SessionLogOffset } from '@x1a0f3n9/dsh-session'
-import { SessionQueryError } from '@x1a0f3n9/dsh-session-query'
+import { brandString } from '@deepseek-ai/dsh-brand'
+import { installModelSelection } from '@deepseek-ai/dsh-agent'
+import type { Agent, ModelSelectionRef } from '@deepseek-ai/dsh-agent'
+import type {} from '@deepseek-ai/dsh-agent-default-model'
+import type {} from '@deepseek-ai/dsh-fs'
+import { createUserMessage } from '@deepseek-ai/dsh-llm'
+import { assertNever } from '@deepseek-ai/dsh-util-values'
+import { SessionSeq } from '@deepseek-ai/dsh-session'
+import type { Session, SessionEvent, SessionId, SessionLogOffset } from '@deepseek-ai/dsh-session'
+import { SessionQueryError } from '@deepseek-ai/dsh-session-query'
 // Empty type imports carry the loader Context merge for the settlement await,
 // the cmdline Context merge for the appExit host value, and the sessionQuery
 // Context merge for exact Session adoption.
 import type {} from '@deepseek-ai/cordis-plugin-loader'
-import type {} from '@x1a0f3n9/dsh-cmdline'
-import type {} from '@x1a0f3n9/dsh-session-query'
+import type {} from '@deepseek-ai/dsh-cmdline'
+import type {} from '@deepseek-ai/dsh-session-query'
+import type {} from '@deepseek-ai/dsh-subagent'
 import { internals } from './runner-internals.ts'
 import { projectJsonRun, boundJsonLine } from './json-stream.ts'
 
@@ -302,6 +303,7 @@ function fail(io: HeadlessIo, error: unknown, json: boolean): void {
 
 /**
  * Run one task through one Agent and request process exit.
+ * Live Agent failures require a later durable terminal before a recovered run can succeed.
  * @param ctx - plugin context carrying the Agent, default model, Session, and launcher IO services.
  * @param config - task, optional exact Session identity, and output mode.
  * @param io - process-facing effects.
@@ -334,7 +336,7 @@ async function run(ctx: Context, config: Config, io: HeadlessIo): Promise<void> 
   // This bundle composes no preset roster, so the model-facing rows sit in the
   // host plane and the agent reads them from the global layer. A deployment
   // that DOES configure one has to join it here first
-  // (@x1a0f3n9/dsh-agent-preset-registry README, "Composing a child agent").
+  // (@deepseek-ai/dsh-agent-preset-registry README, "Composing a child agent").
   const setup = (agentCtx: Context): void => {
     const selected: ModelSelectionRef = { current: selection, assembled: undefined }
     installModelSelection(agentCtx, selected)
@@ -360,17 +362,33 @@ async function run(ctx: Context, config: Config, io: HeadlessIo): Promise<void> 
   const firstSeq = agent.session.seq
   const projection = config.json === true ? projectJsonRun(ctx, agent, io.stdout, { cwd }) : undefined
   const stopReasoning = projection === undefined ? streamReasoning(ctx, agent, io.stderr) : undefined
+  let failure: { error: unknown; atOffset: SessionLogOffset } | undefined
+  const stopErrors = ctx.on('agent/error', ({ agent: subject, error }) => {
+    if (subject === agent) failure = { error, atOffset: agent.session.seq }
+  })
+  const stopTerminals = ctx.on('session/event', (session, event) => {
+    if (session === agent.session && event.type === 'turn/end'
+      && failure !== undefined && event.seq >= failure.atOffset) failure = undefined
+  })
   try {
     try {
       agent.followup(createUserMessage({
         content: [{ type: 'text', text: task }],
         source: { kind: 'user' },
       }))
-      await agent.whenIdle()
+      const subagents = ctx.get('subagents')
+      while (true) {
+        await agent.whenIdle()
+        const idleSeq = agent.session.seq
+        // Child settlement can wake the parent before the child wait observes it.
+        if (!await subagents?.waitForChildren(agent)
+          && agent.status === 'idle' && agent.session.seq === idleSeq) break
+      }
     } finally {
       stopReasoning?.()
     }
     await sessions.flush(agent.session)
+    if (failure !== undefined) throw failure.error
     const outcome = summarize(agent.session, firstSeq)
     if (projection === undefined) io.stdout.write(outcome.text + '\n')
     else projection.finish(outcome.text)
@@ -379,6 +397,8 @@ async function run(ctx: Context, config: Config, io: HeadlessIo): Promise<void> 
     }
     io.exit(outcome.reason?.kind === 'completed' ? 0 : 1)
   } finally {
+    stopErrors()
+    stopTerminals()
     projection?.dispose()
   }
 }

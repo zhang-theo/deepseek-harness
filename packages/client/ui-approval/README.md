@@ -2,7 +2,7 @@
 description: "Browser approval UI that answers Host permission requests through the scoped interaction path."
 kind: "package-reference"
 ---
-# @x1a0f3n9/dsh-client-ui-approval
+# @deepseek-ai/dsh-client-ui-approval
 
 English | [中文](README.zh.md)
 
@@ -45,5 +45,3 @@ None; approval request and response rendering does not alter a model request.
 None.
 
 </details>
-
-**Runtime invariant:** No companion is published. Registries own and observe the Remote listener and temporary Slot entry.

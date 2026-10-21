@@ -8,7 +8,7 @@
  * Only the three markdown-fence and `run_code` grammars (TypeScript, shell,
  * JSON) load into the singleton at boot — the set every session renders. Every
  * other language in the shared extension table
- * (`@x1a0f3n9/dsh-util-code-language`: python, rust, yaml, markup, …) is
+ * (`@deepseek-ai/dsh-util-code-language`: python, rust, yaml, markup, …) is
  * imported lazily and registered the first time such a language is requested,
  * so a session that never opens a code surface in one of those languages pays
  * neither the grammar modules nor their synchronous init. The first render of a
@@ -116,7 +116,7 @@ const LAZY_GRAMMARS = new Map<string, () => Promise<LangModule>>([
  * a label like `constructor` or `__proto__` must miss instead of resolving an
  * inherited property and crashing the renderer inside shiki. Keys cover both
  * the markdown-fence aliases `CodeBlock` uses, the file-extension language ids
- * `@x1a0f3n9/dsh-util-code-language` resolves, and the short ids
+ * `@deepseek-ai/dsh-util-code-language` resolves, and the short ids
  * `readLangHintForPath` persists, so every caller resolves the same grammars.
  * A new short name in the shared table must be aliased here too. The JS family maps to the TypeScript grammar (see {@link LANGS} for
  * the JSX/TSX approximation). A value not in {@link LANGS} names a
@@ -275,6 +275,16 @@ const regexEngine = createJavaScriptRegexEngine({
   }),
 })
 
+/**
+ * Lines at least this many UTF-16 units long render as one uncolored token.
+ * With the JavaScript regex engine, scanning one JavaScript string-literal
+ * line costs about 70 ms at 1,000 units, 300 ms at 2,000, 600 ms at 5,000 and
+ * 2.5 s at 10,000, so this cap keeps one line within a few frames. A skipped
+ * line leaves the grammar state unchanged: a multi-line construct that opens
+ * or closes on it colors the following lines as if the line were absent.
+ */
+const TOKENIZE_MAX_LINE_LENGTH = 1000
+
 let singleton: HighlighterCore | undefined
 
 /** Representative paths through every boot grammar, compiled before user content is timed. */
@@ -386,7 +396,9 @@ export function highlightToHtml(code: string, lang: string | undefined): string 
   const resolved = grammarForHint(lang)
   if (resolved === undefined) return undefined
   if (!ensureGrammar(resolved)) return undefined
-  return highlighter().codeToHtml(code, { lang: resolved, theme: 'css-variables' })
+  return highlighter().codeToHtml(code, {
+    lang: resolved, theme: 'css-variables', tokenizeMaxLineLength: TOKENIZE_MAX_LINE_LENGTH,
+  })
 }
 
 /**
@@ -492,6 +504,7 @@ export class StreamingHighlightSession {
     return highlighter().codeToTokensBase(text, {
       lang: resolved,
       theme: 'css-variables',
+      tokenizeMaxLineLength: TOKENIZE_MAX_LINE_LENGTH,
       ...(this.state === undefined ? {} : { grammarState: this.state }),
     })
   }
@@ -586,7 +599,9 @@ export function highlightLines(code: string, lang: string | undefined): Highligh
   const resolved = grammarForHint(lang)
   if (resolved === undefined) return undefined
   if (!ensureGrammar(resolved)) return undefined
-  const { tokens } = highlighter().codeToTokens(code, { lang: resolved, theme: 'css-variables' })
+  const { tokens } = highlighter().codeToTokens(code, {
+    lang: resolved, theme: 'css-variables', tokenizeMaxLineLength: TOKENIZE_MAX_LINE_LENGTH,
+  })
   // shiki tokenizes `a\nb` into two lines; a trailing newline (`a\n`) adds a
   // third, empty line the caller's own line array does not carry. Drop that
   // one terminator line so the two structures stay in step. The explicit

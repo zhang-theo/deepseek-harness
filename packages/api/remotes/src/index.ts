@@ -2,33 +2,33 @@
 
 import { homedir } from 'node:os'
 import type { Context } from '@deepseek-ai/cordis'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
+import type { Agent } from '@deepseek-ai/dsh-agent'
 import type {
   TypertRemoteEventDispatch,
   TypertRemoteEventInvocation,
   TypertRemoteEventOutcome,
   TypertRemoteEventSource,
-} from '@x1a0f3n9/dsh-api-gateway'
-import { Deque } from '@x1a0f3n9/dsh-deque'
-import { carrierKeyOf } from '@x1a0f3n9/dsh-scope'
-import { isJsonValue, type JsonValue } from '@x1a0f3n9/dsh-util-values'
+} from '@deepseek-ai/dsh-api-gateway'
+import { Deque } from '@deepseek-ai/dsh-deque'
+import { carrierKeyOf } from '@deepseek-ai/dsh-scope'
+import { isJsonValue, type JsonValue } from '@deepseek-ai/dsh-util-values'
 import { API_REMOTE_FORWARDED_EVENTS } from './remote-events.ts'
 
 // The owner packages' client-safe `./types` exports carry the cordis `Events`
 // declarations for every allowlisted event. Pulling them into this face is what
 // makes the shape assertion below judge real signatures rather than an empty
 // event vocabulary.
-import type {} from '@x1a0f3n9/dsh-commands/types'
-import type {} from '@x1a0f3n9/dsh-cordis-host-runner/types'
-import type {} from '@x1a0f3n9/dsh-credentials/types'
-import type {} from '@x1a0f3n9/dsh-goal/types'
-import type {} from '@x1a0f3n9/dsh-llm/types'
-import type {} from '@x1a0f3n9/dsh-agent-preset-registry/types'
-import type {} from '@x1a0f3n9/dsh-permission-presets/types'
-import type {} from '@x1a0f3n9/dsh-settings/types'
-import type {} from '@x1a0f3n9/dsh-user-approval'
-import type {} from '@x1a0f3n9/dsh-user-questions'
-export type {} from '@x1a0f3n9/dsh-api-session-controller/types'
+import type {} from '@deepseek-ai/dsh-commands/types'
+import type {} from '@deepseek-ai/dsh-cordis-host-runner/types'
+import type {} from '@deepseek-ai/dsh-credentials/types'
+import type {} from '@deepseek-ai/dsh-goal/types'
+import type {} from '@deepseek-ai/dsh-llm/types'
+import type {} from '@deepseek-ai/dsh-agent-preset-registry/types'
+import type {} from '@deepseek-ai/dsh-permission-presets/types'
+import type {} from '@deepseek-ai/dsh-settings/types'
+import type {} from '@deepseek-ai/dsh-user-approval'
+import type {} from '@deepseek-ai/dsh-user-questions'
+export type {} from '@deepseek-ai/dsh-api-session-controller/types'
 
 export { API_REMOTE_FORWARDED_EVENTS } from './remote-events.ts'
 export type { ApiRemoteForwardedEvent } from './types.ts'
@@ -48,10 +48,12 @@ export function apply(ctx: Context): void {
 function remoteEventSource(ctx: Context): TypertRemoteEventSource {
   return (signal) => {
     const queue = new RemoteEventQueue()
-    const disposers = API_REMOTE_FORWARDED_EVENTS.map(({ event, mode }) => {
+    const disposers = API_REMOTE_FORWARDED_EVENTS.map((entry) => {
+      const { event, mode } = entry
       if (mode === 'emit') {
+        const resources = 'resources' in entry ? entry.resources : undefined
         return ctx.on(event as never, ((...args: unknown[]) => {
-          queue.push({ event, args: assertJsonArgs(event, args) })
+          queue.push({ event, args: assertJsonArgs(event, args), ...resources === undefined ? {} : { resources } })
         }) as never)
       }
       return ctx.on(event as never, (function (

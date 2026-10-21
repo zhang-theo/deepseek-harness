@@ -2,7 +2,7 @@
 
 import { Context } from '@deepseek-ai/cordis'
 import { describe, expect, it, vi } from 'vitest'
-import { TestRemote } from '@x1a0f3n9/dsh-client-test-runtime'
+import { TestRemote } from '@deepseek-ai/dsh-client-test-runtime'
 import { SettingsSchemaService } from '../src/client/schema.ts'
 import { ConfigForms } from '../src/client/config-form.ts'
 import { SettingsDescribeMirror } from '../src/client/settings-mirror.ts'
@@ -25,7 +25,7 @@ async function bench(namespaces: readonly string[]) {
   const ctx = new Context()
   new TestRemote(ctx, { settings: { describe: describeCall } })
   const mirror = new SettingsDescribeMirror({ remote: { settings: { describe: describeCall } } } as never)
-  await ctx.plugin(ConfigForms, { mirror, schema: new SettingsSchemaService(ctx), persistence: 'host' }).await()
+  await ctx.plugin(ConfigForms, { mirror, schema: new SettingsSchemaService(ctx) }).await()
   return { ctx, mirror, describeCall }
 }
 

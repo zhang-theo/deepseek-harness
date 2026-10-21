@@ -1,6 +1,6 @@
 /**
  * Fork seed construction over an exact source-event prefix.
- * @module @x1a0f3n9/dsh-session/fork
+ * @module @deepseek-ai/dsh-session/fork
  */
 
 import { openTurnClosers } from './repair.ts'

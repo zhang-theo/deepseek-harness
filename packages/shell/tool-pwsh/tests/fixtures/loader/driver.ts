@@ -7,8 +7,8 @@
  */
 
 import { writeFile } from 'node:fs/promises'
-import { boot, resolveConfigPath } from '@x1a0f3n9/dsh-app-boot'
-import { ToolCallId } from '@x1a0f3n9/dsh-llm'
+import { boot, resolveConfigPath } from '@deepseek-ai/dsh-app-boot'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
 
 const configPath = process.argv[2]
 if (configPath === undefined) throw new Error('tool-pwsh driver requires a config path')
@@ -60,7 +60,11 @@ try {
     promptHasMarkerSection: prompt?.text.includes('Non-zero exits are reported as `[exit code: N]` markers') === true,
     // Normalize PowerShell's platform line endings (CRLF on Windows, LF elsewhere).
     foregroundText: foregroundText.replace(/\r\n/g, '\n'),
+    foregroundCwd: (foreground.value as { cwd: string }).cwd,
+    foregroundMeta: foreground.meta,
     backgroundText: backgroundText.replace(/\r\n/g, '\n'),
+    backgroundCwd: (background.value as { cwd: string }).cwd,
+    backgroundMeta: background.meta,
   }))
 } finally {
   await ctx.fiber.dispose()

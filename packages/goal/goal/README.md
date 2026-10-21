@@ -3,7 +3,7 @@ description: "The persisted same-session goal service for users and maintainers 
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-goal
+# @deepseek-ai/dsh-goal
 
 English | [中文](README.zh.md)
 
@@ -36,7 +36,7 @@ A goal suits one long-running completion objective that should continue across a
 Load the package with a composition entry; the only deployment choice is the default round cap applied to creates that do not name their own.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-goal'
+- name: '@deepseek-ai/dsh-goal'
   config:
     defaultMaxGoalRounds: 100000
 ```
@@ -49,7 +49,7 @@ Load the package with a composition entry; the only deployment choice is the def
 
 ### Session projection
 
-`GoalService` requires `ctx.sessionProjections` ([`@x1a0f3n9/dsh-session-projection`](../../session/session-projection/README.md)) and registers the `goal` projection unit at startup; a composition that omits the projection registry cannot activate `ctx.goals`. The unit's version 6 host state retains the latest valid current goal, every previously used goal id, and the first strict replay failure. Its client view exposes the current goal or `null` before the first create and after a clear tombstone. After a retained replay failure, a matching clear against that last valid current goal recovers the host stream so a later create can proceed. The key merges into both `SessionProjectionStateMap` and `SessionProjectionMap`; carriers serve the client value on the history tail page and the `session/projection` push frame.
+`GoalService` requires `ctx.sessionProjections` ([`@deepseek-ai/dsh-session-projection`](../../session/session-projection/README.md)) and registers the `goal` projection unit at startup; a composition that omits the projection registry cannot activate `ctx.goals`. The unit's version 6 host state retains the latest valid current goal, every previously used goal id, and the first strict replay failure. Its client view exposes the current goal or `null` before the first create and after a clear tombstone. After a retained replay failure, a matching clear against that last valid current goal recovers the host stream so a later create can proceed. The key merges into both `SessionProjectionStateMap` and `SessionProjectionMap`; carriers serve the client value on the history tail page and the `session/projection` push frame.
 
 ### Drive the lifecycle
 
@@ -109,7 +109,6 @@ This section explains how the service realizes the behavior above; the observabl
 | [`src/types.ts`](src/types.ts) | Pure client-safe types: `GoalView`, `GoalSnapshot`, `GoalActivationChanged`, projection-key declaration |
 | [`src/fold.ts`](src/fold.ts) | Strict replay fold and decoder for durable goal changes |
 | [`src/runtime.ts`](src/runtime.ts) | `GoalId` brand, `GoalError` codes, change-version constant |
-| [`src/invariant.ts`](src/invariant.ts) | Invariant companion: independent incremental fold over every attached session |
 
 ### Events and attribution
 
@@ -127,7 +126,7 @@ The package-level contract is enough for most consumers; read these when you nee
 - [Goal subsystem](../../../docs/subsystems/goal.md) — the goal types, durable change payloads, and generated service API.
 - [Goal group map](../README.md) — the goal packages and how they compose.
 - [Generated configuration catalog](../../../docs/config-catalog.md#deepseek-aidsh-goal) — every accepted config field and its source declaration.
-- [Goal domain Agent Note](../../../.agents/notes/implemented/feature/2026-07-19-persisted-same-session-goal-domain.md) — the domain design, alternatives, and decisions.
+- [historical Goal domain Agent Note](../../../.agents/notes/archived/feature/2026-07-19-persisted-same-session-goal-domain.md) — the domain design, alternatives, and decisions.
 
 -----
 

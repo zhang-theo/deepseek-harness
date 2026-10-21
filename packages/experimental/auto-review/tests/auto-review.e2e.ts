@@ -1,32 +1,32 @@
 import { randomUUID } from 'node:crypto'
+import { provideWorkingDirectoryFixture, mountAgentLoopTestDependencies } from '@deepseek-ai/dsh-agent-loop-testkit'
 import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Context } from '@deepseek-ai/cordis'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
-import { mountAgentLoopTestDependencies } from '@x1a0f3n9/dsh-agent-loop-testkit'
-import { SandboxBashExecutor } from '@x1a0f3n9/dsh-bash-sandbox'
-import { NodePtcRuntime } from '@x1a0f3n9/dsh-ptc-runtime-node'
-import * as FsObservationPolicy from '@x1a0f3n9/dsh-fs-observation-policy'
-import { SandboxedFileSystem } from '@x1a0f3n9/dsh-fs-sandbox'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
+import { SandboxBashExecutor } from '@deepseek-ai/dsh-bash-sandbox'
+import { NodePtcRuntime } from '@deepseek-ai/dsh-ptc-runtime-node'
+import * as FsObservationPolicy from '@deepseek-ai/dsh-fs-observation-policy'
+import { SandboxedFileSystem } from '@deepseek-ai/dsh-fs-sandbox'
 import {
   createUserMessage, isAgentLoopRequest, ToolCallId,
   type StreamChunk,
-} from '@x1a0f3n9/dsh-llm'
-import * as LlmDeepSeek from '@x1a0f3n9/dsh-llm-deepseek-api-key'
-import PermissionPresetService, { AUTO_PRESET } from '@x1a0f3n9/dsh-permission-presets'
-import SandboxProvider, { type ConfinedArgv, type SandboxPolicy } from '@x1a0f3n9/dsh-sandbox'
-import SandboxPolicyService from '@x1a0f3n9/dsh-sandbox-policy'
-import { SessionId, type SessionEvent } from '@x1a0f3n9/dsh-session'
-import * as ShellEnv from '@x1a0f3n9/dsh-shell-env'
-import LocalSubprocessRuntime from '@x1a0f3n9/dsh-subprocess-local'
-import * as ToolBash from '@x1a0f3n9/dsh-tool-bash'
-import * as ToolFs from '@x1a0f3n9/dsh-tool-fs'
-import { RUN_CODE_NAME } from '@x1a0f3n9/dsh-tools'
-import ApprovalService, { setApprovalPolicy } from '@x1a0f3n9/dsh-user-approval'
+} from '@deepseek-ai/dsh-llm'
+import * as LlmDeepSeek from '@deepseek-ai/dsh-llm-deepseek-api-key'
+import PermissionPresetService, { AUTO_PRESET } from '@deepseek-ai/dsh-permission-presets'
+import SandboxProvider, { type ConfinedArgv, type SandboxPolicy } from '@deepseek-ai/dsh-sandbox'
+import SandboxPolicyService from '@deepseek-ai/dsh-sandbox-policy'
+import { SessionId, type SessionEvent } from '@deepseek-ai/dsh-session'
+import * as ShellEnv from '@deepseek-ai/dsh-shell-env'
+import LocalSubprocessRuntime from '@deepseek-ai/dsh-subprocess-local'
+import * as ToolBash from '@deepseek-ai/dsh-tool-bash'
+import * as ToolFs from '@deepseek-ai/dsh-tool-fs'
+import { RUN_CODE_NAME } from '@deepseek-ai/dsh-tools'
+import ApprovalService, { setApprovalPolicy } from '@deepseek-ai/dsh-user-approval'
 import { expect, it, vi } from 'vitest'
-import * as AutoReview from '@x1a0f3n9/dsh-experimental-auto-review'
+import * as AutoReview from '@deepseek-ai/dsh-experimental-auto-review'
 
 const PROVIDER = 'deepseek-official'
 const FLASH = 'deepseek-v4-flash'
@@ -130,7 +130,7 @@ async function* observe(
 
 async function mount(ctx: Context, workspace: string, dshHome: string): Promise<void> {
   await mountAgentLoopTestDependencies(ctx, {
-    systemPrompt: {}, tools: { mode: 'both' },
+    systemPrompt: {}, tools: { mode: 'native' },
   })
   // No reasoning or output-budget override: use each shipped model's defaults.
   await ctx.plugin(LlmDeepSeek, { retryPolicy: { mode: 'normal', maxRetries: 0 } })
@@ -253,6 +253,7 @@ it('certifies eight Auto risk/authorization cases with zero retries and zero ski
   if (REAL && !process.env.DEEPSEEK_API_KEY) throw new Error('Real Auto certification requires DEEPSEEK_API_KEY')
   const root = await mkdtemp(join(tmpdir(), 'dsh-auto-review-'))
   const ctx = new Context()
+  provideWorkingDirectoryFixture(ctx)
   try {
     await chmod(root, 0o700)
     const workspace = join(root, 'workspace')
@@ -313,6 +314,7 @@ it('certifies eight Auto risk/authorization cases with zero retries and zero ski
         sessionId: SessionId(randomUUID()), meta: { cwd: workspace }, agentOptions: { provider: PROVIDER, model },
       })
       try {
+        if (path === 'ptc-inner') handle.agent.ctx.tools.presentAs('ptc')
         selectFinalAuto(ctx, handle.agent.session)
         const command = `rm -- ${quote(target)}`
         await runCase(handle.agent, 'M01-unauthorized', path, command,
@@ -360,6 +362,7 @@ it.each(['native', 'ptc-inner'] as const)('feeds denial back, re-reviews a new c
 }, async (path) => {
   const root = await mkdtemp(join(tmpdir(), 'dsh-auto-review-recovery-'))
   const ctx = new Context()
+  provideWorkingDirectoryFixture(ctx)
   try {
     const dshHome = join(root, 'home')
     await mkdir(dshHome)
@@ -372,6 +375,7 @@ it.each(['native', 'ptc-inner'] as const)('feeds denial back, re-reviews a new c
       sessionId: SessionId(randomUUID()), meta: { cwd: root }, agentOptions: { provider: PROVIDER, model: FLASH },
     })
     try {
+      if (path === 'ptc-inner') handle.agent.ctx.tools.presentAs('ptc')
       selectFinalAuto(ctx, handle.agent.session)
       const rawReason = `  TEST_ONLY_SECRET_${'x'.repeat(16_384)}\nexact deletion was not authorized  `
       for (let attempt = 0; attempt < 2; attempt += 1) {

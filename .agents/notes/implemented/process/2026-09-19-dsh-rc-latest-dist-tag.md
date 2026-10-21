@@ -6,7 +6,7 @@ English | [中文](2026-09-19-dsh-rc-latest-dist-tag.zh.md)
 
 ## Problem
 
-This fork's friend-facing install is `npm install --global @x1a0f3n9/dsh`. `DshFamily.distTagForVersion` mapped every `rc` to npm's `next` tag, so the untagged command resolved `latest` to an older pin (`0.1.5-rc.2`) while `0.1.5-rc.4` sat on `next`. Friends should not have to pass `@next`.
+This fork's friend-facing install is `npm install --global @deepseek-ai/dsh`. `DshFamily.distTagForVersion` mapped every `rc` to npm's `next` tag, so the untagged command resolved `latest` to an older pin (`0.1.5-rc.2`) while `0.1.5-rc.4` sat on `next`. Friends should not have to pass `@next`.
 
 ## Decision
 
@@ -20,15 +20,15 @@ This fork's friend-facing install is `npm install --global @x1a0f3n9/dsh`. `DshF
 
 ## Alternatives considered
 
-**Document `@x1a0f3n9/dsh@next` and leave `latest` on the older rc.** Rejected: the install path friends actually type is the untagged package name.
+**Document `@deepseek-ai/dsh@next` and leave `latest` on the older rc.** Rejected: the install path friends actually type is the untagged package name.
 
 **Bump to `0.1.5-rc.5` only to retake `latest`.** Rejected: the tarball is already `0.1.5-rc.4`; a dist-tag move is the registry change.
 
-**Move `latest` only for `@x1a0f3n9/dsh`.** Rejected: dependency versions do not use dist-tags, but the family should not advertise two current channels.
+**Move `latest` only for `@deepseek-ai/dsh`.** Rejected: dependency versions do not use dist-tags, but the family should not advertise two current channels.
 
 ## Consequences
 
-- `npm install --global @x1a0f3n9/dsh` and `npx --package @x1a0f3n9/dsh xfdsh web` resolve the current rc.
+- `npm install --global @deepseek-ai/dsh` and `npx --package @deepseek-ai/dsh xfdsh web` resolve the current rc.
 - A later first-time publish of an older dsh `rc` can move `latest` backwards; `release:dist-tag` can do the same without republishing.
 - The leftover `next` tag may still name an rc. It is not the documented install channel.
 

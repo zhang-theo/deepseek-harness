@@ -1,7 +1,7 @@
 /**
  * Tunnel frame protocol between the page and the worker host. Frames cross
  * `postMessage`, so inbound frames are validated before use.
- * @module @x1a0f3n9/dsh-experimental-webworker-runtime/src/transport/frames
+ * @module @deepseek-ai/dsh-experimental-webworker-runtime/src/transport/frames
  */
 
 /** Request identifier minted by the page. */
@@ -133,8 +133,17 @@ export interface TunnelStreamErrorFrame {
     }
 }
 
+/** Worker request to show one VFS text file in the page's read-only viewer; no reply follows. */
+export interface TunnelViewTextFrame {
+  readonly t: 'view-text'
+  /** Absolute VFS path, shown as the viewer title. */
+  readonly path: string
+  readonly text: string
+}
+
 /** Frames the worker emits. */
 export type TunnelOutboundFrame =
+  | TunnelViewTextFrame
   | TunnelResponseFrame
   | TunnelResponseHeadFrame
   | TunnelResponseChunkFrame

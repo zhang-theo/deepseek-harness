@@ -1,18 +1,18 @@
-import { createUserMessage } from '@x1a0f3n9/dsh-llm'
+import { createUserMessage } from '@deepseek-ai/dsh-llm'
 import { describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import AgentRegistry, { type Agent } from '@x1a0f3n9/dsh-agent'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import LlmRuntime from '@x1a0f3n9/dsh-llm'
-import type { MessageSource } from '@x1a0f3n9/dsh-llm'
-import type { ContextFormed } from '@x1a0f3n9/dsh-llm'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import ToolRuntime from '@x1a0f3n9/dsh-tools'
+import AgentRegistry, { type Agent } from '@deepseek-ai/dsh-agent'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import LlmRuntime from '@deepseek-ai/dsh-llm'
+import type { MessageSource } from '@deepseek-ai/dsh-llm'
+import type { ContextFormed } from '@deepseek-ai/dsh-llm'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import ToolRuntime from '@deepseek-ai/dsh-tools'
 import { MockAdapter, textResponse } from './mock-adapter.ts'
 
-declare module '@x1a0f3n9/dsh-llm' {
+declare module '@deepseek-ai/dsh-llm' {
   interface MessageSourceMap {
     'p': { kind: 'p' } & ContextFormed
     'test': { kind: 'test' } & ContextFormed

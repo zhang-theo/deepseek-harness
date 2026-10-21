@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { RemoteResult } from '@x1a0f3n9/dsh-api-remotes/client'
-import { RemoteError } from '@x1a0f3n9/dsh-client-test-runtime'
+import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
+import { RemoteError } from '@deepseek-ai/dsh-client-test-runtime'
 import type {
   ScheduleCatalogEntry, ScheduleDeleteResult, ScheduleId, ScheduleRecord,
-} from '@x1a0f3n9/dsh-schedule/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+} from '@deepseek-ai/dsh-schedule/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { CatalogSnapshot } from '../src/client/catalog-source.ts'
 import {
   createSessionScheduleSource, selectSessionScheduleFacts,

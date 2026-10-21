@@ -1,8 +1,8 @@
 /** Adapt authorized delivery and changed-file routes to the shared opening control. */
-import type { PropsLocale, PropsRuntime } from '@x1a0f3n9/dsh-client-ui-slots'
-import type {} from '@x1a0f3n9/dsh-client-ui-deliverables/client'
-import { parseNativeFileApplications } from '@x1a0f3n9/dsh-native-command/types'
-import type { SessionWorkspacePathApplication } from '@x1a0f3n9/dsh-api-session-controller/types'
+import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-deliverables/client'
+import { parseNativeFileApplications } from '@deepseek-ai/dsh-native-command/types'
+import type { SessionWorkspacePathApplication } from '@deepseek-ai/dsh-api-session-controller/types'
 import { useFileApplications } from './file-applications.ts'
 import { OpenTargetButton } from './OpenTargetButton.tsx'
 import type { NS } from './locales.ts'

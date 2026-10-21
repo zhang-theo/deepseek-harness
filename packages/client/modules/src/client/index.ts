@@ -8,7 +8,7 @@
  * its bootstrap export, which constructs the system and retains the same
  * exports for this package's graph row. The plugin face enrolls the module
  * system attached to its own Loader as `ctx.modules`.
- * @module @x1a0f3n9/dsh-client-modules/client
+ * @module @deepseek-ai/dsh-client-modules/client
  */
 import type { Context } from '@deepseek-ai/cordis'
 import type { Loader } from '@deepseek-ai/cordis-plugin-loader'
@@ -20,13 +20,14 @@ import type {
 
 export { ClientModuleSystem }
 export { tearDownEntryFiber } from './entry-lifecycle.ts'
+export type { ClientReleaseChange } from './release-change.ts'
 export type { ClientEntries, ClientEntryState } from './entries.ts'
 export { exactPackageSpecifier, parseBootManifest, parseDshClient, stripClientSuffix } from './manifest.ts'
 export type {
   BootManifest, BootModuleRow, BootPluginRow, ClientBootstrapModule, ClientBundleRegistration,
   ClientModuleCreateOptions, ClientModuleLoader, ClientModuleLoaderTarget, ClientModuleRecord,
   ClientModuleSystemOptions, DshWindow,
-  WebBootEntry, WebBootGraph,
+  WebBootEntry, WebBootGraph, WebBootRelease,
 } from './manifest.ts'
 
 /**

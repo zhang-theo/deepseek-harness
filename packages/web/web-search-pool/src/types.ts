@@ -1,6 +1,6 @@
 /**
  * Config and failure types for the multi-backend search pool.
- * @module @x1a0f3n9/dsh-web-search-pool/types
+ * @module @deepseek-ai/dsh-web-search-pool/types
  */
 
 /** How the pool picks the next healthy backend. */

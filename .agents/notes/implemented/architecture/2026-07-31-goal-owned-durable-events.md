@@ -12,9 +12,9 @@ The goal domain needs durable state, but it does not need ownership of pending m
 
 ## Decision
 
-`@x1a0f3n9/dsh-goal` owns a durable `goal/change` session event. Each event carries the complete post-mutation goal snapshot or a revisioned clear tombstone. `GoalService` appends that event synchronously, then emits `goal/changed`; strict replay and the `goal` session projection fold only `goal/change` for lifecycle state.
+`@deepseek-ai/dsh-goal` owns a durable `goal/change` session event. Each event carries the complete post-mutation goal snapshot or a revisioned clear tombstone. `GoalService` appends that event synchronously, then emits `goal/changed`; strict replay and the `goal` session projection fold only `goal/change` for lifecycle state.
 
-`GoalMessageSource` identifies only positive admitted continuation rounds. A matching `user/message` advances `roundsStarted`; ordinary user messages and inbox splice events do not change goal state. The goal package never inserts, claims, removes, or inspects inbox messages. `@x1a0f3n9/dsh-goal-round-driver` remains responsible for queuing and tracking its own continuation prompts through the public inbox lifecycle.
+`GoalMessageSource` identifies only positive admitted continuation rounds. A matching `user/message` advances `roundsStarted`; ordinary user messages and inbox splice events do not change goal state. The goal package never inserts, claims, removes, or inspects inbox messages. `@deepseek-ai/dsh-goal-round-driver` remains responsible for queuing and tracking its own continuation prompts through the public inbox lifecycle.
 
 Activation remains process-local. The service associates the synchronously appended event sequence with the requested activation while its cache observes the event; replayed or externally appended changes default to disarmed. The session log remains the only durable authority.
 
@@ -28,6 +28,6 @@ The domain does not automatically project each mutation into model input. Goal t
 
 ## Consequences
 
-Goal state is independent of inbox placement and admission. Replay has one mutation path, projections advance directly on `goal/change`, and continuation messages carry only round attribution. The model does not receive a mutation-only `<goal_state>` message; model-visible state appears through goal tools and scheduled continuation prompts. Direct session writers remain trusted and can append malformed changes, which the strict fold and invariant companion reject.
+Goal state is independent of inbox placement and admission. Replay has one mutation path, projections advance directly on `goal/change`, and continuation messages carry only round attribution. The model does not receive a mutation-only `<goal_state>` message; model-visible state appears through goal tools and scheduled continuation prompts. Direct session writers remain trusted and can append malformed changes, which the strict fold rejects.
 
 Focused goal, goal-round-driver, command, TUI, and Client RemoteMock tests pin durable replay, positive-round accounting, inbox independence, projection updates, and restored-session behavior. The keyless process test inspects the persisted `goal/change` event and verifies that creation alone starts no continuation round.

@@ -5,7 +5,7 @@
  * Desktop host owns a single WebContentsView and its `open` destroys whatever
  * was showing before.
  */
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 
 /** Platform destinations the shared native host can show. */
 export type PlatformPage = 'usage' | 'top-up'

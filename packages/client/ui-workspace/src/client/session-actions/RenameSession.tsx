@@ -5,7 +5,7 @@
  * menu; the browser raises the same request from a title double-click.
  */
 import { useRef, useState } from 'react'
-import { Button, IconEditOutlineRegular, MenuItemButton, Modal } from '@x1a0f3n9/dsh-client-ui-primitives'
+import { Button, IconEditOutlineRegular, MenuItemButton, Modal } from '@deepseek-ai/dsh-client-ui-primitives'
 import type {
   RenameSessionInjected, SessionMenuItemProps, SessionRenameDialogInjected, SessionRenameDialogProps, SessionRenameTarget,
 } from '../contract/slots.ts'
@@ -40,7 +40,7 @@ export function RenameSessionMenuItem({
  * one dialog per request (keyed by the Session, so a new request starts a
  * fresh draft). Sessions have no client-side name-conflict rule (the host
  * normalizes), and unlike Workspace rename an unchanged title is NOT
- * blocked: confirming the current automatic title is the gesture that pins it.
+ * blocked. An unnamed Session starts with an empty draft and requires a name.
  * @param props - the request hook, its settlement, the rename hop, and the locale seat.
  * @returns the open dialog, or null.
  */

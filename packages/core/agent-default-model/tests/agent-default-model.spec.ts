@@ -19,7 +19,7 @@ it('reads complete selections from volatile config and clears omitted reasoning 
 
 it('persists complete selections through its owning profile entry', async () => {
   const { configurationFixture } = await import('../../../settings/settings/tests/configuration-fixture.ts')
-  const { ReasoningEffortId } = await import('@x1a0f3n9/dsh-llm')
+  const { ReasoningEffortId } = await import('@deepseek-ai/dsh-llm')
   const { ctx } = await configurationFixture({ hmr: false })
   await ctx.agentDefaultModel.saveSelection({ provider: 'test', model: 'next', reasoningEffort: ReasoningEffortId('high') })
   expect(ctx.agentDefaultModel.currentSelection()).toEqual({ provider: 'test', model: 'next', reasoningEffort: 'high' })

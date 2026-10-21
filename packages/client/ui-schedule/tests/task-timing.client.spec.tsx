@@ -1,7 +1,7 @@
 /** Exact rules, native drafts, and Host failure mapping the retained-task detail composes. */
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { ScheduleCatalogEntry, ScheduleId, ScheduleRecord } from '@x1a0f3n9/dsh-schedule/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+import type { ScheduleCatalogEntry, ScheduleId, ScheduleRecord } from '@deepseek-ai/dsh-schedule/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import {
   draftZone, timingDraft, timingError, timingSnapshot, zonedWallClock,
 } from '../src/client/task-timing.ts'
@@ -174,6 +174,7 @@ describe('timingError', () => {
     ['schedule_conflict', 'timing.conflict'],
     ['schedule_ended', 'timing.inactive'],
     ['schedule_not_found', 'timing.notFound'],
+    ['subagent_session', 'timing.subagentSession'],
     ['invalid_time_zone', 'timing.invalidZone'],
     ['not_future', 'timing.notFuture'],
     ['frequency_too_high', 'timing.invalidInterval'],

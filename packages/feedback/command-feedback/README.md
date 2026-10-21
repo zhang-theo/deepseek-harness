@@ -3,7 +3,7 @@ description: "Session feedback: the `/feedback` command, the `sessionFeedback` H
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-command-feedback
+# @deepseek-ai/dsh-command-feedback
 
 English | [中文](README.zh.md)
 
@@ -61,11 +61,11 @@ Feedback does not have to come from the slash command or the dialog: any UI, hoo
 
 ```yaml
 - id: session
-  name: '@x1a0f3n9/dsh-session'
+  name: '@deepseek-ai/dsh-session'
 - id: commands
-  name: '@x1a0f3n9/dsh-commands'
+  name: '@deepseek-ai/dsh-commands'
 - id: command-feedback
-  name: '@x1a0f3n9/dsh-command-feedback'
+  name: '@deepseek-ai/dsh-command-feedback'
 ```
 
 The Web client ships the command. Headless mode, ACP automation, and JSON-RPC provide no slash commands, so `/feedback` is unavailable there.
@@ -92,7 +92,6 @@ The producer trims the text, records blank text as absent, and writes one event 
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry: `recordFeedback` producer, the `sessionFeedback` Remote service, `/feedback` command registration |
 | [`src/types.ts`](src/types.ts) | `feedback/record` event declaration, the category taxonomy, and the Remote request and result types |
-| — | No runtime invariant companion is published; each `feedback/record` is an independent append-only fact with no cross-event or mutable-data relationship. |
 
 </details>
 

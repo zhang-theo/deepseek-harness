@@ -3,10 +3,10 @@
  * shell tools have always shown it (stdout, then one marked stderr section),
  * the `[status: …]` line, and the public job projection the tool schemas
  * expose.
- * @module @x1a0f3n9/dsh-tool-jobs/render
+ * @module @deepseek-ai/dsh-tool-jobs/render
  */
 
-import type { JobChunk, JobView } from '@x1a0f3n9/dsh-jobs/view'
+import type { JobChunk, JobView } from '@deepseek-ai/dsh-jobs/view'
 
 /** Job state safe for model-authored programs; ownership and offsets are omitted. */
 export interface PublicJobSnapshot {

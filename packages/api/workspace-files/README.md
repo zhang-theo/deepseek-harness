@@ -3,7 +3,7 @@ description: "Workspace file service for the web GUI: bounded reads and target-s
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-api-workspace-files
+# @deepseek-ai/dsh-api-workspace-files
 
 English | [中文](README.zh.md)
 
@@ -105,7 +105,6 @@ Complete-file reads delegate size enforcement to `fs.readBytes` and return raw b
 | [`src/types.ts`](src/types.ts) | Wire types and the `RemoteErrorDetailsMap` codes, published as `./types` for Client packages |
 | [`src/client/index.ts`](src/client/index.ts), [`provider.ts`](src/client/provider.ts), [`change-feed.ts`](src/client/change-feed.ts) | Browser plugin, file metadata, and per-target change feeds |
 | [`src/client/types.ts`](src/client/types.ts), [`remote.ts`](src/client/remote.ts) | Resource values, parameters, Client error codes, and generated Remote types |
-| — | No runtime invariant companion is published; every Host answer is derived from `ctx.fs` and the sandbox policy at call time. |
 
 Typert generates the Host and Client Remote artifacts exposed by `./typert` and `./remote`.
 

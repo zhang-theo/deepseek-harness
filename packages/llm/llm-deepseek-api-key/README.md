@@ -3,7 +3,7 @@ description: "DeepSeek api-key authentication and model discovery."
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-llm-deepseek-api-key
+# @deepseek-ai/dsh-llm-deepseek-api-key
 
 English | [中文](README.zh.md)
 
@@ -25,11 +25,11 @@ Authentication resolution returns the validated API key in `x-api-key` for both 
 <a id="use-this-package"></a>
 ## Use this package
 
-`apiKeyEnv` defaults to `DEEPSEEK_API_KEY` and resolves per request. When the credentials service exists, its precedence applies; only compositions without that service read the launch environment directly. Requests with missing credentials fail with `MISSING_CREDENTIAL`; malformed credentials fail with `INVALID_CREDENTIAL`. Model discovery returns the configured catalog regardless of credentials.
+`apiKeyEnv` defaults to `DEEPSEEK_API_KEY` and resolves per request and model discovery. When the credentials service exists, its precedence applies; only compositions without that service read the launch environment directly. Requests with missing credentials fail with `MISSING_CREDENTIAL`; malformed credentials fail with `INVALID_CREDENTIAL`. Model discovery returns an empty catalog when the credential is missing, hiding the route from model selectors while retaining its settings entry. Malformed credentials and other lookup failures propagate. Adding or removing a key affects the next discovery call.
 
 ```yaml
 - id: llm-deepseek
-  name: '@x1a0f3n9/dsh-llm-deepseek-api-key'
+  name: '@deepseek-ai/dsh-llm-deepseek-api-key'
   config:
     reasoningEffort: high
     apiKeyEnv: DEEPSEEK_API_KEY
@@ -42,7 +42,7 @@ The endpoint and credential reference come from one configuration resolution. In
 <a id="understand-the-implementation"></a>
 ## Understand the implementation
 
-Registrations and listeners dispose with the plugin. Shared Host wiring supplies attachments, request extensions, anonymous identity, and atomic retry-policy updates; this plugin registers only its own route. No invariant companion is published: discovery derives directly from configuration without an independent copy.
+Registrations and listeners dispose with the plugin. Shared Host wiring supplies attachments, request extensions, anonymous identity, and atomic retry-policy updates; this plugin registers only its own route.
 
 <a id="further-exploration"></a>
 ## Further Exploration

@@ -6,11 +6,11 @@ Status: implemented
 
 ## Problem
 
-xfdsh web 没有预装 Skills manager。想用本机 Agent 技能界面的人得自己 `xfdsh plugin --profile web add`，而上游包仍发布为 `@michengai/dsh-skills-manager`，peer 还是 `@x1a0f3n9/dsh-*`。
+xfdsh web 没有预装 Skills manager。想用本机 Agent 技能界面的人得自己 `xfdsh plugin --profile web add`，而上游包仍发布为 `@michengai/dsh-skills-manager`，peer 还是 `@deepseek-ai/dsh-*`。
 
 ## Decision
 
-预装 [LunFengChen/dsh-skills-manager](https://github.com/LunFengChen/dsh-skills-manager) 的 `v0.1.53-xfdsh.1`，npm 名为 `@x1a0f3n9/dsh-skills-manager`。web-app 目录卡片、依赖 pin 和 cordis insert 共用 id `skills-manager`，`defaultEnabled: true`。这个 fork 把上游 `0.1.53`（恢复 Project 标签页）接到已有的 `@x1a0f3n9` xfdsh 适配上。pin 策略见 [pin remaining prebundled plugins](2026-09-11-pin-prebundled-plugin-forks.zh.md)；npm 名见 [preset plugin npm scope](2026-09-18-preset-plugin-npm-scope.zh.md)。
+预装 [LunFengChen/dsh-skills-manager](https://github.com/LunFengChen/dsh-skills-manager) 的 `v0.1.53-xfdsh.1`，npm 名为 `@deepseek-ai/dsh-skills-manager`。web-app 目录卡片、依赖 pin 和 cordis insert 共用 id `skills-manager`，`defaultEnabled: true`。这个 fork 把上游 `0.1.53`（恢复 Project 标签页）接到已有的 `@x1a0f3n9` xfdsh 适配上。pin 策略见 [pin remaining prebundled plugins](2026-09-11-pin-prebundled-plugin-forks.zh.md)；npm 名见 [preset plugin npm scope](2026-09-18-preset-plugin-npm-scope.zh.md)。
 
 ## Alternatives considered
 
@@ -25,4 +25,4 @@ xfdsh web 没有预装 Skills manager。想用本机 Agent 技能界面的人得
 - Settings → xfdsh预置插件 出现技能管理；关掉卡片就会卸掉插件。
 - 卡片打开时出现 Settings → 技能。
 - `pnpm install` 解析这个 pin 之前，GitHub tag 必须已经存在。
-- 插件的 `@x1a0f3n9/dsh-skill` 和 `@x1a0f3n9/dsh-web-app` peer 加入 `pnpm-workspace.yaml` 的 workspace override，锁文件就不会去拉官方副本。
+- 插件的 `@deepseek-ai/dsh-skill` 和 `@deepseek-ai/dsh-web-app` peer 加入 `pnpm-workspace.yaml` 的 workspace override，锁文件就不会去拉官方副本。

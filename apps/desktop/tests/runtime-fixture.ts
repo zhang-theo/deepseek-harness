@@ -30,18 +30,18 @@ export function writePackage(modules: string, name: string, fields: Record<strin
  * @returns Sealed runtime metadata.
  */
 export function runtimeFixture(root: string, version = '1.0.0', nodeVersion = '24.17.0'): DesktopRuntimeDescriptor {
-  const names = ['@x1a0f3n9/dsh', '@x1a0f3n9/dsh-desktop-host', '@x1a0f3n9/dsh-base', '@x1a0f3n9/dsh-web-app', '@deepseek-ai/cordis']
+  const names = ['@deepseek-ai/dsh', '@deepseek-ai/dsh-desktop-host', '@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', '@deepseek-ai/cordis']
   for (const name of names) {
-    const bundle = name === '@x1a0f3n9/dsh-base' || name === '@x1a0f3n9/dsh-web-app'
+    const bundle = name === '@deepseek-ai/dsh-base' || name === '@deepseek-ai/dsh-web-app'
     const path = writePackage(join(root, 'node_modules'), name, {
       version,
-      ...(name === '@x1a0f3n9/dsh' ? { dependencies: Object.fromEntries(names.slice(1).map(dependency => [dependency, version])) } : {}),
+      ...(name === '@deepseek-ai/dsh' ? { dependencies: Object.fromEntries(names.slice(1).map(dependency => [dependency, version])) } : {}),
       ...(bundle ? { dsh: { bundle: { patch: './bundle.yml' } } } : {}),
     })
     if (bundle) writeFileSync(join(path, 'bundle.yml'), '[]\n')
   }
   for (const file of DESKTOP_HOST_RUNTIME_FILES) {
-    const path = join(root, 'node_modules', '@x1a0f3n9/dsh-desktop-host', file)
+    const path = join(root, 'node_modules', '@deepseek-ai/dsh-desktop-host', file)
     mkdirSync(join(path, '..'), { recursive: true })
     writeFileSync(path, '')
   }

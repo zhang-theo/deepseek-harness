@@ -1,6 +1,6 @@
 /** Optional Electron status presentation; the native shell owns actions and Web owns visible copy. */
-import { IconDownloadOutlineRegular, IconLoadingOutlineRegular, Tooltip } from '@x1a0f3n9/dsh-client-ui-primitives'
-import type { InjectFace, PropsLocale, PropsRuntime } from '@x1a0f3n9/dsh-client-ui-slots'
+import { IconDownloadOutlineRegular, IconLoadingOutlineRegular, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
+import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import css from './DesktopUpdateIndicator.module.css'
 import type { DesktopUpdateFailureKind, DesktopUpdatePresentation, DesktopUpdateView } from '../types.ts'
 import type { SettingsRootInjected } from './shell-contract.ts'
@@ -23,6 +23,9 @@ function updateCopy(state: DesktopUpdatePresentation, t: SettingsTranslate): { l
     error: t('desktop.update.retry'),
   }
   const label = labels[state.phase]
+  if (state.phase === 'checking' || state.phase === 'verifying' || state.phase === 'installing') {
+    return { label, detail: state.version ?? label }
+  }
   if (state.phase === 'error') {
     const failures: Readonly<Record<DesktopUpdateFailureKind, string>> = {
       check: t('desktop.update.checkFailed'),

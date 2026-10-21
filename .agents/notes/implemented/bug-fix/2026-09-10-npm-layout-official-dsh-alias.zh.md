@@ -6,7 +6,7 @@ Status: implemented
 
 ## Problem
 
-`verify-npm-install-layout` 的本地仓库只提供 `@x1a0f3n9/dsh*`。预装社区插件仍声明 `@deepseek-ai/dsh*` 依赖，npm 会 404，Release 的 publish job 不会启动。
+`verify-npm-install-layout` 的本地仓库只提供 `@deepseek-ai/dsh*`。预装社区插件仍声明 `@deepseek-ai/dsh*` 依赖，npm 会 404，Release 的 publish job 不会启动。
 
 ## Decision
 

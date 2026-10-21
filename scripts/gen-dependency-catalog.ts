@@ -8,7 +8,7 @@ import { parseArgs } from 'node:util'
 import { runCommandWithTimeout } from './benchmark-npm-resolution.ts'
 
 const ROOT = resolve(import.meta.dirname, '..')
-const PACKAGE = '@x1a0f3n9/dsh'
+const PACKAGE = '@deepseek-ai/dsh'
 const ENTRY = `node_modules/${PACKAGE}`
 const REGISTRY = 'https://registry.npmjs.org/'
 const LOCK = 'scripts/dependency-catalog/package-lock.json'

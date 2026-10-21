@@ -1,9 +1,9 @@
 import type {
-  AssistantMessageNode, ConversationLocation, ConversationNode, ConversationPromptSnapshot,
+  AssistantMessageNode, AssistantTiming, ConversationLocation, ConversationNode, ConversationPromptSnapshot,
   ConversationViewNode, MessageImagesOwnerProps, PartialAssistant, RequestPromptChange,
   RequestView, RunningToolCall, SystemPromptNode, ToolCallBlock,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { SnapshotSelectorHook } from '@x1a0f3n9/dsh-client-ui-slots'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { SnapshotSelectorHook } from '@deepseek-ai/dsh-client-ui-slots'
 
 /** Request-header facts retained by the Trajectory target. */
 export interface TrajectoryRequestHeaderState {
@@ -12,6 +12,11 @@ export interface TrajectoryRequestHeaderState {
   readonly prompt: ConversationPromptSnapshot
   readonly change?: RequestPromptChange
   readonly location: ConversationLocation
+}
+
+/** In-flight assistant output with the loaded Step start and first token timestamps. */
+export interface TrajectoryPartialAssistant extends PartialAssistant {
+  readonly timing?: Pick<AssistantTiming, 'stepStartTime' | 'firstTokenTime'>
 }
 
 /** One independently assembled contribution to the legacy Trajectory ledger. */
@@ -24,7 +29,7 @@ export type TrajectoryContribution =
   | {
     readonly kind: 'assistant'
     readonly node?: AssistantMessageNode
-    readonly partial: PartialAssistant | null
+    readonly partial: TrajectoryPartialAssistant | null
     readonly request?: Extract<RequestView, { purpose: 'assistant' }>
   }
   | {
@@ -68,21 +73,21 @@ export interface TrajectorySnapshot {
   readonly eventLocations: ReadonlyMap<number, ConversationLocation>
   readonly requests: readonly RequestView[]
   readonly callSchemas: ReadonlyMap<string, ConversationPromptSnapshot['tools'][number]>
-  readonly partial: PartialAssistant | null
+  readonly partial: TrajectoryPartialAssistant | null
   readonly runningCalls: readonly RunningToolCall[]
 }
 
 /** Selector hook over the current Conversation binding's Trajectory target. */
 export type UseTrajectory = SnapshotSelectorHook<TrajectorySnapshot>
 
-declare module '@x1a0f3n9/dsh-client-ui-conversation/client' {
+declare module '@deepseek-ai/dsh-client-ui-conversation/client' {
   interface ConversationViewSnapshotMap {
     /** Independently assembled data consumed by the Trajectory view. */
     trajectory: TrajectorySnapshot
   }
 }
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SessionStandardProps {
     /** Selector hook over the current Conversation binding's Trajectory target. */
     useTrajectory: UseTrajectory

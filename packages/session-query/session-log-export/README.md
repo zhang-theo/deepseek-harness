@@ -3,7 +3,7 @@ description: "Web Session-log ZIP export: Host streaming, the authenticated down
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-session-log-export
+# @deepseek-ai/dsh-session-log-export
 
 English | [中文](README.zh.md)
 
@@ -37,7 +37,7 @@ Choose it for a Web deployment that needs user-facing session export with a visi
 
 ```yaml
 - id: session-log-download
-  name: '@x1a0f3n9/dsh-session-log-export'
+  name: '@deepseek-ai/dsh-session-log-export'
 ```
 
 The Web bundle mounts the package with Connection, `dsh-commands`, `dsh-client-ui-commands`, and `dsh-client-ui-conversation`.
@@ -143,5 +143,3 @@ This Dev Note is working context for maintainers: open design questions and dire
 The download is deliberately browser-scoped; a Host-path or native folder export would need a new endpoint contract and a decision on where the ZIP lands.
 
 </details>
-
-**Runtime invariant:** No companion is published. Connection and the command registry own both registrations, while each export reads authoritative Session services.

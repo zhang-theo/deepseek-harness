@@ -1,7 +1,7 @@
 /** SSE framing delegated to eventsource-parser; JSON errors remain provider failures. */
 
 import { EventSourceParserStream } from 'eventsource-parser/stream'
-import { LlmError } from '@x1a0f3n9/dsh-llm'
+import { LlmError } from '@deepseek-ai/dsh-llm'
 import { object } from './replay.ts'
 import { providerError } from './transport.ts'
 

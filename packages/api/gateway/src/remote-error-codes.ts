@@ -12,7 +12,7 @@ export interface TypertGatewayFaultDetails {
   readonly field?: string
 }
 
-declare module '@x1a0f3n9/dsh-typert-protocol' {
+declare module '@deepseek-ai/dsh-typert-protocol' {
   interface RemoteErrorDetailsMap {
     'gateway/ambiguous-endpoint': TypertGatewayFaultDetails
     'gateway/arguments-invalid': TypertGatewayFaultDetails
@@ -22,11 +22,13 @@ declare module '@x1a0f3n9/dsh-typert-protocol' {
     'gateway/context-unavailable': TypertGatewayFaultDetails
     'gateway/definition-unavailable': TypertGatewayFaultDetails
     'gateway/input-invalid': TypertGatewayFaultDetails
+    'gateway/interactions-forbidden': TypertGatewayFaultDetails
     'gateway/invocation-unavailable': TypertGatewayFaultDetails
     'gateway/lookup-failed': TypertGatewayFaultDetails
     'gateway/lookup-not-found': TypertGatewayFaultDetails
     'gateway/lookup-unavailable': TypertGatewayFaultDetails
     'gateway/method-unavailable': TypertGatewayFaultDetails
+    'gateway/peer-disposed': TypertGatewayFaultDetails
     'gateway/protocol': TypertGatewayFaultDetails
     'gateway/provider-mismatch': TypertGatewayFaultDetails
     'gateway/result-invalid': TypertGatewayFaultDetails

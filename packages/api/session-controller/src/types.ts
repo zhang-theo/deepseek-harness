@@ -1,18 +1,19 @@
 /** Browser-safe request, result, and lifecycle vocabulary for the Session Remote service. */
-import type { NativeFileApplication } from '@x1a0f3n9/dsh-native-command/types'
+import type { NativeFileApplication } from '@deepseek-ai/dsh-native-command/types'
 
 import type {
   AttachmentIdType, ImageAttachmentLimits, ImageAttachmentRef, ImageMediaType,
-} from '@x1a0f3n9/dsh-attachment'
-import type { Branded } from '@x1a0f3n9/dsh-brand'
-import type { LlmAttemptId, MessageId } from '@x1a0f3n9/dsh-llm/brand'
-import type { TextBlock } from '@x1a0f3n9/dsh-llm'
-import type { SessionId, SessionSeqCursor } from '@x1a0f3n9/dsh-session/types'
-import type { SessionProjectionMap } from '@x1a0f3n9/dsh-session-projection/types'
-import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
-import type { WorkspaceId } from '@x1a0f3n9/dsh-workspace/types'
+} from '@deepseek-ai/dsh-attachment'
+import type { Branded } from '@deepseek-ai/dsh-brand'
+import type { LlmAttemptId, MessageId } from '@deepseek-ai/dsh-llm/brand'
+import type { TextBlock } from '@deepseek-ai/dsh-llm'
+import type { SessionId, SessionSeqCursor } from '@deepseek-ai/dsh-session/types'
+import type { SessionProjectionMap } from '@deepseek-ai/dsh-session-projection/types'
+import type { Principal } from '@deepseek-ai/dsh-typert-protocol'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
+import type { WorkspaceId } from '@deepseek-ai/dsh-workspace/types'
 
-declare module '@x1a0f3n9/dsh-session-projection/types' {
+declare module '@deepseek-ai/dsh-session-projection/types' {
   interface SessionProjectionStateMap {
     /** Host state persisted for cold Session list summaries. */
     sessionListMetadata: SessionListMetadata
@@ -31,7 +32,7 @@ declare module '@x1a0f3n9/dsh-session-projection/types' {
   }
 }
 
-declare module '@x1a0f3n9/dsh-session/types' {
+declare module '@deepseek-ai/dsh-session/types' {
   interface SessionEventMap {
     /**
      * Complete validated model selection requested for subsequent prompt
@@ -177,6 +178,8 @@ export type QueueAction =
 export interface SessionSummary {
   /** Whether this Session currently owns a live Agent. */
   readonly agentAvailable: boolean
+  /** Current for attached Sessions; otherwise the persistence format status when reported. */
+  readonly formatStatus?: 'current' | 'migration-required'
   readonly sessionId: SessionId
   readonly updatedAt: number
   readonly running: boolean
@@ -199,7 +202,7 @@ export const SESSION_SEARCH_RESULT_LIMIT = 20
 /** Maximum search snippet length in Unicode code points. */
 export const SESSION_SEARCH_SNIPPET_MAX_CODE_POINTS = 240
 
-declare module '@x1a0f3n9/dsh-typert-protocol' {
+declare module '@deepseek-ai/dsh-typert-protocol' {
   interface RemoteErrorDetailsMap {
     'session/provider-credentials-unavailable': Record<string, never>
     'session/provider-models-unavailable': { readonly provider: string }
@@ -217,13 +220,13 @@ declare module '@x1a0f3n9/dsh-typert-protocol' {
     'agent-preset/conflict': {
       readonly sessionId: SessionId
       readonly requestedPreset: string
-      readonly existingPreset?: string
     }
     'session/attachment-invalid': { readonly reason: string }
     'session/queue-item-not-found': { readonly itemId: MessageId }
     'session/steer-unavailable': { readonly itemId: MessageId }
     'session/title-invalid': { readonly sessionId: SessionId }
     'session/fork-unavailable': { readonly sessionId: SessionId }
+    'session/migration-required': { readonly sessionId: SessionId }
     'subagent/not-found': {
       readonly parentSessionId: SessionId
       readonly childSessionId: SessionId
@@ -281,17 +284,23 @@ export interface SessionSearchValue {
   readonly hasMore: boolean
 }
 
-/** Session creation or explicit-id adoption request. */
+/** Request for a Session for a new conversation. */
 export interface SessionCreateRequest {
+  /** Workspace the Session joins; exclusive with `cwd`. */
   readonly workspaceId?: WorkspaceId
+  /** Directory the Session owns when no Workspace is named. */
   readonly cwd?: string
+  /** Blank Session to reuse while it is reusable, or the identity of a new Session when none is stored under it. */
   readonly sessionId?: SessionId
+  /** Preset the Session runs, replacing a reused Session's recorded preset; the configured default when omitted. */
   readonly agentPreset?: string
 }
 
 /** Session creation response value. */
 export interface SessionCreateValue {
+  /** The created or reused Session, which may differ from the requested `sessionId`. */
   readonly sessionId: SessionId
+  /** Preset the Session runs, when the deployment composes a preset roster. */
   readonly agentPreset?: string
 }
 
@@ -334,6 +343,8 @@ export interface SessionForkRequest {
   readonly sessionId: SessionId
   /** Exact inclusive source event seq; omission selects the latest completed-turn prefix. */
   readonly atSeq?: number
+  /** False asks the Host to check for required migration before forking. Defaults to true. */
+  readonly allowMigration?: boolean
 }
 
 /** Identity of a newly forked Session. */
@@ -409,10 +420,14 @@ export interface SessionOpenWorkspacePathValue {
 /** Client-minted prompt identity used to reconcile optimistic and durable messages. */
 export type SessionRequestId = Branded<'session-request-id'>
 
-declare module '@x1a0f3n9/dsh-llm' {
+declare module '@deepseek-ai/dsh-llm' {
   interface MessageSourceMap {
-    /** Browser prompt correlation and optional Host-validated time zone. */
-    'user-rpc': { kind: 'user'; rpcId: SessionRequestId; clientTimeZone?: string }
+    /**
+     * Browser prompt correlation, optional Host-validated time zone, and the
+     * caller that submitted the prompt. `principal` is written only for a
+     * caller other than the owner, so an absent `principal` means the owner.
+     */
+    'user-rpc': { kind: 'user'; rpcId: SessionRequestId; clientTimeZone?: string; principal?: Principal }
   }
 }
 
@@ -431,8 +446,11 @@ export interface SessionProjectionsRequest {
   readonly sessionId: SessionId
 }
 
-/** Complete Session projection baseline; null when the Session does not exist. */
-export type SessionProjectionsValue = SessionProjectionBaseline | null
+/** Exact projections carry their event cut; required migration returns sequence-free cache hints. Null means absent. */
+export type SessionProjectionsValue =
+  | (SessionProjectionBaseline & { readonly kind: 'sequenced' })
+  | { readonly kind: 'migration-required'; readonly values: SessionProjectionValues }
+  | null
 
 /** One raw Session event in the Remote journal. */
 export interface SessionEventEntry {

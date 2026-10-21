@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 /** Inspect the public Codex provider composition without invoking the product. */
 
-import { resolveConfigPath } from '@x1a0f3n9/dsh-app-boot'
-import type {} from '@x1a0f3n9/dsh-subagent'
-import type {} from '@x1a0f3n9/dsh-tools'
+import { resolveConfigPath } from '@deepseek-ai/dsh-app-boot'
+import type {} from '@deepseek-ai/dsh-subagent'
+import type {} from '@deepseek-ai/dsh-tools'
 import { bootProductionProfile } from '../../../../../test-support/loader-smoke/tests/fixtures/production-profile.ts'
 
 const configPath = process.argv[2]
-const bundlePatchPath = process.argv[3]
-if (configPath === undefined || bundlePatchPath === undefined) {
-  throw new Error('subagent-codex Loader composition driver requires config and Bundle patch paths')
+if (configPath === undefined) {
+  throw new Error('subagent-codex Loader composition driver requires a config path')
 }
 
 let starts = 0
@@ -17,7 +16,6 @@ const ctx = await bootProductionProfile({
   binName: 'subagent-codex-loader-composition',
   profile: 'headless',
   overlayPaths: [
-    resolveConfigPath(bundlePatchPath, undefined),
     resolveConfigPath(configPath, undefined),
   ],
   prepare: (hostCtx) => {

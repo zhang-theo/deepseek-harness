@@ -3,7 +3,7 @@ description: "The Subagent settings page on the dsh web client's Plugins page: d
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-client-ui-settings-subagent
+# @deepseek-ai/dsh-client-ui-settings-subagent
 
 English | [中文](README.zh.md)
 
@@ -69,7 +69,6 @@ None; this package neither assembles nor sends a provider request.
 <a id="known-limitations-and-deferred-work"></a>
 
 - **The catalogue re-reads on three signals only** — adapter changes, document commits, and reconnects; a provider that starts advertising without any of them shows up on the next of those or on **Retry**.
-- **Runtime invariant:** No companion is published. The page holds no owned relationship of its own: what it shows derives from the settings mirror and the model catalogue, and what it writes the Host validates.
 
 <a id="dev-note"></a>
 ### Dev Note

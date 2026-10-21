@@ -3,7 +3,7 @@ description: "App-owned command lines for dsh app bins: your app parses its own 
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-cmdline
+# @deepseek-ai/dsh-cmdline
 
 English | [中文](README.zh.md)
 
@@ -45,14 +45,14 @@ You bring your own commander program: declare your flags and your actions, and t
 
 ```yaml
 - id: web-startup
-  name: '@x1a0f3n9/dsh-web-app/startup'
+  name: '@deepseek-ai/dsh-web-app/startup'
 ```
 
 Rows configured from the parsed values inject the published service and read it directly in their config:
 
 ```yaml
 - id: webserver
-  name: '@x1a0f3n9/dsh-host-webserver'
+  name: '@deepseek-ai/dsh-host-webserver'
   inject: [webStartup]
   config:
     host: !!js ctx.webStartup.host ?? '127.0.0.1'
@@ -97,7 +97,6 @@ The parse path is one small family with two owners: `provideCmdline` freezes the
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | `CmdlineArgs`/`AppExit` types, `provideCmdline`, `parseCmdline`, commander exit/output routing |
-| — | No runtime invariant companion is published; `cmdlineArgs` is an immutable launcher fact that any number of ordinary plugins may read. App-owned providers and consumers use normal Cordis service injection, whose missing dependencies are already reported by Loader settlement. |
 
 </details>
 

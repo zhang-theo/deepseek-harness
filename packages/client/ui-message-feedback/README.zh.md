@@ -3,7 +3,7 @@ description: "Web 反馈界面：已定稿助手消息动作行中的 Like/Disli
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-client-ui-message-feedback
+# @deepseek-ai/dsh-client-ui-message-feedback
 
 [English](README.md) | 中文
 
@@ -89,5 +89,3 @@ kind: "package-reference"
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。插件持有两个 slot 注册、一个命令装饰、`feedbackUi` 服务，以及一个按 Session 划分的控制器对 map；它们都随所属插件 fiber 释放。生命周期规格测试验证，fiber 释放时会撤销所有注册和服务并丢弃所有控制器，因此不存在需要在运行时检查的第二权威来源。

@@ -4,12 +4,12 @@
  * archived with its work. Installed by the registry's constructor, so it
  * answers for every Agent the registry publishes.
  *
- * @module @x1a0f3n9/dsh-agent
+ * @module @deepseek-ai/dsh-agent
  */
 
 import type { Context } from '@deepseek-ai/cordis'
-import type { SessionId } from '@x1a0f3n9/dsh-session'
-import type { SessionActivity } from '@x1a0f3n9/dsh-workspace'
+import type { SessionId } from '@deepseek-ai/dsh-session'
+import type { SessionActivity } from '@deepseek-ai/dsh-workspace'
 import type { Agent } from './types.ts'
 
 /**

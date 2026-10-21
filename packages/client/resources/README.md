@@ -2,7 +2,7 @@
 description: "Client resource model: protocol-registered providers turn URL addresses into live values that any slot component reads through the useResource standard hook."
 kind: "package-reference"
 ---
-# @x1a0f3n9/dsh-client-resources
+# @deepseek-ai/dsh-client-resources
 
 English | [中文](README.zh.md)
 
@@ -41,7 +41,7 @@ Every slot component receives `useResource` in its props. `useResource<P>(addres
 The protocol's owning client package declares its value type in `ResourceProtocolMap` and registers one provider as an owned effect. `open` yields `RemoteResult` frames: the current content first and one frame per later change, with a failure as an `ok: false` frame rather than a throw; it must stop when `signal` aborts:
 
 ```ts ignore-check
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface ResourceProtocolMap { note: NoteView }
 }
 
@@ -103,5 +103,3 @@ None; resource streams do not assemble model requests.
 None.
 
 </details>
-
-**Runtime invariant:** No companion is published. Provider ownership and holder counts have one owner, the registry, with no independent runtime source to compare against; registration disposal and the open/close lifecycle are asserted by behavior specs.

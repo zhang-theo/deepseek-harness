@@ -3,7 +3,7 @@ description: "The host-filesystem backend for ctx.fs for deployments and maintai
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-fs-local
+# @deepseek-ai/dsh-fs-local
 
 English | [中文](README.zh.md)
 
@@ -36,7 +36,7 @@ Choose `fs-local` for ordinary host-file access in a single process. Choose [`fs
 Load the backend with a base directory; relative paths resolve against it, and absolute paths ignore it. A relative base is anchored to the provider process working directory, and display paths remain absolute. On POSIX, resolution follows filesystem semantics before lexical normalization: `symlink/..` reaches the parent of the link target, including when the final file does not exist yet. Directory listings preserve the same physical traversal in displayed child paths. Windows retains native drive-relative normalization.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-fs-local'
+- name: '@deepseek-ai/dsh-fs-local'
   config:
     cwd: /absolute/path/to/workspace
 ```
@@ -147,5 +147,3 @@ These limits define when the local backend is a poor fit or needs special operat
 None.
 
 </details>
-
-**Runtime invariant:** No companion is published. This package exposes no independent event sequence or mutable data relation beyond contracts enforced at its owning seam.

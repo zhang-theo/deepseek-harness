@@ -3,7 +3,7 @@ description: "面向在 UI 命令平面中选择、组合或排查 goal 控制�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-command-goal
+# @deepseek-ai/dsh-command-goal
 
 [English](README.md) | 中文
 
@@ -54,11 +54,11 @@ kind: "package-reference"
 
 ```yaml
 - id: commands
-  name: '@x1a0f3n9/dsh-commands'
+  name: '@deepseek-ai/dsh-commands'
 - id: goal
-  name: '@x1a0f3n9/dsh-goal'
+  name: '@deepseek-ai/dsh-goal'
 - id: command-goal
-  name: '@x1a0f3n9/dsh-command-goal'
+  name: '@deepseek-ai/dsh-command-goal'
 ```
 
 随附的 `dsh` 基础配置启用持久 goal 栈与此命令。Web bundle 把 goal 服务与 driver 保留在 Host，禁用基础命令 producer，并在 `standard`、`code` 和 `cordis` agent preset 中挂载 producer；`minimal` 会省略它。ACP（Agent Client Protocol）自动化应用启用领域与模型工具，但不挂载命令适配器。独立的 `sdk-minimal` profile 省略完整 goal 栈，因此其结果 API 仍在一个关联的物理轮次后结束。
@@ -84,7 +84,6 @@ kind: "package-reference"
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：命令语法、状态渲染、附件提交 |
-| — | 不发布运行时不变式伴生入口；此命令适配器不拥有事件流或状态投影；已接受的变更由 goal 领域检查，命令分发行为由包测试覆盖。 |
 
 </details>
 
@@ -97,7 +96,7 @@ kind: "package-reference"
 
 - [goal 服务](../goal/README.zh.md)——命令变更的状态与生命周期。
 - [命令服务](../../interaction/commands/README.zh.md)——命令注册表约定与分发。
-- [Harness 层目标式执行 Agent Note](../../../.agents/notes/implemented/feature/2026-07-16-harness-level-loop.zh.md)——用户体验与组合决策。
+- [历史Harness 层目标式执行 Agent Note](../../../.agents/notes/archived/feature/2026-07-16-harness-level-loop.md)——用户体验与组合决策。
 
 -----
 

@@ -8,14 +8,14 @@ import {
   createSystemMessage,
   createToolResultMessage,
   createUserMessage,
-} from '@x1a0f3n9/dsh-llm'
+} from '@deepseek-ai/dsh-llm'
 import {
   SESSION_FORMAT_VERSION,
   Session,
   SessionId,
-} from '@x1a0f3n9/dsh-session'
+} from '@deepseek-ai/dsh-session'
 // Carries the session/title event declaration into this fixture builder.
-import type {} from '@x1a0f3n9/dsh-session-title'
+import type {} from '@deepseek-ai/dsh-session-title'
 
 /** Options for one deterministic long-chat fixture. */
 export interface ChatScrollFixtureOptions {

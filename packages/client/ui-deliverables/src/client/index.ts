@@ -10,14 +10,14 @@
  */
 import './file-actions.ts'
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
-import type {} from '@x1a0f3n9/dsh-api-remotes/client'
-import type {} from '@x1a0f3n9/dsh-client-connection/client'
-import type { ChatFileMentions } from '@x1a0f3n9/dsh-client-ui-chat/client'
-import type {} from '@x1a0f3n9/dsh-client-locale/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-renderer/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-sidebar-right/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-settings/client'
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-client-connection/client'
+import type { ChatFileMentions } from '@deepseek-ai/dsh-client-ui-chat/client'
+import type {} from '@deepseek-ai/dsh-client-locale/client'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
+import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import { changesReviewAddress } from '../changes.ts'
 import { ChangesDiffStore } from './changes-diff.ts'
 import { ChangesSummaryStore } from './changes-summary.ts'
@@ -32,7 +32,7 @@ import {
   deliverablesDefinition, presentedForClosing, producedFileMentions, selectProducedFiles,
 } from './turn-deliverables.ts'
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** Changed-files card, review tab, delivery card, and file-mention copy. */
     'deliverables': DeliverablesKey
@@ -62,7 +62,7 @@ export function apply(ctx: ClientContext): void {
     'conversation.chat.turnTail',
     () => ctx.slots.register({
       name: 'conversation.chat.turnTail',
-      id: '@x1a0f3n9/dsh-client-ui-deliverables',
+      id: '@deepseek-ai/dsh-client-ui-deliverables',
       locale: NS,
       children: { 'deliverables.file.actions': { kind: 'list', scope: 'session' } },
       inject: (): DeliverablesInjected => ({
@@ -106,7 +106,8 @@ export function apply(ctx: ClientContext): void {
       const presented = presentedForClosing(owner)
       if (paths === null && presented.length === 0) return undefined
       return producedFileMentions([...new Set([...paths ?? [], ...presented.map(file => file.path)])], owner.openFile,
-        path => t('presented.previewButton', { name: path }))
+        path => t('presented.previewButton', { name: path }),
+        owner.turn.data.get('deliverables')?.produced.filter(operation => operation.seq <= owner.seq))
     },
   }
   ctx.provide('chatFileMentions', mentions)

@@ -1,13 +1,14 @@
 /** Host Schedule tests use real domain storage and an explicit Session resolver. */
 import { Context, Service } from '@deepseek-ai/cordis'
-import AgentRegistry, { type Agent } from '@x1a0f3n9/dsh-agent'
-import { unsupportedInbox } from '@x1a0f3n9/dsh-agent-loop-testkit'
-import type { UserMessage } from '@x1a0f3n9/dsh-llm'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import Storage, { type KvUnit, type KvUnitDescriptor, type StorageBackend } from '@x1a0f3n9/dsh-storage'
-import { DomainFacility } from '@x1a0f3n9/dsh-storage-domain'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import ToolRuntime from '@x1a0f3n9/dsh-tools'
+import AgentRegistry, { type Agent } from '@deepseek-ai/dsh-agent'
+import { unsupportedInbox } from '@deepseek-ai/dsh-agent-loop-testkit'
+import type { UserMessage } from '@deepseek-ai/dsh-llm'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import type { CreateSessionOptions } from '@deepseek-ai/dsh-session'
+import Storage, { type KvUnit, type KvUnitDescriptor, type StorageBackend } from '@deepseek-ai/dsh-storage'
+import { DomainFacility } from '@deepseek-ai/dsh-storage-domain'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import ToolRuntime from '@deepseek-ai/dsh-tools'
 import { vi } from 'vitest'
 import type { Mock } from 'vitest'
 import { MemoryMediaPool, MemoryStorageBackend } from '../../../storage/storage-domain/tests/helpers/memory-backend.ts'
@@ -118,10 +119,11 @@ export interface HarnessAgent extends Agent {
 /** Build an unregistered Agent for a test-owned Session.
  * @param ctx - Services owning the Session.
  * @param id - Unique Session identity within the test Context.
+ * @param meta - Optional Session creation metadata, such as subagent lineage.
  * @returns Agent whose follow-up entry is a spy.
  */
-export function agentFor(ctx: Context, id = 'original'): HarnessAgent {
-  const session = ctx.sessions.create(SessionId(id))
+export function agentFor(ctx: Context, id = 'original', meta?: CreateSessionOptions['meta']): HarnessAgent {
+  const session = ctx.sessions.create(SessionId(id), meta === undefined ? undefined : { meta })
   return {
     id: session.id, session, ctx: ctx.extend(), options: {}, status: 'idle', inbox: unsupportedInbox(),
     send() {}, followup: vi.fn<(message: UserMessage) => void>(), steer() {}, inject() {}, cancel() {},

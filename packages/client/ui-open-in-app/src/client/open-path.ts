@@ -2,9 +2,9 @@
  * Host desktop availability, file associations, and open/reveal actions over the Session Remote.
  * The desktop answer is read once per page; a failed read renders no control.
  */
-import { createSnapshotStore, type SnapshotStore } from '@x1a0f3n9/dsh-client-store'
-import type { RemoteResult } from '@x1a0f3n9/dsh-api-remotes/client'
-import type { SessionOpenWorkspacePathRequest, SessionWorkspacePathApplication } from '@x1a0f3n9/dsh-api-session-controller/types'
+import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
+import type { SessionOpenWorkspacePathRequest, SessionWorkspacePathApplication } from '@deepseek-ai/dsh-api-session-controller/types'
 
 /** What a path gesture asks of the Host desktop: the default application, or the file manager showing the file. */
 export type OpenInAppPathAction = 'open' | 'reveal'

@@ -1,10 +1,10 @@
 /**
  * Shared JSON/text fetch for credentialed pool adapters. Redirects fail before
  * a Location is contacted.
- * @module @x1a0f3n9/dsh-web-search-pool/http
+ * @module @deepseek-ai/dsh-web-search-pool/http
  */
 
-import { WebError } from '@x1a0f3n9/dsh-web'
+import { WebError } from '@deepseek-ai/dsh-web'
 import type { SearchPoolFailureKind } from './types.ts'
 
 /** Attribution header sent on pool-owned HTTP. Bump with the package version. */

@@ -12,12 +12,12 @@ import { describe, expect, it } from 'vitest'
 import { act, render } from '@testing-library/react'
 import { Context } from '@deepseek-ai/cordis'
 import { useSyncExternalStore } from 'react'
-import type { SessionReference } from '@x1a0f3n9/dsh-api-session-controller/client'
-import type { SessionProviderComponent, StoredEntry } from '@x1a0f3n9/dsh-client-ui-slots'
-import type {} from '@x1a0f3n9/dsh-client-ui-session/client'
+import type { SessionReference } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionProviderComponent, StoredEntry } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type {
   ScopedStandardSourceBinding, SlotRendererHost, SlotScopeAdapter, StandardSourceBinding,
-} from '@x1a0f3n9/dsh-client-ui-renderer/client'
+} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { createSlotRenderer } from '../src/client/scoped-slots.tsx'
 
 type SessionBinding = ScopedStandardSourceBinding

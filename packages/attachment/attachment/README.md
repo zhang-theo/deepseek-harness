@@ -3,7 +3,7 @@ description: "Durable image and file attachments for users and maintainers attac
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-attachment
+# @deepseek-ai/dsh-attachment
 
 English | [中文](README.zh.md)
 
@@ -32,7 +32,7 @@ Image attachments work end to end: attach an image to a prompt or a command, and
 Attach one or more images to a user prompt in the client UI. Each source is checked, normalized to a provider-independent 8-bit sRGB/sRGBA raster, and saved before your message is processed; if any image is refused, the whole message fails and nothing is published. Supported source formats are PNG, JPEG, WebP, and GIF; a deployment controls source limits separately from normalized-storage and route-specific request limits. The one plugin below enables durable image attachments (the shipped base composition already mounts it):
 
 ```yaml
-- name: '@x1a0f3n9/dsh-attachment-local'
+- name: '@deepseek-ai/dsh-attachment-local'
 ```
 
 ### Attach any other file to a prompt
@@ -83,7 +83,6 @@ The service family runs one admission-and-storage flow: every entry point enforc
 | [`src/admission.ts`](src/admission.ts) | Canonical-base64 enforcement and store delegation for encoded image and file uploads |
 | [`src/error.ts`](src/error.ts) | `AttachmentError` class and the `isImageAdmissionError` runtime subset |
 | [`src/brand.ts`](src/brand.ts) | `AttachmentId` branded opaque identifier |
-| — | No runtime invariant companion is published; this stateless seam owns types while implementations enforce immutable-store checks. |
 
 </details>
 

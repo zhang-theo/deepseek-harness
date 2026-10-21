@@ -5,8 +5,8 @@ import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium, type Browser, type Page } from 'playwright'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import type {} from '@x1a0f3n9/dsh-tool-present/types'
-import { deriveReplayScript, parseSessionLog } from '@x1a0f3n9/dsh-llm-replay'
+import type {} from '@deepseek-ai/dsh-tool-present/types'
+import { deriveReplayScript, parseSessionLog } from '@deepseek-ai/dsh-llm-replay'
 import {
   assertFinalWorkspaceSnapshot, captureExpandedTurnProcessAria, compareOrRefreshGolden,
   fixtureUserPrompts, launchWebScaffold, recordFixture, watchConsole,
@@ -36,7 +36,7 @@ describe('web e2e: requested SVG is explicitly delivered', () => {
       replayOverride = join(replayRoot, 'replay.override.json')
       const script = deriveReplayScript(parseSessionLog(await readFile(FIXTURE, 'utf8')))
       // Recorded absolute paths must follow each isolated Session's working directory.
-      const cwdToken = '{{fromRequest:Your working directory is ([^\\n]+)\\.}}'
+      const cwdToken = '{{fromRequest:Current working directory: "([^"]+)"}}'
       await writeFile(replayOverride, JSON.stringify(script).replaceAll('{{cwd}}', JSON.stringify(cwdToken).slice(1, -1)))
     }
     scaffold = await launchWebScaffold({
@@ -122,6 +122,8 @@ describe('web e2e: requested SVG is explicitly delivered', () => {
     expect(await page.getByText('产物', { exact: true }).count()).toBe(0)
     // The scaffold workspace is not a git repository; the write call supplies its single changed file.
     const changes = page.locator('[data-changed-files]')
+    // Changed-file cards wait for a separate summary request after the presentation events arrive.
+    await changes.waitFor({ state: 'visible' })
     expect(await changes.count()).toBe(1)
     expect(await changes.getByText(`已编辑 ${FILE}`, { exact: true }).count()).toBe(1)
     expect(await changes.getByRole('list').count()).toBe(0)

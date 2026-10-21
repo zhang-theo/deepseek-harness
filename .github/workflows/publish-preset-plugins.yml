@@ -26,42 +26,42 @@ jobs:
         include:
           - repo: LunFengChen/dsh-market
             ref: v1.45.2
-            package: '@x1a0f3n9/dshmarket'
+            package: '@deepseek-ai/dshmarket'
             version: '1.45.2'
             build: npm
           - repo: LunFengChen/dsh-reasoning-effort
             ref: v0.7.3
-            package: '@x1a0f3n9/dsh-reasoning-effort'
+            package: '@deepseek-ai/dsh-reasoning-effort'
             version: '0.7.3'
             build: none
           - repo: LunFengChen/dsh-session-timeline
             ref: v0.1.5-xfdsh.2
-            package: '@x1a0f3n9/dsh-session-timeline'
+            package: '@deepseek-ai/dsh-session-timeline'
             version: '0.1.5-xfdsh.2'
             build: none
           - repo: LunFengChen/dsh-context
             ref: v0.49.7
-            package: '@x1a0f3n9/dsh-context'
+            package: '@deepseek-ai/dsh-context'
             version: '0.49.7'
             build: none
           - repo: LunFengChen/DSH-better-sidebar
             ref: v0.19.3
-            package: '@x1a0f3n9/dsh-better-sidebar'
+            package: '@deepseek-ai/dsh-better-sidebar'
             version: '0.19.3'
             build: pnpm
           - repo: LunFengChen/hindsight-coding-agents
             ref: v0.5.2-xfdsh.4
-            package: '@x1a0f3n9/hindsight-coding-agents'
+            package: '@deepseek-ai/hindsight-coding-agents'
             version: '0.5.2-xfdsh.4'
             build: none
           - repo: LunFengChen/dsh-failover-queue
             ref: v0.1.12
-            package: '@x1a0f3n9/dsh-failover-queue'
+            package: '@deepseek-ai/dsh-failover-queue'
             version: '0.1.12'
             build: none
           - repo: LunFengChen/dsh-skills-manager
             ref: v0.1.53-xfdsh.1
-            package: '@x1a0f3n9/dsh-skills-manager'
+            package: '@deepseek-ai/dsh-skills-manager'
             version: '0.1.53-xfdsh.1'
             build: none
     steps:
@@ -99,9 +99,9 @@ jobs:
             exit 1
           fi
           case "$NAME" in
-            @x1a0f3n9/*) ;;
+            @deepseek-ai/*) ;;
             *)
-              echo "::error::refusing to publish $NAME; preset plugins must be @x1a0f3n9/*"
+              echo "::error::refusing to publish $NAME; preset plugins must be @deepseek-ai/*"
               exit 1
               ;;
           esac

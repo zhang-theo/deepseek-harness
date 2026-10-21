@@ -1,10 +1,10 @@
 /** Browser availability/choice state and the launch carrier for the split button. */
 
-import { createSnapshotStore, type SnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-store'
 import {
   OPEN_IN_APP_APPS_ROUTE, OPEN_IN_APP_OPEN_ROUTE,
   type OpenInAppAppsPayload, type OpenInAppOpenPayload,
-} from '@x1a0f3n9/dsh-host-open-in-app/shared'
+} from '@deepseek-ai/dsh-host-open-in-app/shared'
 
 import { APP_LABEL_KEY } from './applications.ts'
 

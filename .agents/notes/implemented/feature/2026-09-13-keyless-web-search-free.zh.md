@@ -10,7 +10,7 @@ Status: implemented
 
 ## Decision
 
-新增 `@x1a0f3n9/dsh-web-search-free`，作为 `free` 搜索提供方。它先读 Bing HTML，Bing 没有来源时再读 DuckDuckGo HTML。已交付的 xfdsh web 独占顺序是 `[search-pool, perplexity, exa, free]`；`free` 仍是可固定的叶子，也是搜索池的最后一跳。DeepSeek 搜索仍挂载，并且只能靠固定选择。HTML 搜索引擎会按地区重定向，所以这里跟随重定向；带凭证的搜索后端仍然拒绝重定向。见[web 搜索池](2026-09-17-web-search-pool.zh.md)。
+新增 `@deepseek-ai/dsh-web-search-free`，作为 `free` 搜索提供方。它先读 Bing HTML，Bing 没有来源时再读 DuckDuckGo HTML。已交付的 xfdsh web 独占顺序是 `[search-pool, perplexity, exa, free]`；`free` 仍是可固定的叶子，也是搜索池的最后一跳。DeepSeek 搜索仍挂载，并且只能靠固定选择。HTML 搜索引擎会按地区重定向，所以这里跟随重定向；带凭证的搜索后端仍然拒绝重定向。见[web 搜索池](2026-09-17-web-search-pool.zh.md)。
 
 ## Alternatives considered
 

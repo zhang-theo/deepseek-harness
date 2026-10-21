@@ -3,7 +3,7 @@ description: "ctx.web 的 Perplexity 搜索提供方：部署方如何挂载 Ope
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-web-search-perplexity
+# @deepseek-ai/dsh-web-search-perplexity
 
 [English](README.md) | 中文
 
@@ -36,8 +36,8 @@ kind: "package-reference"
 加载 web 服务与本提供方；API 密钥回退到启动环境中的 `$PERPLEXITY_API_KEY`，其余设置都有安全默认值。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-web'
-- name: '@x1a0f3n9/dsh-web-search-perplexity'
+- name: '@deepseek-ai/dsh-web'
+- name: '@deepseek-ai/dsh-web-search-perplexity'
   config:
     apiKey: !!js process.env.PERPLEXITY_API_KEY
 ```
@@ -84,7 +84,6 @@ kind: "package-reference"
 | [`src/index.ts`](src/index.ts) | 插件入口：配置 schema、环境变量回退、提供方注册 |
 | [`src/provider.ts`](src/provider.ts) | `PerplexitySearchProvider`：请求分发、中止分类、答案与来源映射 |
 | [`src/types.ts`](src/types.ts) | chat-completions 响应的 Perplexity 协议类型 |
-| — | 不发布运行时不变量配套入口；除所属 seam 强制执行的约定外，本包不公开独立的事件序列或可变数据关系。 |
 
 ### 请求与映射流程
 

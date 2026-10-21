@@ -16,18 +16,18 @@ import { Service } from '@deepseek-ai/cordis'
 import type { Context } from '@deepseek-ai/cordis'
 // Type-only: pulls the ctx.remote merge and the forwarded-event key face
 // (`commands/change` rides the allowlist) into this program.
-import type {} from '@x1a0f3n9/dsh-api-remotes/client'
-import type { CommandResult } from '@x1a0f3n9/dsh-commands/types'
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type { CommandResult } from '@deepseek-ai/dsh-commands/types'
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
-import type { ISessions, SessionBinding } from '@x1a0f3n9/dsh-api-session-controller/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import { WeakMapWithValues } from '@x1a0f3n9/dsh-util-values'
-import type { TranslateNS } from '@x1a0f3n9/dsh-client-locale/client'
-import { rankByName } from '@x1a0f3n9/dsh-client-ui-primitives'
+import type { ISessions, SessionBinding } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import { WeakMapWithValues } from '@deepseek-ai/dsh-util-values'
+import type { TranslateNS } from '@deepseek-ai/dsh-client-locale/client'
+import { rankByName } from '@deepseek-ai/dsh-client-ui-primitives'
 import type {
   CandidateRequest, ClientSessionContext, CommandClaim, PickOutcome, InputTriggerCandidate, InputTriggerPick,
   SubmitAttachment, SubmitEnvelope, SubmitOutcome,
-} from '@x1a0f3n9/dsh-client-ui-input-trigger/client'
+} from '@deepseek-ai/dsh-client-ui-input-trigger/client'
 import type { CommandContribution, CommandDecoration, CommandUiContract } from './contract.ts'
 import type { CommandDescriptor } from './directory.ts'
 import { CommandDirectory } from './directory.ts'
@@ -36,7 +36,7 @@ import { builtinRowFace, sectionRows } from './presentation.ts'
 import { claimToken } from './resolution.ts'
 import type { TokenSegment } from './popup.ts'
 
-declare module '@x1a0f3n9/dsh-api-session-controller/client' {
+declare module '@deepseek-ai/dsh-api-session-controller/client' {
   interface SessionReferenceSourceMap {
     /** A command-catalog fetch waiting for initial history and its RPC result. */
     commandCatalog: unknown
@@ -118,6 +118,7 @@ export class CommandUiRuntime extends Service implements CommandUiContract {
       candidates: (session, req) => this.candidates(session, req),
       onPick: pick => this.dispatch(pick),
       matchSpace: (session, token) => this.matchSpace(session, token),
+      matchClaim: (session, token, signal) => this.matchClaim(session, token, signal),
       matchEnter: (session, line, signal, envelope) => this.matchEnter(session, line, signal, envelope),
       warm: (session) => { this.directory.warm(session.sessionId) },
     }), 'command: slash source')
@@ -276,11 +277,27 @@ export class CommandUiRuntime extends Service implements CommandUiContract {
 
   /** Decision table, space column: hot-key sync check; only host leadingInput claims. */
   private matchSpace(session: ClientSessionContext, token: string): PickOutcome {
+    const claim = this.claimOf(session, token)
+    return claim === undefined ? undefined : { claim }
+  }
+
+  /**
+   * Restore column: the space column's answer once the session's catalog is
+   * ready (a warmup failure rejects). It only resolves; nothing is invoked or
+   * executed.
+   */
+  private async matchClaim(session: ClientSessionContext, token: string, signal: AbortSignal): Promise<CommandClaim | undefined> {
+    await this.directory.ensureReady(session.sessionId, signal)
+    return this.claimOf(session, token)
+  }
+
+  /** The host leadingInput claim a token names in the hot catalog; popup and action kinds never claim. */
+  private claimOf(session: ClientSessionContext, token: string): CommandClaim | undefined {
     if (!token.startsWith('/')) return undefined
-    if (this.live.contributions.has(token.slice(1))) return undefined // popup and action kinds never claim on space
+    if (this.live.contributions.has(token.slice(1))) return undefined
     const desc = this.directory.resolve(session.sessionId, token.slice(1))
     if (desc === undefined || desc.input === undefined) return undefined
-    return { claim: this.leadingClaim(desc, session, token.slice(1)) }
+    return this.leadingClaim(desc, session, token.slice(1))
   }
 
   /**

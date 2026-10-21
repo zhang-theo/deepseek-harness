@@ -1,14 +1,14 @@
 // @vitest-environment jsdom
 import { afterEach, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
-import { bindSnapshotSelector, makeTranslate } from '@x1a0f3n9/dsh-client-test-runtime'
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
-import type { ShortcutCatalogEntry, ShortcutCommandId, ShortcutFixedCatalogEntry } from '@x1a0f3n9/dsh-client-shortcuts/client'
+import { bindSnapshotSelector, makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { ShortcutCatalogEntry, ShortcutCommandId, ShortcutFixedCatalogEntry } from '@deepseek-ai/dsh-client-shortcuts/client'
 import { ShortcutReference, ShortcutsRow } from '../src/client/Reference.tsx'
 import { createShortcutsStore } from '../src/client/store.ts'
 import { en, zh } from '../src/client/locales.ts'
-import { initialShortcutConfig, bindingIssue, normalizeBinding, presentBinding } from '@x1a0f3n9/dsh-client-shortcuts/protocol'
-import type { ShortcutConfigSnapshot } from '@x1a0f3n9/dsh-client-shortcuts/protocol'
+import { initialShortcutConfig, bindingIssue, normalizeBinding, presentBinding } from '@deepseek-ai/dsh-client-shortcuts/protocol'
+import type { ShortcutConfigSnapshot } from '@deepseek-ai/dsh-client-shortcuts/protocol'
 import { ShortcutRegistry } from '../../shortcuts/src/client/registry.ts'
 import { apply as hostApply } from '../src/index.ts'
 import { fixedCommands } from '../src/client/fixed.ts'
@@ -173,7 +173,7 @@ function referenceFixture({ runtime = 'web', dictionary = en }: { runtime?: 'web
 }
 
 it('keeps core actions in product order across registration, remount and label changes', () => {
-  const { catalog, fixedCatalog, store } = referenceFixture()
+  const { catalog, fixedCatalog, store } = referenceFixture({ runtime: 'desktop' })
   const template = catalog.getSnapshot()[0]!
   const core = [
     ['shortcuts.open', 'Keyboard shortcuts'], ['session.new', 'New session'],
@@ -197,11 +197,14 @@ it('keeps core actions in product order across registration, remount and label c
     { ...stop, id: 'fixed.select' as ShortcutCommandId, label: 'Select', keys: ['Enter'], bindings: [{ code: 'Enter', modifiers: [] }], group: 'menus' },
     { ...stop, id: 'fixed.dismiss' as ShortcutCommandId, label: 'Dismiss', group: 'menus' },
     { ...stop, id: 'approval.accept' as ShortcutCommandId, label: 'Approve', keys: ['Enter'], bindings: [{ code: 'Enter', modifiers: [] }], group: 'approval' },
+    { ...stop, id: 'fontSize.increase' as ShortcutCommandId, label: 'Increase font size', keys: ['⌘', '='], bindings: [{ code: 'Equal', modifiers: ['meta'] }], group: 'application' },
+    { ...stop, id: 'fontSize.decrease' as ShortcutCommandId, label: 'Decrease font size', keys: ['⌘', '-'], bindings: [{ code: 'Minus', modifiers: ['meta'] }], group: 'application' },
     stop,
   ]
   const labels = (group: string) => within(screen.getByRole('region', { name: group })).getAllByRole('listitem')
     .map(row => row.querySelector(':scope > span')?.textContent)
-  const expected = [...core.map(([, label]) => label), 'Zulu extension', 'Alpha extension']
+  const expected = [...core.flatMap(([id, label]) => id === 'settings.open'
+    ? [label, 'Increase font size', 'Decrease font size'] : [label]), 'Zulu extension', 'Alpha extension']
   for (const reversed of [true, false]) {
     act(() => {
       catalog.set(reversed ? [...extensions, ...commands].reverse() : [...extensions, ...commands])
@@ -218,7 +221,7 @@ it('keeps core actions in product order across registration, remount and label c
   expect(screen.queryByRole('button', { name: 'Edit shortcut for Stop reply' })).toBeNull()
   expect(screen.queryByRole('group', { name: 'Stop reply' })).toBeNull()
   act(() => { catalog.set(extensions); fixedCatalog.set(fixed.filter(row => row.id !== stop.id)) })
-  expect(labels(en.application)).toEqual(['Zulu extension', 'Alpha extension'])
+  expect(labels(en.application)).toEqual(['Increase font size', 'Decrease font size', 'Zulu extension', 'Alpha extension'])
   act(() => { catalog.set([...extensions, ...[...commands].reverse()]); fixedCatalog.set(fixed) })
   expect(labels(en.application)).toEqual(expected)
   act(() => {

@@ -3,7 +3,7 @@ description: "Opt-in per-turn tmux location context for users and maintainers en
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-tmux-context
+# @deepseek-ai/dsh-tmux-context
 
 English | [中文](README.zh.md)
 
@@ -36,7 +36,7 @@ On each turn whose tmux state changed, the model receives one source-tagged cont
 The minimal mount needs no configuration. A positive `refreshIntervalMs` additionally suppresses injections that fall within that many milliseconds of the latest one; omission or `0` injects whenever the tmux state changed since the last injection.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-tmux-context'
+- name: '@deepseek-ai/dsh-tmux-context'
   config:
     refreshIntervalMs: 60000
 ```
@@ -70,7 +70,6 @@ The plugin prepends an `agent/pre-step` listener that runs only on the first ste
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry: first-step listener, shell query, change suppression, scheduling |
-| — | No runtime invariant companion is published; a reading is a per-turn snapshot of external tmux state, so the session holds no cross-event relation to check; scheduling and format are owned by pipeline tests. |
 
 ### Main flow
 

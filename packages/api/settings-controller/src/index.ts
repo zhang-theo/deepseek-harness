@@ -4,19 +4,19 @@
  * `ctx.settings`, owned by the class below; and `credentials`, mounted from
  * here as its own plugin.
  *
- * @module @x1a0f3n9/dsh-api-settings-controller
+ * @module @deepseek-ai/dsh-api-settings-controller
  */
 
 import { Context } from '@deepseek-ai/cordis'
 import {
   openNativeTextFile,
-} from '@x1a0f3n9/dsh-native-command'
-import type { SettingsDescriptor, SettingsPathOp, SettingsForms } from '@x1a0f3n9/dsh-settings'
+} from '@deepseek-ai/dsh-native-command'
+import type { SettingsDescriptor, SettingsPathOp, SettingsForms } from '@deepseek-ai/dsh-settings'
 import type {
   SettingsDescribeValue, SettingsNamespaceView, SettingsPathOpView,
-} from '@x1a0f3n9/dsh-settings/types'
-import { Remote, RemoteError, TypertRemoteService } from '@x1a0f3n9/dsh-typert-protocol'
-import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
+} from '@deepseek-ai/dsh-settings/types'
+import { Remote, RemoteError, TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 import { z } from 'zod'
 import { CredentialsController } from './credentials.ts'
 import type { SettingsDocumentOpenValue } from './types.ts'
@@ -218,7 +218,7 @@ export class SettingsController extends TypertRemoteService {
     if (settings === undefined) {
       throw new RemoteError(
         'gateway/internal',
-        'settings service is absent: mount @x1a0f3n9/dsh-settings with @x1a0f3n9/dsh-config-editor in the profile composition',
+        'settings service is absent: mount @deepseek-ai/dsh-settings with @deepseek-ai/dsh-config-editor in the profile composition',
         {},
       )
     }

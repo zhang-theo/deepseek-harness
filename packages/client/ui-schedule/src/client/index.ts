@@ -29,19 +29,19 @@
  */
 
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
-import type {} from '@x1a0f3n9/dsh-client-locale/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-renderer/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-session/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-sidebar/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-sidebar-right/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-tool/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-workspace/client'
-import type { MainPanelId } from '@x1a0f3n9/dsh-client-ui-layout/client'
-import type {} from '@x1a0f3n9/dsh-api-remotes/client'
-import type {} from '@x1a0f3n9/dsh-client-connection/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { ScheduleCatalogEntry, ScheduleDeliveryHistoryRequest, ScheduleId, ScheduleUpdateRequest } from '@x1a0f3n9/dsh-schedule/client'
+import type {} from '@deepseek-ai/dsh-client-locale/client'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
+import type {} from '@deepseek-ai/dsh-client-ui-tool/client'
+import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
+import type { MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client'
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-client-connection/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { ScheduleCatalogEntry, ScheduleDeliveryHistoryRequest, ScheduleId, ScheduleUpdateRequest } from '@deepseek-ai/dsh-schedule/client'
 import { createCatalogSource, type CatalogDeleteOutcome, type CatalogInjected } from './catalog-source.ts'
 import { createDeleteToastSource, ScheduleDeleteToast } from './DeleteToast.tsx'
 import { SCHEDULE_TASK_ID, SCHEDULE_TASK_KIND, scheduleTaskDefinition } from './definition.ts'
@@ -64,7 +64,7 @@ import { en as managerEn, zh as managerZh, type TaskManagerKey } from './task-ma
 const MANAGER_NS = 'schedule.manager'
 const PANEL_ID = 'schedules' as MainPanelId
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** Active Schedule catalog copy. */
     'schedule.catalog': ScheduleCatalogKey

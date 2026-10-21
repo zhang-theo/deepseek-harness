@@ -2,7 +2,7 @@
 import { vi } from 'vitest'
 import type {
   ConfigForm, ConfigFormSnapshot,
-} from '@x1a0f3n9/dsh-client-ui-settings/client'
+} from '@deepseek-ai/dsh-client-ui-settings/client'
 
 /** Handle over one stubbed scope: the scope, its write spy, and publication controls. */
 export interface StubConfigForm<T> {
@@ -25,14 +25,14 @@ export interface StubConfigForm<T> {
 }
 
 /**
- * Build an in-memory settings scope for service specs: starts in the host
- * loading state, records writes, and lets the test publish Host acceptances.
+ * Build an in-memory settings scope for service specs: starts in the loading
+ * state, records writes, and lets the test publish Host acceptances.
  * @returns the stub handle.
  */
 export function stubConfigForm<T>(): StubConfigForm<T> {
   let snapshot: ConfigFormSnapshot<T> = {
     status: 'loading', value: undefined, base: undefined, user: undefined,
-    revision: undefined, writable: false, mode: 'host',
+    revision: undefined, writable: false,
   }
   const listeners = new Set<() => void>()
   const set = vi.fn(() => Promise.resolve(true))

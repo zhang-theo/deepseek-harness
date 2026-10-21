@@ -2,20 +2,20 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type {
   ISessions, SessionReference,
-} from '@x1a0f3n9/dsh-api-session-controller/client'
-import type { ResourceProvider } from '@x1a0f3n9/dsh-client-resources/client'
-import type { ConversationViewsProps } from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { SidebarRightTabDefinition } from '@x1a0f3n9/dsh-client-ui-sidebar-right/client'
+} from '@deepseek-ai/dsh-api-session-controller/client'
+import type { ResourceProvider } from '@deepseek-ai/dsh-client-resources/client'
+import type { ConversationViewsProps } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { SidebarRightTabDefinition } from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type {
   PropsRenderFactories, PropsRenderSlots, PropsRuntime, TranslateNS,
-} from '@x1a0f3n9/dsh-client-ui-slots'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { SubagentAddress } from '@x1a0f3n9/dsh-subagent/client'
+} from '@deepseek-ai/dsh-client-ui-slots'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { SubagentAddress } from '@deepseek-ai/dsh-subagent/client'
 import type { NS } from '../locales.ts'
 import css from './SidebarChat.module.css'
 
 /** Stable implementation identity for the Sidebar tab body. */
-export const SUBAGENT_CHAT_ID = '@x1a0f3n9/dsh-client-ui-subagent'
+export const SUBAGENT_CHAT_ID = '@deepseek-ai/dsh-client-ui-subagent'
 
 /** Resource-address prefix for an embedded Session chat. */
 export const SUBAGENT_CHAT_ADDRESS = 'dsh-resource://subagentchat/session/'
@@ -26,13 +26,13 @@ export interface SubagentChatResource {
   readonly reference: SessionReference
 }
 
-declare module '@x1a0f3n9/dsh-api-session-controller/client' {
+declare module '@deepseek-ai/dsh-api-session-controller/client' {
   interface SessionReferenceSourceMap {
     sidebarChat: unknown
   }
 }
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface ResourceProtocolMap {
     subagentchat: SubagentChatResource
   }

@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { createScope, scopeOf } from '@x1a0f3n9/dsh-scope'
-import type { Scope, ScopeKey } from '@x1a0f3n9/dsh-scope'
-import SystemPrompt, { TOOL_ORDER_REST, renderContextSnapshot, renderPrompt } from '@x1a0f3n9/dsh-system-prompt'
-import type { Config, PromptAssembly } from '@x1a0f3n9/dsh-system-prompt'
+import { createScope, scopeOf } from '@deepseek-ai/dsh-scope'
+import type { Scope, ScopeKey } from '@deepseek-ai/dsh-scope'
+import SystemPrompt, { TOOL_ORDER_REST, renderContextSnapshot, renderPrompt } from '@deepseek-ai/dsh-system-prompt'
+import type { Config, PromptAssembly } from '@deepseek-ai/dsh-system-prompt'
 
 async function mount(config: Config = {}): Promise<Context> {
   const ctx = new Context()
@@ -205,6 +205,27 @@ describe('scoped tool providers and toolOrder × restriction', () => {
 })
 
 describe('scoped assemble dispatch', () => {
+  it('refreshes through the same scoped providers and suppression as assembly', async () => {
+    const ctx = await mount()
+    try {
+      const scope = await mintScope(ctx, 'refresh')
+      let current = 'before'
+      ctx.systemPrompt.context({ name: 'fact', order: 0, text: 'global' })
+      scope.ctx.systemPrompt.context({ name: 'fact', order: 0, required: true, text: () => current })
+      scope.ctx.systemPrompt.context({ name: 'optional', order: 10, text: 'optional' })
+      const context = { scope: scopeKeyOf(scope) }
+      const accepted = await ctx.systemPrompt.assemble(context)
+      current = 'after'
+      const restore = scope.ctx.systemPrompt.suppressRuntimeContext()
+      expect(ctx.systemPrompt.refreshContext(accepted, context).contexts).toEqual([{ name: 'fact', text: 'after' }])
+      restore()
+      expect(ctx.systemPrompt.refreshContext(await ctx.systemPrompt.assemble()).contexts).toEqual([{ name: 'fact', text: 'global' }])
+    } finally {
+      await ctx.fiber.dispose()
+    }
+  })
+
+
   it('an agent.ctx assemble listener shapes only its own scope\'s assemblies', async () => {
     const ctx = await mount()
     const scope = await mintScope(ctx, 'child')

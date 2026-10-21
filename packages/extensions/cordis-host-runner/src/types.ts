@@ -1,11 +1,11 @@
 /**
  * Client-safe wire vocabulary of the dynamic Cordis plugin runner.
- * @module @x1a0f3n9/dsh-cordis-host-runner/types
+ * @module @deepseek-ai/dsh-cordis-host-runner/types
  */
 
-import type { Branded } from '@x1a0f3n9/dsh-brand'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
+import type { Branded } from '@deepseek-ai/dsh-brand'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 
 /** Stable identity of one dynamic plugin instance. */
 export type CordisDynamicPluginId = Branded<'CordisDynamicPluginId'>
@@ -84,7 +84,10 @@ export interface CordisInspectQueryResolved {
 
 /** Whether a Client answer claimed the still-pending query. */
 export interface CordisInspectResolveAck {
-  /** False for unknown, cancelled, stale, or late answers. */
+  /**
+   * True only for a valid success that settles the query;
+   * false for retained failures and unknown, timed out, cancelled, or late answers.
+   */
   accepted: boolean
 }
 

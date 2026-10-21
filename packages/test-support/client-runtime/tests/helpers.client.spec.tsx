@@ -1,14 +1,16 @@
 // @vitest-environment jsdom
 import { act, cleanup, renderHook } from '@testing-library/react'
-import type { SessionLiveEventEntry } from '@x1a0f3n9/dsh-api-session-controller/client'
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
-import { EMPTY_CHAT_SNAPSHOT } from '@x1a0f3n9/dsh-client-ui-chat/client'
-import { EMPTY_CONVERSATION_SNAPSHOT } from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { MainPanelId, PanelInfo } from '@x1a0f3n9/dsh-client-ui-layout/client'
-import type { PropsRuntime } from '@x1a0f3n9/dsh-client-ui-slots'
+import type { SessionLiveEventEntry } from '@deepseek-ai/dsh-api-session-controller/client'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
+import { EMPTY_CHAT_SNAPSHOT } from '@deepseek-ai/dsh-client-ui-chat/client'
+import { EMPTY_CONVERSATION_SNAPSHOT } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { WorkspaceId } from '@deepseek-ai/dsh-api-workspace-controller/client'
+import type { MainPanelId, PanelInfo } from '@deepseek-ai/dsh-client-ui-layout/client'
+import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { afterAll, afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  allowAllAccess,
   bindSnapshotSelector,
   chatSnapshot,
   conversationSnapshot,
@@ -19,7 +21,7 @@ import {
 const originalLanguages = [...navigator.languages]
 const originalLanguage = navigator.language
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotMap {
     'trt.panel-info': { kind: 'keyed'; scope: 'root'; owner: { label: string } }
   }
@@ -46,6 +48,26 @@ function entry(seq: number): SessionLiveEventEntry {
 }
 
 describe('fixture helpers', () => {
+  it('allows every action on every resource through the hand-built access Hooks', () => {
+    expect(allowAllAccess.useRemoteAccess('session/list')).toBe(true)
+    expect(allowAllAccess.useAccess('session/fork')).toBe(true)
+    expect(allowAllAccess.useSessionAccess('s1' as SessionId, 'session/fork')).toBe(true)
+    expect(allowAllAccess.useWorkspaceAccess('w1' as WorkspaceId, 'workspace/follow')).toBe(true)
+  })
+
+  it('installs an allow-all remoteAccess service whose sources never change', async () => {
+    const runtime = await SlotTestRuntime.create()
+    try {
+      const source = runtime.ctx.remoteAccess.source('session', 's1', 'session/fork')
+      expect(source.getSnapshot()).toBe(true)
+      const unsubscribe = source.subscribe(() => {})
+      unsubscribe()
+      expect(source.getSnapshot()).toBe(true)
+    } finally {
+      await runtime.dispose()
+    }
+  })
+
   it('retracts default root sources without removing their live replacements', async () => {
     const runtime = await SlotTestRuntime.create()
     const hooks = { workspaces: runtime.workspaces.list, panelInfo: runtime.panelInfo }

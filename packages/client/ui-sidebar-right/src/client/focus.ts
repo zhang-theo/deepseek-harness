@@ -1,6 +1,6 @@
 /** Live DOM ownership for docked and floating sidebar pages. */
-import type { LayoutState, PaneId, TabId } from '@x1a0f3n9/dsh-client-ui-dockkit'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+import type { LayoutState, PaneId, TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabOccurrence } from './tab-domain.ts'
 
 /** A page captured from the currently mounted Session and its current occurrence. */

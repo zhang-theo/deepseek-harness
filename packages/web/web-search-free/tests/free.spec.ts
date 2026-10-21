@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import WebRuntime from '@x1a0f3n9/dsh-web'
+import WebRuntime from '@deepseek-ai/dsh-web'
 import {
   FREE_DEFAULT_BING_BASE_URL,
   FREE_DEFAULT_DDG_BASE_URL,
@@ -9,8 +9,8 @@ import {
   FreeSearchProvider,
   bingSearchUrl,
   ddgSearchUrl,
-} from '@x1a0f3n9/dsh-web-search-free'
-import * as freePlugin from '@x1a0f3n9/dsh-web-search-free'
+} from '@deepseek-ai/dsh-web-search-free'
+import * as freePlugin from '@deepseek-ai/dsh-web-search-free'
 
 const options = {
   bingBaseURL: 'https://bing.test',

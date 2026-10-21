@@ -12,7 +12,7 @@ describe('release verify refs', () => {
   const family = releaseFamily('dsh')
   const members: ReleaseMember[] = [{
     directory: 'apps/cli',
-    name: '@x1a0f3n9/dsh',
+    name: '@deepseek-ai/dsh',
     version: '0.1.5-alpha.2',
     manifest: {},
   }]

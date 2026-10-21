@@ -3,7 +3,7 @@ description: "用于 projection state 的不可变的仅追加列表，提供有
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-chunked-list
+# @deepseek-ai/dsh-chunked-list
 
 [English](README.md) | 中文
 
@@ -28,7 +28,7 @@ kind: "package-library"
 当仅追加集合需要不可变版本和兼容 JSON 的存储时，使用此列表。空列表用 `undefined` 表示；追加返回新的头节点，不修改已有节点。列表按引用共享所存的值，因此调用方必须将这些值视为不可变。
 
 ```ts
-import { appendChunkedList, iterateChunkedList } from '@x1a0f3n9/dsh-chunked-list'
+import { appendChunkedList, iterateChunkedList } from '@deepseek-ai/dsh-chunked-list'
 
 const first = appendChunkedList(undefined, 'first')
 const second = appendChunkedList(first, 'second')
@@ -51,8 +51,6 @@ console.log([...iterateChunkedList(second)])
 |---|---|
 | [`src/index.ts`](src/index.ts) | 持久化列表操作与检查点校验 |
 | [`tests/chunked-list.spec.ts`](tests/chunked-list.spec.ts) | 版本隔离、顺序、结构共享与检查点接受条件 |
-
-此库没有独立变化的观测值，因此不发布运行时不变式伴随模块；其操作返回调用方拥有的不可变值。
 
 </details>
 

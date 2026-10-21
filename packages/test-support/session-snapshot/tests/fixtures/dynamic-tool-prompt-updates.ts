@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import type { Context } from '@deepseek-ai/cordis'
-import type { GenerateOptions } from '@x1a0f3n9/dsh-llm'
-import type {} from '@x1a0f3n9/dsh-system-prompt'
+import type { GenerateOptions } from '@deepseek-ai/dsh-llm'
+import type {} from '@deepseek-ai/dsh-system-prompt'
 import { apply as registerDynamicTools } from './dynamic-tool-updates.ts'
 
 export const name = 'snapshot-dynamic-tool-prompt-updates'

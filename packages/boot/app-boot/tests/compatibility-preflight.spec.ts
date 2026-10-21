@@ -36,7 +36,7 @@ function fixture() {
     mkdirSync(packageDir, { recursive: true })
     writeFileSync(join(packageDir, 'package.json'), JSON.stringify({
       name, version: options.version ?? '1.0.0', type: 'module', exports: './index.mjs',
-      ...options.peer === undefined ? {} : { peerDependencies: { '@x1a0f3n9/dsh-test': options.peer } },
+      ...options.peer === undefined ? {} : { peerDependencies: { '@deepseek-ai/dsh-test': options.peer } },
     }))
     writeFileSync(join(packageDir, 'index.mjs'), `import { appendFileSync } from 'node:fs'
 const record = (value) => appendFileSync(new URL('${pathToFileURL(effects).href}'), value + '\\n')
@@ -121,7 +121,7 @@ it('blocks a denied plugin reached through a package-imports alias', async () =>
   mkdirSync(aliased)
   writeFileSync(join(aliased, 'package.json'), JSON.stringify({
     name: 'denied-plugin', version: '1.0.0', type: 'module', exports: './index.mjs',
-    peerDependencies: { '@x1a0f3n9/dsh-test': '^9.0.0' },
+    peerDependencies: { '@deepseek-ai/dsh-test': '^9.0.0' },
   }))
   writeFileSync(join(aliased, 'index.mjs'), `import { appendFileSync } from 'node:fs'
 appendFileSync(new URL('${pathToFileURL(join(f.dir, 'effects')).href}'), 'import:denied-plugin\\n')
@@ -173,7 +173,7 @@ it('denies a row whose peer metadata cannot be validated', async () => {
   const f = fixture()
   f.plugin('malformed-plugin')
   writeFileSync(join(f.dir, 'node_modules', 'malformed-plugin', 'package.json'),
-    JSON.stringify({ name: 'malformed-plugin', version: '1.0.0', peerDependencies: ['@x1a0f3n9/dsh'] }))
+    JSON.stringify({ name: 'malformed-plugin', version: '1.0.0', peerDependencies: ['@deepseek-ai/dsh'] }))
   expect(await f.run(insert('malformed-plugin'))).toEqual([])
   expect(f.warnings.join('\n')).toContain('cannot be validated')
 })

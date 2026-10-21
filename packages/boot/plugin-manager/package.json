@@ -1,7 +1,7 @@
 {
-  "name": "@x1a0f3n9/dsh-plugin-manager",
+  "name": "@deepseek-ai/dsh-plugin-manager",
   "description": "Current-profile plugin and bundle management shared by dsh CLI, Web and agent tools",
-  "version": "0.1.7-rc.4",
+  "version": "0.2.1-rc.2",
   "publishConfig": {
     "access": "public"
   },
@@ -43,9 +43,13 @@
     "./tools": {
       "types": "./lib/types/tools.d.ts",
       "default": "./lib/types/tools.js"
-    }
+    },
+    "./tools/locale/*.json": "./locale/tools/*.json",
+    "./locale/*.json": "./locale/*.json"
   },
   "files": [
+    "locale/*.json",
+    "locale/tools/*.json",
     "lib/index.js",
     "lib/types/**/*.js",
     "lib/types/**/*.d.ts",
@@ -56,52 +60,53 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@x1a0f3n9/dsh-app-boot": "workspace:*",
-    "@x1a0f3n9/dsh-atomic-write": "workspace:*",
+    "@deepseek-ai/dsh-app-boot": "workspace:*",
+    "@deepseek-ai/dsh-atomic-write": "workspace:*",
     "@deepseek-ai/schemastery": "workspace:~",
-    "execa": "^10.0.0",
+    "execa": "^10.0.1",
     "yaml": "^2.9.0",
-    "zod": "^4.4.3",
-    "@x1a0f3n9/dsh-util-values": "workspace:*"
+    "zod": "4.4.3",
+    "@deepseek-ai/dsh-util-values": "workspace:*"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "workspace:~",
     "@deepseek-ai/cordis-plugin-loader": "workspace:~",
-    "@x1a0f3n9/dsh-host-plugin-inventory": "workspace:*",
-    "@x1a0f3n9/dsh-subprocess": "workspace:*",
-    "@x1a0f3n9/dsh-typert-protocol": "workspace:*",
-    "@x1a0f3n9/dsh-tools": "workspace:*",
-    "@x1a0f3n9/dsh-hmr": "workspace:*",
-    "@x1a0f3n9/dsh-brand": "workspace:*",
-    "@x1a0f3n9/dsh-sandbox-policy": "workspace:*",
-    "@x1a0f3n9/dsh-sandbox": "workspace:*",
-    "@x1a0f3n9/dsh-user-approval": "workspace:*"
+    "@deepseek-ai/dsh-host-plugin-inventory": "workspace:*",
+    "@deepseek-ai/dsh-subprocess": "workspace:*",
+    "@deepseek-ai/dsh-typert-protocol": "workspace:*",
+    "@deepseek-ai/dsh-tools": "workspace:*",
+    "@deepseek-ai/dsh-hmr": "workspace:*",
+    "@deepseek-ai/dsh-brand": "workspace:*",
+    "@deepseek-ai/dsh-sandbox-policy": "workspace:*",
+    "@deepseek-ai/dsh-sandbox": "workspace:*",
+    "@deepseek-ai/dsh-user-approval": "workspace:*"
   },
   "peerDependenciesMeta": {
-    "@x1a0f3n9/dsh-hmr": {
+    "@deepseek-ai/dsh-hmr": {
       "optional": true
     },
-    "@x1a0f3n9/dsh-user-approval": {
+    "@deepseek-ai/dsh-user-approval": {
       "optional": true
     }
   },
   "devDependencies": {
-    "@x1a0f3n9/dsh-package-manifest": "workspace:*",
+    "chokidar": "^4.0.3",
+    "@deepseek-ai/dsh-package-manifest": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~",
     "@deepseek-ai/cordis-plugin-loader": "workspace:~",
-    "@x1a0f3n9/dsh-host-plugin-inventory": "workspace:*",
-    "@x1a0f3n9/dsh-subprocess": "workspace:*",
-    "@x1a0f3n9/dsh-typert-protocol": "workspace:*",
-    "@x1a0f3n9/dsh-tools": "workspace:*",
-    "@x1a0f3n9/dsh-system-prompt": "workspace:*",
-    "@x1a0f3n9/dsh-hmr": "workspace:*",
+    "@deepseek-ai/dsh-host-plugin-inventory": "workspace:*",
+    "@deepseek-ai/dsh-subprocess": "workspace:*",
+    "@deepseek-ai/dsh-typert-protocol": "workspace:*",
+    "@deepseek-ai/dsh-tools": "workspace:*",
+    "@deepseek-ai/dsh-system-prompt": "workspace:*",
+    "@deepseek-ai/dsh-hmr": "workspace:*",
     "@deepseek-ai/cordis-plugin-timer": "workspace:~",
-    "@x1a0f3n9/dsh-brand": "workspace:*",
-    "@x1a0f3n9/dsh-sandbox-policy": "workspace:*",
-    "@x1a0f3n9/dsh-agent": "workspace:*",
-    "@x1a0f3n9/dsh-session": "workspace:*",
-    "@x1a0f3n9/dsh-session-projection": "workspace:*",
-    "@x1a0f3n9/dsh-sandbox": "workspace:*",
-    "@x1a0f3n9/dsh-user-approval": "workspace:*"
+    "@deepseek-ai/dsh-brand": "workspace:*",
+    "@deepseek-ai/dsh-sandbox-policy": "workspace:*",
+    "@deepseek-ai/dsh-agent": "workspace:*",
+    "@deepseek-ai/dsh-session": "workspace:*",
+    "@deepseek-ai/dsh-session-projection": "workspace:*",
+    "@deepseek-ai/dsh-sandbox": "workspace:*",
+    "@deepseek-ai/dsh-user-approval": "workspace:*"
   }
 }

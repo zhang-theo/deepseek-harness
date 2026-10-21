@@ -1,25 +1,26 @@
-import * as Protocol from '@x1a0f3n9/dsh-llm-deepseek'
+import * as Protocol from '@deepseek-ai/dsh-llm-deepseek'
 /**
  * Real Messages round trips use the official root and require credentials.
  * System-update checks additionally require DEEPSEEK_IN_HISTORY_MODEL.
  */
 import { randomUUID } from 'node:crypto'
-import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createRequire } from 'node:module'
+import { pathToFileURL } from 'node:url'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Context, LoggerLevel } from '@deepseek-ai/cordis'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
-import AgentRegistry from '@x1a0f3n9/dsh-agent'
-import LocalAttachments from '@x1a0f3n9/dsh-attachment-local'
-import DeepSeekLlmApiExtensionRegistry from '@x1a0f3n9/dsh-deepseek-llm-api-extensions'
-import LlmRuntime, { BlockAssembler, createAssistantMessage, createSystemMessage, createToolResultMessage, ReasoningEffortId, ToolCallId } from '@x1a0f3n9/dsh-llm'
-import type { Message } from '@x1a0f3n9/dsh-llm'
-import * as PluginPackageInventoryDeepSeek from '@x1a0f3n9/dsh-plugin-package-inventory-deepseek'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import * as SessionLogDeepSeek from '@x1a0f3n9/dsh-session-log-deepseek'
-import * as Messages from '@x1a0f3n9/dsh-llm-deepseek-api-key'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import LocalAttachments from '@deepseek-ai/dsh-attachment-local'
+import DeepSeekLlmApiExtensionRegistry from '@deepseek-ai/dsh-deepseek-llm-api-extensions'
+import LlmRuntime, { BlockAssembler, createAssistantMessage, createSystemMessage, createToolResultMessage, ReasoningEffortId, ToolCallId } from '@deepseek-ai/dsh-llm'
+import type { Message } from '@deepseek-ai/dsh-llm'
+import * as PluginPackageInventoryDeepSeek from '@deepseek-ai/dsh-plugin-package-inventory-deepseek'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import * as SessionLogDeepSeek from '@deepseek-ai/dsh-session-log-deepseek'
+import * as Messages from '@deepseek-ai/dsh-llm-deepseek-api-key'
 import { DeepSeekFilesClient } from '../src/files-api.ts'
 import { MESSAGES_FILES_BETA } from '../src/messages-api.ts'
 import { assemble, options, user, sourceModuleLoader } from './helpers.ts'
@@ -139,6 +140,12 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('DeepSeek Messages real API', () 
   })
 
   it.each([false, true])('submits Loader package inventory and records HTTP acceptance with session-log enabled=%s', async (enabled) => {
+    const pluginRoot = await mkdtemp(join(tmpdir(), 'dsh-unversioned-plugin-e2e-'))
+    cleanups.push(() => rm(pluginRoot, { recursive: true, force: true }))
+    const unversionedName = 'unversioned-e2e-plugin'
+    await writeFile(join(pluginRoot, 'package.json'), JSON.stringify({ name: unversionedName, type: 'module' }))
+    await writeFile(join(pluginRoot, 'plugin.mjs'), 'export const name = "unversioned-e2e-plugin"\nexport function apply() {}\n')
+    const unversionedModule = pathToFileURL(join(pluginRoot, 'plugin.mjs')).href
     const ctx = await boot()
     await ctx.plugin(Loader)
     await ctx.plugin(AgentRegistry)
@@ -148,12 +155,14 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('DeepSeek Messages real API', () 
     ctx.baseUrl = import.meta.url
     // Select the source module while Loader owns its active package entry.
     ctx.loader.internal = sourceModuleLoader(async (specifier) => {
-      if (specifier !== '@x1a0f3n9/dsh-plugin-package-inventory-deepseek') throw new Error(`unexpected Loader import: ${specifier}`)
+      if (specifier === unversionedModule) return import(specifier)
+      if (specifier !== '@deepseek-ai/dsh-plugin-package-inventory-deepseek') throw new Error(`unexpected Loader import: ${specifier}`)
       return PluginPackageInventoryDeepSeek
     })
-    await ctx.loader.create({ name: '@x1a0f3n9/dsh-plugin-package-inventory-deepseek' })
+    await ctx.loader.create({ name: '@deepseek-ai/dsh-plugin-package-inventory-deepseek' })
+    await ctx.loader.create({ name: unversionedModule })
     await ctx.loader.await()
-    const packagePath = createRequire(import.meta.url).resolve('@x1a0f3n9/dsh-plugin-package-inventory-deepseek/package.json')
+    const packagePath = createRequire(import.meta.url).resolve('@deepseek-ai/dsh-plugin-package-inventory-deepseek/package.json')
     const packageIdentity = JSON.parse(await readFile(packagePath, 'utf8')) as { name: string; version: string }
     const session = ctx.sessions.create(SessionId(`real-messages-extensions-${randomUUID()}`))
     session.append('turn/start', { turn: 1 })
@@ -166,9 +175,12 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('DeepSeek Messages real API', () 
       if (url !== `${Protocol.PUBLIC_BASE_URL}/v1/messages`) return fetchImpl(input, init)
       if (typeof init?.body !== 'string') throw new Error('expected a JSON Messages request')
       const body = JSON.parse(init.body) as Record<string, unknown>
-      expect(body).toMatchObject({ dsh_plugin_packages: {
-        version: 1, packages: [{ name: packageIdentity.name, version: packageIdentity.version }],
-      } })
+      expect(body.dsh_plugin_packages).toStrictEqual({
+        version: 1, packages: [
+          { name: packageIdentity.name, version: packageIdentity.version },
+          { name: unversionedName },
+        ],
+      })
       if (enabled) {
         expect(body).toMatchObject({ dsh_session_log: {
           version: 1, sessionFormatVersion: session.header.version, session: { id: session.id },
@@ -225,6 +237,24 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('DeepSeek Messages real API', () 
     history.push(second.message, user('Reply with exactly DONE.'))
     const third = await assemble(ctx.llm.stream({ ...request, messages: history }))
     expect(third.assembler.finish.kind).toBe('stop')
+  })
+
+  it('continues saved Responses tool history with an empty trailing text item', async () => {
+    const ctx = await boot()
+    const calls = [0, 1, 2].map(index => ({
+      type: 'tool-call' as const, id: ToolCallId(`call_${index}|item_${index}`), name: 'lookup_value', arguments: '{"key":"secret"}',
+    }))
+    const history = [
+      user('Look up the secret value.'),
+      createAssistantMessage({ source: { provider: 'foreign', model: 'claude' }, content: [...calls, { type: 'text', text: '' }] }),
+      ...calls.map(call => createToolResultMessage({ callId: call.id, content: [{ type: 'text', text: 'EMPTY_TEXT_RECOVERED_731' }], isError: false })),
+      user('Do not call tools. Reply with exactly EMPTY_TEXT_RECOVERED_731.'),
+    ]
+    const saved = JSON.stringify(history)
+    const response = await assemble(ctx.llm.stream(options({ model: 'deepseek-flash', messages: history, tools: [tool], reasoningEffort: ReasoningEffortId('off') })))
+    expect(response.assembler.finish.kind).toBe('stop')
+    expect(response.message.content.filter(block => block.type === 'text').map(block => block.text).join('')).toContain('EMPTY_TEXT_RECOVERED_731')
+    expect(JSON.stringify(history)).toBe(saved)
   })
 
   it('continues persisted foreign history containing malformed tool arguments', async () => {

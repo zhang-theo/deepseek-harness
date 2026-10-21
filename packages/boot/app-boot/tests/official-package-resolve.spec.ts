@@ -17,10 +17,10 @@ describe('official dsh package resolve', () => {
   it('remaps official dsh specifiers including subpaths', () => {
     expect(remapOfficialDshSpecifier('@deepseek-ai/dsh')).toBeUndefined()
     expect(remapOfficialDshSpecifier('@deepseek-ai/dsh/package.json')).toBeUndefined()
-    expect(remapOfficialDshSpecifier('@deepseek-ai/dsh-session')).toBe('@x1a0f3n9/dsh-session')
-    expect(remapOfficialDshSpecifier('@deepseek-ai/dsh-session/types')).toBe('@x1a0f3n9/dsh-session/types')
+    expect(remapOfficialDshSpecifier('@deepseek-ai/dsh-session')).toBe('@deepseek-ai/dsh-session')
+    expect(remapOfficialDshSpecifier('@deepseek-ai/dsh-session/types')).toBe('@deepseek-ai/dsh-session/types')
     expect(remapOfficialDshSpecifier('@deepseek-ai/cordis')).toBeUndefined()
-    expect(remapOfficialDshSpecifier('@x1a0f3n9/dsh-session')).toBeUndefined()
+    expect(remapOfficialDshSpecifier('@deepseek-ai/dsh-session')).toBeUndefined()
   })
 
   it('forwards remapped specifiers to the next resolver', () => {
@@ -29,7 +29,7 @@ describe('official dsh package resolve', () => {
       '@deepseek-ai/dsh-settings',
       { parentURL: 'file:///plugin.js' } as never,
       nextResolve as never,
-    )).toEqual({ url: 'resolved:@x1a0f3n9/dsh-settings' })
+    )).toEqual({ url: 'resolved:@deepseek-ai/dsh-settings' })
     expect(resolveOfficialDshPackage(
       'zod',
       { parentURL: 'file:///plugin.js' } as never,

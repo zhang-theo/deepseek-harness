@@ -3,7 +3,7 @@ description: "The read-before-edit filesystem policy plugin for deployments and 
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-fs-observation-policy
+# @deepseek-ai/dsh-fs-observation-policy
 
 English | [中文](README.zh.md)
 
@@ -32,9 +32,9 @@ Load this plugin alongside a `ctx.fs` backend and the `dsh-tool-fs` tools when a
 Load a backend, then this plugin, then the tools. The policy listener should be the first decider registered for the `fs/*`-intent slots.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-fs-local'
-- name: '@x1a0f3n9/dsh-fs-observation-policy'
-- name: '@x1a0f3n9/dsh-tool-fs'
+- name: '@deepseek-ai/dsh-fs-local'
+- name: '@deepseek-ai/dsh-fs-observation-policy'
+- name: '@deepseek-ai/dsh-tool-fs'
 ```
 
 ### What changes for the model
@@ -95,7 +95,7 @@ Read these pages when the package-level contract is not enough. They move from t
 - [tool-fs](../tool-fs/README.md) — the model-facing tools that dispatch the `fs/*` events.
 - [fs-local](../fs-local/README.md) — the host-filesystem backend this policy guards.
 - [fs-sandbox](../fs-sandbox/README.md) — the sandbox-enforcing backend this policy composes with.
-- [Fsspec-style seam-split Agent Note](../../../.agents/notes/implemented/simplification/2026-06-26-fsspec-style-fs-seam.md) — why the policy is an event plugin rather than a provider method.
+- [Fsspec-style seam-split reference](../fs/README.md) — why the policy is an event plugin rather than a provider method.
 
 -----
 
@@ -126,7 +126,7 @@ These limits define when the policy is a poor fit or needs special operational c
 - **Observed state does not survive a session resume** — persistence of the record is deferred, so a resumed session must re-read files before guarded writes and edits.
 - **Actors without an agent session can never satisfy the policy** — their edits throw `FS_NOT_OBSERVED` and their writes always resolve `createIfAbsent`, so a non-agent caller cannot overwrite an existing file through the gate.
 - **Direct `ctx.fs` reads emit no `fs/observed`** — a file read outside the `read` tool stays unobserved, and a later guarded edit rejects with `FS_NOT_OBSERVED` until the tool reads it.
-- **Authorization is version freshness, not view completeness** — any windowed read authorizes a full-file overwrite of an unchanged file, deliberately weaker than a full-view rule ([seam-split Agent Note](../../../.agents/notes/implemented/simplification/2026-06-26-fsspec-style-fs-seam.md)).
+- **Authorization is version freshness, not view completeness** — any windowed read authorizes a full-file overwrite of an unchanged file, deliberately weaker than a full-view rule ([seam-split reference](../fs/README.md)).
 
 <a id="dev-note"></a>
 ### Dev Note
@@ -137,5 +137,3 @@ These limits define when the policy is a poor fit or needs special operational c
 None.
 
 </details>
-
-**Runtime invariant:** No companion is published. This package exposes no independent event sequence or mutable data relation beyond contracts enforced at its owning seam.

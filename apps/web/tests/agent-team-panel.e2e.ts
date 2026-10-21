@@ -8,8 +8,8 @@ import { chromium } from 'playwright'
 import { afterAll, beforeAll, describe, expect, it, onTestFailed, onTestFinished, vi } from 'vitest'
 import * as yaml from 'js-yaml'
 import { entryListSchema } from '@deepseek-ai/cordis-plugin-include'
-import type {} from '@x1a0f3n9/dsh-experimental-agent-team'
-import { createMessage, createUserMessage } from '@x1a0f3n9/dsh-llm'
+import type {} from '@deepseek-ai/dsh-experimental-agent-team'
+import { createMessage, createUserMessage } from '@deepseek-ai/dsh-llm'
 import {
   assertFixtureInventory, captureStableAria, compareOrRefreshGolden,
   launchWebScaffold, watchConsole, webSnapshotMode, type WebScaffold,
@@ -150,7 +150,7 @@ describe('web e2e: Agent Teams panel', () => {
       expect(await trigger.evaluate(element => element === document.activeElement)).toBe(true)
       await page.keyboard.press('Enter')
       await panel.waitFor()
-      const outside = page.getByRole('button', { name: 'Settings', exact: true })
+      const outside = page.getByRole('button', { name: 'Account menu', exact: true })
       await outside.focus()
       expect(await panel.count()).toBe(1)
       await page.keyboard.press('Escape')

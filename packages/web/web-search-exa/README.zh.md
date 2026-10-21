@@ -3,7 +3,7 @@ description: "ctx.web 的 Exa 搜索提供方：部署方如何挂载厂商原�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-web-search-exa
+# @deepseek-ai/dsh-web-search-exa
 
 [English](README.md) | 中文
 
@@ -36,8 +36,8 @@ kind: "package-reference"
 加载 web 服务与本提供方；API 密钥回退到启动环境中的 `$EXA_API_KEY`，其余设置都有安全默认值。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-web'
-- name: '@x1a0f3n9/dsh-web-search-exa'
+- name: '@deepseek-ai/dsh-web'
+- name: '@deepseek-ai/dsh-web-search-exa'
   config:
     apiKey: !!js process.env.EXA_API_KEY
 ```
@@ -84,7 +84,6 @@ kind: "package-reference"
 | [`src/index.ts`](src/index.ts) | 插件入口：配置 schema、环境变量回退、提供方注册 |
 | [`src/provider.ts`](src/provider.ts) | `ExaSearchProvider`：请求分发、中止分类、结果映射 |
 | [`src/types.ts`](src/types.ts) | Exa 协议类型：`ExaSearchResponse`、`ExaResult`、`ExaError` |
-| — | 不发布运行时不变量配套入口；除所属 seam 强制执行的约定外，本包没有独立的事件序列或可变数据关系。 |
 
 ### 请求与映射流程
 

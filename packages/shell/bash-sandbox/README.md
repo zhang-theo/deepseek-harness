@@ -3,7 +3,7 @@ description: "The sandbox-consuming Bash executor for deployments and maintainer
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-bash-sandbox
+# @deepseek-ai/dsh-bash-sandbox
 
 English | [中文](README.zh.md)
 
@@ -45,14 +45,14 @@ The executor takes no sandbox configuration of its own: the default mode and wor
 
 ```yaml
 - id: sandbox
-  name: '@x1a0f3n9/dsh-sandbox-local'
+  name: '@deepseek-ai/dsh-sandbox-local'
 - id: sandbox-policy
-  name: '@x1a0f3n9/dsh-sandbox-policy'
+  name: '@deepseek-ai/dsh-sandbox-policy'
   config:
     mode: read-only
     workspaceRoot: !!js process.cwd() # fallback for calls without a session cwd
 - id: bash
-  name: '@x1a0f3n9/dsh-bash-sandbox'
+  name: '@deepseek-ai/dsh-bash-sandbox'
 ```
 
 ### Denials are result facts
@@ -83,7 +83,6 @@ The executor is the sandboxing Service Provider for the `ctx.shell` seam: it inh
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry: `SandboxBashExecutor`, per-process fact retention, execution preparation |
 | [`src/helpers.ts`](src/helpers.ts) | Denial, runner-failure, and runner-spawn-failure classification |
-| — | No runtime invariant companion is published; classification is observable in results, and this package exposes no independent event sequence or mutable data relation beyond contracts enforced at its owning seam. |
 | `tests/` | Exercised behavior across the bwrap, Landlock, and Seatbelt runners |
 
 ### Main flow
@@ -112,7 +111,7 @@ Read these pages when the executor contract is not enough. They move from the se
 - [sandbox-policy](../../sandbox/sandbox-policy/README.md) — the per-session mode and workspace root this executor honors.
 - [sandbox-local](../../sandbox/sandbox-local/README.md) — the shipped runner backends: bwrap, Landlock, and Seatbelt.
 - [tool-bash](../tool-bash/README.md) — the model-facing `bash` tool and its escalation surface.
-- [Sandbox Agent Note](../../../.agents/notes/implemented/feature/2026-07-06-sandbox.md) — the sandbox design, escalation, and switching contract.
+- [Sandbox reference](../../sandbox/sandbox/README.md) — the sandbox design, escalation, and switching contract.
 
 -----
 

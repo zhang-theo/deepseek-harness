@@ -19,17 +19,17 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Context } from '@deepseek-ai/cordis'
-import SessionStore, { SESSION_FORMAT_VERSION, SessionId } from '@x1a0f3n9/dsh-session'
-import type { SessionHeader } from '@x1a0f3n9/dsh-session'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import Storage from '@x1a0f3n9/dsh-storage'
+import SessionStore, { SESSION_FORMAT_VERSION, SessionId } from '@deepseek-ai/dsh-session'
+import type { SessionHeader } from '@deepseek-ai/dsh-session'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import Storage from '@deepseek-ai/dsh-storage'
 import {
   apply as storageJsonApply, Config as storageJsonConfig, inject as storageJsonInject, name as storageJsonName,
-} from '@x1a0f3n9/dsh-storage-json'
+} from '@deepseek-ai/dsh-storage-json'
 import {
   apply as storageDomainApply, Config as storageDomainConfig, inject as storageDomainInject, name as storageDomainName,
-} from '@x1a0f3n9/dsh-storage-domain'
-import { titleProjectionDefinition } from '@x1a0f3n9/dsh-session-title'
+} from '@deepseek-ai/dsh-storage-domain'
+import { titleProjectionDefinition } from '@deepseek-ai/dsh-session-title'
 import SessionProjectionCache from '../src/index.ts'
 import { checkpointRow, projectionCacheDomainSpec } from '../src/spec.ts'
 
@@ -96,23 +96,17 @@ async function placeDoc(root: string, id: string, name: string): Promise<Fixture
  */
 async function assertRewrite(ctx: Context, root: string, id: SessionId): Promise<void> {
   const session = ctx.sessions.create(id)
-  session.append('session/title', {
-    title: '重写标题',
-    messageSeqs: [],
-    source: { kind: 'fallback' },
-  })
-  session.append('turn/end', { turn: 1, reason: { kind: 'completed' } })
+  session.append('fixtures-test/set-title', { title: '重写标题' })
+  await ctx.sessionProjectionCache.write(session)
   const path = join(root, projectionCacheDomainSpec.name, 'sessions', `${id}.json`)
-  await vi.waitFor(async () => {
-    const doc = JSON.parse(await readFile(path, 'utf8')) as FixtureDoc
-    expect(doc.version).toBe(projectionCacheDomainSpec.version)
-    expect(doc.record.identity).toMatchObject({
-      formatVersion: SESSION_FORMAT_VERSION,
-      isSeeded: false,
-      inheritedEventCount: 0,
-    })
-    expect(doc.record.rows['title']?.val).toMatchObject({ title: '重写标题' })
-  }, { timeout: 5_000 })
+  const doc = JSON.parse(await readFile(path, 'utf8')) as FixtureDoc
+  expect(doc.version).toBe(projectionCacheDomainSpec.version)
+  expect(doc.record.identity).toMatchObject({
+    formatVersion: SESSION_FORMAT_VERSION,
+    isSeeded: false,
+    inheritedEventCount: 0,
+  })
+  expect(doc.record.rows['title']?.val).toBe('重写标题')
 }
 
 afterEach(async () => {

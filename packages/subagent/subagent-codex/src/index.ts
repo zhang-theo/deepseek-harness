@@ -3,20 +3,20 @@
  * fresh official package-local Codex wrapper with `app-server --stdio` in the
  * delegating Session's workspace and publishes only after an ephemeral thread exists.
  *
- * @module @x1a0f3n9/dsh-subagent-codex
+ * @module @deepseek-ai/dsh-subagent-codex
  */
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { MAX_TIMER_DELAY_MS } from '@x1a0f3n9/dsh-timeout'
+import { MAX_TIMER_DELAY_MS } from '@deepseek-ai/dsh-timeout'
 import {
   assertPositiveFinite,
   NO_START_CAPABILITIES,
-  resolveChildCwd,
+  assertUsableCwd,
   type ResolvedSubagentStartRequest,
   type SubagentCapabilities,
   type SubagentProvider,
-} from '@x1a0f3n9/dsh-subagent'
+} from '@deepseek-ai/dsh-subagent'
 import {
   CODEX_PERMISSION_MODES,
   DEFAULT_CODEX_PERMISSION_MODE,
@@ -71,19 +71,9 @@ class CodexProvider implements SubagentProvider {
   ) {}
 
   start(request: ResolvedSubagentStartRequest) {
-    const parentCwd = request.parent.session.header.cwd
-    if (parentCwd === undefined) {
-      throw new Error(
-        'subagent-codex: no working directory for the child — delegate from a parent session that has one',
-      )
-    }
     let cwd: string
     try {
-      cwd = resolveChildCwd(
-        'subagent-codex',
-        undefined,
-        parentCwd,
-      )
+      cwd = assertUsableCwd('subagent-codex', 'child cwd', request.cwd)
     } catch (error: unknown) {
       if (request.signal.aborted) {
         throw new Error(

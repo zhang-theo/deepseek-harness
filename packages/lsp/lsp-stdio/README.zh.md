@@ -3,7 +3,7 @@ description: "ctx.lsp 的 stdio 语言服务器提供方：配置好的服务器
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-lsp-stdio
+# @deepseek-ai/dsh-lsp-stdio
 
 [English](README.md) | 中文
 
@@ -32,10 +32,10 @@ kind: "package-reference"
 `servers` 记录把每个稳定的提供方 id 映射到一条服务器命令。提供方会在清理 credential 后于加载时解析每个可执行文件，因此一个坏配置项会阻止所有提供方注册；进程在第一次匹配查询时惰性启动。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-fs-local'
-- name: '@x1a0f3n9/dsh-subprocess-local'
-- name: '@x1a0f3n9/dsh-lsp'
-- name: '@x1a0f3n9/dsh-lsp-stdio'
+- name: '@deepseek-ai/dsh-fs-local'
+- name: '@deepseek-ai/dsh-subprocess-local'
+- name: '@deepseek-ai/dsh-lsp'
+- name: '@deepseek-ai/dsh-lsp-stdio'
   config:
     servers:
       typescript:
@@ -43,7 +43,7 @@ kind: "package-reference"
         args: ['--stdio']
         extensionToLanguage:
           '.ts': typescript
-- name: '@x1a0f3n9/dsh-tool-lsp'
+- name: '@deepseek-ai/dsh-tool-lsp'
 ```
 
 | 字段 | 默认值 | 含义 |
@@ -106,7 +106,6 @@ kind: "package-reference"
 | [`src/protocol.ts`](src/protocol.ts) | 协议类型子集：能力、位置、悬停、文本文档同步 |
 | [`src/translate.ts`](src/translate.ts) | 能力检查、UTF-16 协商、`Location`／`LocationLink`／hover 规范化 |
 | [`src/abort.ts`](src/abort.ts) | 融合调用方与释放信号的取消辅助 |
-| — | 不发布运行时不变式伴生入口；进程池与队列是私有状态，本提供方也不发布独立的生命周期事件流或可枚举快照。 |
 
 ### 协议行为
 

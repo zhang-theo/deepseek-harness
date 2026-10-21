@@ -3,7 +3,7 @@ description: "Shared compaction contract for backend implementers and deployers:
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-compaction
+# @deepseek-ai/dsh-compaction
 
 English | [中文](README.zh.md)
 
@@ -40,8 +40,8 @@ When condensation runs, the selected older span of the conversation is replaced 
 Mount the shipped backend to register the condensation service, and add `dsh-command-compact` for the on-demand command:
 
 ```yaml
-- name: '@x1a0f3n9/dsh-compaction-basic'
-- name: '@x1a0f3n9/dsh-command-compact'
+- name: '@deepseek-ai/dsh-compaction-basic'
+- name: '@deepseek-ai/dsh-command-compact'
 ```
 
 With these two rows the feature is on: the conversation condenses automatically as it grows, and `/compact` condenses immediately on request and reports how many history items were replaced. If no backend is mounted, nothing condenses and `/compact` fails; the full dependency chain for the shipped backend is in its own README.
@@ -69,7 +69,7 @@ This section explains the contract in API terms and the design decisions behind 
 The seam is built on one split and three commitments:
 
 - **Abstract contract, concrete backends.** The interface states what condensation does; providers own policy, retention, and summarization so each role evolves and swaps independently.
-- **Session and LLM vocabulary are part of the contract.** The operations act on a `Session` and the summary uses `ContentBlock`, so the Service Definition depends on `dsh-session` and `dsh-llm` despite the general Cordis-only guidance — a deliberate deviation recorded in the [compaction capability-seam Agent Note](../../../.agents/notes/implemented/feature/2026-06-18-compaction-capability-seam.md).
+- **Session and LLM vocabulary are part of the contract.** The operations act on a `Session` and the summary uses `ContentBlock`, so the Service Definition depends on `dsh-session` and `dsh-llm` despite the general Cordis-only guidance — a deliberate deviation recorded in the [historical compaction capability-seam Agent Note](../../../.agents/notes/archived/feature/2026-06-18-compaction-capability-seam.md).
 - **The log-recorded bracket is the lock.** `compaction/start` is appended before summarization yields and `compaction/end` releases; every failure makes exactly one close attempt, and a failed close leaves the unmatched start as the intentional busy signal.
 - **The surface is mutated exactly once.** The summary rides on a `user/message` replacement inside the bracket; all `compaction/*` events stay log-only.
 
@@ -105,7 +105,6 @@ The replacement sits inside the lock bracket, so a crash between `compaction/sta
 | [`src/tool-pairing.ts`](src/tool-pairing.ts) | Per-session cut-balance cache behind the two boundary helpers |
 | [`src/checkpoint.ts`](src/checkpoint.ts) | Cordis-free checkpoint source constructor and predicate (`./checkpoint` leaf) |
 | [`src/brand.ts`](src/brand.ts) | `CompactionId` branded identity |
-| [`src/invariant.ts`](src/invariant.ts) | Invariant companion: validates the `compaction/start`→`summary`→`end` bracket, its owner-turn enclosure, and checkpoint correlation |
 
 ### Locking and serialization
 
@@ -129,7 +128,7 @@ Read these pages when the package-level contract is not enough; they move from t
 - [Tool-result pruner](../compaction-tool-result-pruner/README.md) — the optional companion that trims oversized tool outputs first.
 - [Human /compact command](../command-compact/README.md) — the on-demand trigger for condensation.
 - [Token meter](../../llm/token-meter/README.md) — the measurement service that decides when to condense.
-- [Compaction capability-seam Agent Note](../../../.agents/notes/implemented/feature/2026-06-18-compaction-capability-seam.md) — the split and the session/llm dependency rationale.
+- [historical Compaction capability-seam Agent Note](../../../.agents/notes/archived/feature/2026-06-18-compaction-capability-seam.md) — the split and the session/llm dependency rationale.
 
 -----
 

@@ -6,17 +6,17 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { Context } from '@deepseek-ai/cordis'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
 import Include, { applyEntryPatches } from '@deepseek-ai/cordis-plugin-include'
-import { loadOverlayPatches } from '@x1a0f3n9/dsh-app-boot'
-import WorkspaceFiles, { type WorkspaceFileScope } from '@x1a0f3n9/dsh-api-workspace-files'
-import OfficeToPdf from '@x1a0f3n9/dsh-office-to-pdf'
-import * as DocumentPreview from '@x1a0f3n9/dsh-client-ui-sidebar-documentpreview'
-import type { IndexInjection } from '@x1a0f3n9/dsh-host-webserver'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import SandboxPolicyService from '@x1a0f3n9/dsh-sandbox-policy'
-import LocalFileSystem from '@x1a0f3n9/dsh-fs-local'
-import { FsError } from '@x1a0f3n9/dsh-fs'
-import TypertRegistry from '@x1a0f3n9/dsh-typert-registry'
+import { loadOverlayPatches } from '@deepseek-ai/dsh-app-boot'
+import WorkspaceFiles, { type WorkspaceFileScope } from '@deepseek-ai/dsh-api-workspace-files'
+import OfficeToPdf from '@deepseek-ai/dsh-office-to-pdf'
+import * as DocumentPreview from '@deepseek-ai/dsh-client-ui-sidebar-documentpreview'
+import type { IndexInjection } from '@deepseek-ai/dsh-host-webserver'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import SandboxPolicyService from '@deepseek-ai/dsh-sandbox-policy'
+import LocalFileSystem from '@deepseek-ai/dsh-fs-local'
+import { FsError } from '@deepseek-ai/dsh-fs'
+import TypertRegistry from '@deepseek-ai/dsh-typert-registry'
 import type { Converter, ConverterOptions } from '@deepseek-ai/libreoffice-kit'
 import { expect, it, onTestFinished, vi } from 'vitest'
 
@@ -32,8 +32,8 @@ it('loads the shipped Office rows with separately patched settings and authorize
   })
   const configPath = join(directory, 'cordis.yml')
   const expectedRows = {
-    'office-to-pdf': '@x1a0f3n9/dsh-office-to-pdf',
-    'ui-sidebar-documentpreview': '@x1a0f3n9/dsh-client-ui-sidebar-documentpreview',
+    'office-to-pdf': '@deepseek-ai/dsh-office-to-pdf',
+    'ui-sidebar-documentpreview': '@deepseek-ai/dsh-client-ui-sidebar-documentpreview',
   }
   const rows = loadOverlayPatches('web-office-test', fileURLToPath(new URL('../cordis.patch.yml', import.meta.url)))
     .flatMap(patch => patch.insert ?? []).filter(row => row.id !== undefined && Object.hasOwn(expectedRows, row.id))
@@ -46,12 +46,12 @@ it('loads the shipped Office rows with separately patched settings and authorize
   ], (message) => { throw new Error(message) })
   expect(configured.find(row => row.id === 'ui-sidebar-documentpreview')!.config).toEqual(clientConfig)
   await writeFile(configPath, JSON.stringify([
-    { name: '@x1a0f3n9/dsh-session' },
-    { name: '@x1a0f3n9/dsh-session-projection' },
-    { name: '@x1a0f3n9/dsh-sandbox-policy', config: { workspaceRoot: directory } },
-    { name: '@x1a0f3n9/dsh-fs-local', config: { cwd: directory } },
-    { name: '@x1a0f3n9/dsh-typert-registry' },
-    { name: '@x1a0f3n9/dsh-api-workspace-files', config: { maxFileBytes: 1 } },
+    { name: '@deepseek-ai/dsh-session' },
+    { name: '@deepseek-ai/dsh-session-projection' },
+    { name: '@deepseek-ai/dsh-sandbox-policy', config: { workspaceRoot: directory } },
+    { name: '@deepseek-ai/dsh-fs-local', config: { cwd: directory } },
+    { name: '@deepseek-ai/dsh-typert-registry' },
+    { name: '@deepseek-ai/dsh-api-workspace-files', config: { maxFileBytes: 1 } },
     ...configured,
   ]))
   const pdf = Buffer.from('%PDF-1.7\nLoader preview\n%%EOF\n')
@@ -71,14 +71,14 @@ it('loads the shipped Office rows with separately patched settings and authorize
   ctx.loader.builtins.include = Include
   // Loader's native imports must share the test's source-plane Service classes.
   const modules = new Map<string, unknown>([
-    ['@x1a0f3n9/dsh-session', SessionStore],
-    ['@x1a0f3n9/dsh-session-projection', SessionProjectionRegistry],
-    ['@x1a0f3n9/dsh-sandbox-policy', SandboxPolicyService],
-    ['@x1a0f3n9/dsh-fs-local', LocalFileSystem],
-    ['@x1a0f3n9/dsh-typert-registry', TypertRegistry],
-    ['@x1a0f3n9/dsh-api-workspace-files', WorkspaceFiles],
-    ['@x1a0f3n9/dsh-office-to-pdf', OfficeToPdf],
-    ['@x1a0f3n9/dsh-client-ui-sidebar-documentpreview', DocumentPreview],
+    ['@deepseek-ai/dsh-session', SessionStore],
+    ['@deepseek-ai/dsh-session-projection', SessionProjectionRegistry],
+    ['@deepseek-ai/dsh-sandbox-policy', SandboxPolicyService],
+    ['@deepseek-ai/dsh-fs-local', LocalFileSystem],
+    ['@deepseek-ai/dsh-typert-registry', TypertRegistry],
+    ['@deepseek-ai/dsh-api-workspace-files', WorkspaceFiles],
+    ['@deepseek-ai/dsh-office-to-pdf', OfficeToPdf],
+    ['@deepseek-ai/dsh-client-ui-sidebar-documentpreview', DocumentPreview],
   ])
   ctx.loader.internal = {
     version: 'v2',

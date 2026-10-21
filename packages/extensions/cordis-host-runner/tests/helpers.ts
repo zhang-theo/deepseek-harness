@@ -1,12 +1,12 @@
 import { Context } from '@deepseek-ai/cordis'
 import Timer from '@deepseek-ai/cordis-plugin-timer'
-import { ToolCallId } from '@x1a0f3n9/dsh-llm'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import ToolRegistry from '@x1a0f3n9/dsh-tools'
-import type { ToolDefinition, ToolExecutionResult } from '@x1a0f3n9/dsh-tools'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import ToolRegistry from '@deepseek-ai/dsh-tools'
+import type { ToolDefinition, ToolExecutionResult } from '@deepseek-ai/dsh-tools'
 import type { CordisDynamicPluginId } from '../src/types.ts'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import DynamicCordisRunnerService from '../src/index.ts'
 import type { Config } from '../src/index.ts'
 
@@ -48,7 +48,7 @@ interface Harness {
 
 /**
  * Build a real tree with the runner mounted and a recording gateway provided.
- * @param config - runner config overrides (the vm bound).
+ * @param config - runner configuration overrides.
  * @returns the context, the runner service, and the gateway recorder.
  */
 export async function setup(config?: Config): Promise<Harness> {

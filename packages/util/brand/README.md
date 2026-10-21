@@ -3,7 +3,7 @@ description: "Nominal string and number types with stateless constructors for pa
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-brand
+# @deepseek-ai/dsh-brand
 
 English | [中文](README.zh.md)
 
@@ -30,7 +30,7 @@ Brand a domain value when it crosses a package boundary and could plausibly be c
 Declare the branded type in the owning package and apply it at the point where that package admits a string:
 
 ```ts
-import { brandString, type Branded } from '@x1a0f3n9/dsh-brand'
+import { brandString, type Branded } from '@deepseek-ai/dsh-brand'
 
 export type SessionId = Branded<'SessionId'>
 
@@ -44,7 +44,7 @@ const sessionId = brandString<SessionId>('session-1')
 Declare a numeric brand in its owning package and apply it only after that package admits the number:
 
 ```ts
-import { brandNumber, type BrandedNumber } from '@x1a0f3n9/dsh-brand'
+import { brandNumber, type BrandedNumber } from '@deepseek-ai/dsh-brand'
 
 export type SessionSeq = BrandedNumber<'SessionSeq'>
 
@@ -72,7 +72,6 @@ The package defines two intersection types, `string & { readonly [BRAND]: B }` a
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Branded string and number types with stateless constructors |
-| — | No runtime invariant companion is published; this pure utility owns no event stream or mutable runtime data; its value algebra is enforced by unit tests. |
 
 ### How values stay portable
 

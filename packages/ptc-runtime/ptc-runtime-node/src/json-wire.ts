@@ -1,9 +1,9 @@
 /**
  * Lossless-JSON snapshots for the dependency-free source bootstrap closure.
- * @module @x1a0f3n9/dsh-ptc-runtime-node/json-wire
+ * @module @deepseek-ai/dsh-ptc-runtime-node/json-wire
  */
 
-import type { PtcJsonValue } from '@x1a0f3n9/dsh-ptc-runtime'
+import type { PtcJsonValue } from '@deepseek-ai/dsh-ptc-runtime'
 
 /* jscpd:ignore-start -- the source bootstrap mirrors session JSON helpers without workspace runtime imports */
 type IntrinsicCallable = (this: unknown, ...args: unknown[]) => unknown

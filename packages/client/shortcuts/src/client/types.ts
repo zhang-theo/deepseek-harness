@@ -1,5 +1,5 @@
 /** Command contributions and immutable catalog values. */
-import type { ObservableSnapshot } from '@x1a0f3n9/dsh-client-store'
+import type { ObservableSnapshot } from '@deepseek-ai/dsh-client-store'
 import type { BindingIssue, NormalizedBinding, ShortcutConfigSnapshot, ShortcutEdit, ShortcutRevision, ShortcutSaveResult, ShortcutBinding, ShortcutCommandId, ShortcutPlatform, ShortcutProfile, ShortcutRuntime } from '../protocol.ts'
 
 /** Local input owner resolved before an application command. */

@@ -3,7 +3,7 @@ description: "The sandbox-enforcing ctx.fs backend for deployments and maintaine
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-fs-sandbox
+# @deepseek-ai/dsh-fs-sandbox
 
 English | [中文](README.zh.md)
 
@@ -32,11 +32,11 @@ Mount this backend instead of `fs-local` when the model's file writes and edits 
 Load the shared policy service, then this backend, then the tools; the read-before-edit policy plugin stays optional.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-sandbox-policy'
-- name: '@x1a0f3n9/dsh-fs-sandbox'
+- name: '@deepseek-ai/dsh-sandbox-policy'
+- name: '@deepseek-ai/dsh-fs-sandbox'
   config:
     cwd: /absolute/path/to/workspace
-- name: '@x1a0f3n9/dsh-tool-fs'
+- name: '@deepseek-ai/dsh-tool-fs'
 ```
 
 The backend's config is unchanged from the local backend's (`cwd` resolution default and `diffBasisMaxBytes` overwrite bound); the [configuration catalog](../../../docs/config-catalog.md#deepseek-aidsh-fs-sandbox) is the exhaustive source.
@@ -92,7 +92,7 @@ Read these pages when the package-level contract is not enough. They move from t
 - [fs-local](../fs-local/README.md) — the local backend this one extends.
 - [sandbox-policy](../../sandbox/sandbox-policy/README.md) — the shared per-session policy resolver this backend requires.
 - [Process sandbox subsystem](../../../docs/subsystems/sandbox.md) — modes, per-call policy, and fail-closed errors.
-- [Cross-family fs sandbox decision](../../../.agents/notes/implemented/feature/2026-07-14-cross-family-fs-sandbox.md) — the shared mode fence and its escalation choreography.
+- [Cross-family fs sandbox reference](../../sandbox/sandbox-policy/README.md) — the shared mode fence and its escalation choreography.
 
 -----
 
@@ -133,5 +133,3 @@ These limits define when the sandbox backend is a poor fit or needs special oper
 None.
 
 </details>
-
-**Runtime invariant:** No companion is published. This stateless adapter delegates policy and filesystem relations to their owning seams.

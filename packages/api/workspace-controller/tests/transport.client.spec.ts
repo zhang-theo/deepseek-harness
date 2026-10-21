@@ -5,11 +5,11 @@
  */
 
 import { describe, expect, onTestFinished, vi } from 'vitest'
-import { RemoteStreamCarrierError, type ClientRemote } from '@x1a0f3n9/dsh-api-gateway/client'
-import { SessionId } from '@x1a0f3n9/dsh-session/types'
-import { RemoteError } from '@x1a0f3n9/dsh-typert-protocol'
-import { frames, openStream, type RemoteMock, type StreamScript } from '@x1a0f3n9/dsh-remote-mock'
-import { createClientTest, type TestClient, webApp } from '@x1a0f3n9/dsh-client-test-runtime/src/assembly/index.ts'
+import { RemoteStreamCarrierError, type ClientRemote } from '@deepseek-ai/dsh-api-gateway/client'
+import { SessionId } from '@deepseek-ai/dsh-session/types'
+import { RemoteError } from '@deepseek-ai/dsh-typert-protocol'
+import { frames, openStream, type RemoteMock, type StreamScript } from '@deepseek-ai/dsh-remote-mock'
+import { createClientTest, type TestClient, webApp } from '@deepseek-ai/dsh-client-test-runtime/src/assembly/index.ts'
 import {
   ClientWorkspaceModel,
   createWorkspaceStateStream,
@@ -21,11 +21,11 @@ import {
 import type { WorkspaceFollowFrame, WorkspaceId } from '../src/types.ts'
 import { FOLLOW, baseline, err, followGenerations, workspace, workspaceWorld } from './remote/workspace.client.ts'
 
-const SELF = '@x1a0f3n9/dsh-api-workspace-controller'
+const SELF = '@deepseek-ai/dsh-api-workspace-controller'
 /** The plugin as the web bundle composes it: itself plus the Gateway client, the Connection, and the Typert registry. */
 const PLUGIN_ROSTER = webApp.closure([SELF])
 /** A stream or model built by hand talks through the Gateway client alone. */
-const API_ROSTER = webApp.closure(['@x1a0f3n9/dsh-api-gateway'])
+const API_ROSTER = webApp.closure(['@deepseek-ai/dsh-api-gateway'])
 const pluginTest = createClientTest({ roster: PLUGIN_ROSTER })
 const it = createClientTest({ roster: API_ROSTER })
 /** The first client boot pays the cold module transform of the plugin cone. */
@@ -181,6 +181,38 @@ describe('Workspace state stream', () => {
     expect(replacePinned).toHaveBeenCalledWith(['session-two'])
     await stream.dispose()
     expect(streamStates(mock)).toEqual(['cancelled'])
+  })
+
+  it('applies a replace increment in place, so a Workspace hidden and shown again never errors or reconnects', async ({ mock, start }) => {
+    const { remote } = await gatewayClient(mock, start)
+    mock.stream(FOLLOW, openStream([baseline('one', 'two')]))
+    const model = new ClientWorkspaceModel(remote.workspace)
+    const carrierFailed = vi.fn(() => { model.handleCarrierFailure() })
+    const failed = vi.fn((error: unknown) => { model.handleStreamFailure(error) })
+    const stream = createWorkspaceStateStream(remote, { accept: model, carrierFailed, failed })
+    const states = new Set<string>()
+    model.subscribe(() => { states.add(model.getSnapshot().state) })
+    const ids = (): string[] => model.getSnapshot().items.map(item => item.workspaceId).sort()
+    const replace = (...workspaceIds: string[]): WorkspaceFollowFrame => ({ type: 'replace', value: baseline(...workspaceIds).value })
+
+    stream.start()
+    await vi.waitFor(() => { expect(ids()).toEqual(['one', 'two']) })
+    // Access to `two` is revoked, restored through a replace, revoked again, and restored through an upsert.
+    mock.streams.push(FOLLOW, replace('one'))
+    await vi.waitFor(() => { expect(ids()).toEqual(['one']) })
+    mock.streams.push(FOLLOW, replace('one', 'two'))
+    await vi.waitFor(() => { expect(ids()).toEqual(['one', 'two']) })
+    mock.streams.push(FOLLOW, replace('one'))
+    await vi.waitFor(() => { expect(ids()).toEqual(['one']) })
+    mock.streams.push(FOLLOW, { type: 'upsert', workspace: workspace('two') })
+    await vi.waitFor(() => { expect(ids()).toEqual(['one', 'two']) })
+
+    expect(states).not.toContain('error')
+    expect(model.getSnapshot()).toMatchObject({ phase: 'ready', state: 'idle', error: null })
+    expect(carrierFailed).not.toHaveBeenCalled()
+    expect(failed).not.toHaveBeenCalled()
+    expect(streamStates(mock)).toEqual(['open'])
+    await stream.dispose()
   })
 
   it('retains the old state across carrier loss and applies the replacement baseline', async ({ mock, start }) => {
@@ -420,7 +452,7 @@ describe('WorkspaceController', () => {
 })
 
 // The wire relays whatever families the Host's providers report; this suite merges its own.
-declare module '@x1a0f3n9/dsh-workspace/types' {
+declare module '@deepseek-ai/dsh-workspace/types' {
   interface SessionActivityKindMap {
     probe: true
     'probe-items': true

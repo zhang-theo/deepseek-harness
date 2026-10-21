@@ -1,22 +1,22 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { provideWorkingDirectoryFixture, unsupportedInbox } from '@deepseek-ai/dsh-agent-loop-testkit'
 import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { Session, SessionId } from '@x1a0f3n9/dsh-session'
-import AgentRegistry from '@x1a0f3n9/dsh-agent'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import TerminalSessionService from '@x1a0f3n9/dsh-terminal'
-import type { TerminalSendOperation } from '@x1a0f3n9/dsh-terminal'
-import SandboxProvider from '@x1a0f3n9/dsh-sandbox'
-import type { ConfinedArgv, SandboxPolicy } from '@x1a0f3n9/dsh-sandbox'
-import SandboxPolicyService from '@x1a0f3n9/dsh-sandbox-policy'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import LocalSubprocessRuntime from '@x1a0f3n9/dsh-subprocess-local'
-import { resolvePwshPath } from '@x1a0f3n9/dsh-pwsh-local/src/resolve.ts'
-import * as ptyLocal from '@x1a0f3n9/dsh-terminal-bash'
-import { unsupportedInbox } from '@x1a0f3n9/dsh-agent-loop-testkit'
+import { Session, SessionId } from '@deepseek-ai/dsh-session'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import TerminalSessionService from '@deepseek-ai/dsh-terminal'
+import type { TerminalSendOperation } from '@deepseek-ai/dsh-terminal'
+import SandboxProvider from '@deepseek-ai/dsh-sandbox'
+import type { ConfinedArgv, SandboxPolicy } from '@deepseek-ai/dsh-sandbox'
+import SandboxPolicyService from '@deepseek-ai/dsh-sandbox-policy'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import LocalSubprocessRuntime from '@deepseek-ai/dsh-subprocess-local'
+import { resolvePwshPath } from '@deepseek-ai/dsh-pwsh-local/src/resolve.ts'
+import * as ptyLocal from '@deepseek-ai/dsh-terminal-bash'
 
 const roots: string[] = []
 const contexts: Context[] = []
@@ -59,6 +59,7 @@ async function harness(
   const root = mkdtempSync(join(tmpdir(), 'dsh-pty-local-'))
   roots.push(root)
   const ctx = new Context()
+  provideWorkingDirectoryFixture(ctx)
   contexts.push(ctx)
   await ctx.plugin(AgentRegistry)
   await ctx.plugin(TerminalSessionService)

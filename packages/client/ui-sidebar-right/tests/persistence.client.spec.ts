@@ -1,8 +1,8 @@
 /** Per-Session layout recovery precedes resource-body rendering. */
 import { afterEach, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { TabId } from '@x1a0f3n9/dsh-client-ui-dockkit'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import { createSidebarRightStore } from '../src/client/stores.ts'
 import { createSidebarRightController } from '../src/client/service.ts'
 import { SidebarRightTabRegistry } from '../src/client/tab-registry.ts'
@@ -63,7 +63,11 @@ it('pins restored records during adoption before the first render or store mutat
   first.actions.openContent(sessionId, { kind: 'text', contentId: address, title: 'a' }, (id) => { file = id })
   const ctx = new Context()
   const pin = vi.fn()
-  const { controller, adopt } = createSidebarRightController(new SidebarRightTabRegistry(ctx), pin)
+  const { controller, adopt } = createSidebarRightController(new SidebarRightTabRegistry(ctx), pin, {
+    autoFullscreen: () => false,
+    openWithFocus: (_sessionId, open) => { open() },
+    closeWithFocus: (_sessionId, _paneId, close) => { close() },
+  })
   expect(controller.tabsIn(sessionId)).toEqual([])
   const restored = createSidebarRightStore(seed).create(sessionId)
   const release = adopt(sessionId, restored)

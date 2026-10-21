@@ -1,5 +1,5 @@
 /** Per-turn workspace change summaries, the Session event announcing them, and the Host service serving them with their comparisons. */
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 
 /** One file changed during a turn, with line counts from git or from the whole-file captures around its file-tool edits. */
 export interface WorkspaceChangedFile {
@@ -96,7 +96,7 @@ export interface WorkspaceChanges {
   diff(sessionId: SessionId, seq: number, index: number, signal: AbortSignal): Promise<WorkspaceFileDiff | undefined>
 }
 
-declare module '@x1a0f3n9/dsh-session/types' {
+declare module '@deepseek-ai/dsh-session/types' {
   interface SessionEventMap {
     /**
      * A completed top-level turn's changed files were summarized; the summary itself stays on the

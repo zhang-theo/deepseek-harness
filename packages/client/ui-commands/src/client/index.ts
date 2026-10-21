@@ -6,15 +6,15 @@
  * per-session resolution.
  */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
-import type { ISessions } from '@x1a0f3n9/dsh-api-session-controller/client'
+import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client'
 // Type-only: pulls the 'conversation.input.overlay' SlotMap declaration (the
 // key's owner) into this program so the overlay registration below typechecks
 // against the real declaration — no runtime edge to ui-conversation.
-import type {} from '@x1a0f3n9/dsh-client-ui-conversation/client'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
-import type {} from '@x1a0f3n9/dsh-client-locale/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-renderer/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-session/client'
+import type {} from '@deepseek-ai/dsh-client-locale/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import { CommandUiRuntime } from './service.ts'
 import type { PopupSelectInjected } from './PopupSelectView.tsx'
 import { PopupSelectView } from './PopupSelectView.tsx'
@@ -27,8 +27,8 @@ export { filterOptions, PopupSelectController } from './popup.ts'
 export type { PopupSelectDeps, PopupSpec, PopupState, TokenSegment } from './popup.ts'
 export type { PopupSelectInjected, PopupSelectViewProps } from './PopupSelectView.tsx'
 export type {
-  ActionSpec, CommandContribution, CommandDecoration, CommandUiContract, CommandUiSpec, PopupSelectSpec,
-  SelectConfirmation, SelectOption,
+  ActionSpec, CommandContribution, CommandDecoration, CommandUiContract, CommandUiSpec, PopupSearchLabels, PopupSelectSpec,
+  SelectConfirmation, SelectOption, SelectOptionGroup, PopupSearchMode,
 } from './contract.ts'
 export type { CommandKey } from './locales.ts'
 
@@ -38,7 +38,7 @@ declare module '@deepseek-ai/cordis' {
   }
 }
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** The menu rows' and the popupSelect shell's copy. */
     command: CommandKey

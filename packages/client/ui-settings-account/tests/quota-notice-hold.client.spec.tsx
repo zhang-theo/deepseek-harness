@@ -3,20 +3,20 @@
  * The account takeover inside the shipped composition: the frame-wide notice
  * chain, the account settings page, and the one shared native Platform host.
  */
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
-import { SlotTestRuntime, stubConfigForm, usePinnedBrowserLanguages } from '@x1a0f3n9/dsh-client-test-runtime'
-import { LocaleRuntime } from '@x1a0f3n9/dsh-client-locale/client'
-import type { SessionLiveEventEntry, SessionReference } from '@x1a0f3n9/dsh-api-session-controller/client'
-import type { SessionId, SessionSeq } from '@x1a0f3n9/dsh-session/types'
-import type { WorkspaceId } from '@x1a0f3n9/dsh-workspace/types'
-import type { AccountView } from '@x1a0f3n9/dsh-deepseek-account/types'
-import type { ThemeSnapshot } from '@x1a0f3n9/dsh-client-ui-theme/client'
+import { SlotTestRuntime, stubConfigForm, usePinnedBrowserLanguages } from '@deepseek-ai/dsh-client-test-runtime'
+import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
+import type { SessionLiveEventEntry, SessionReference } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionId, SessionSeq } from '@deepseek-ai/dsh-session/types'
+import type { WorkspaceId } from '@deepseek-ai/dsh-workspace/types'
+import type { AccountView } from '@deepseek-ai/dsh-deepseek-account/types'
+import type { ThemeSnapshot } from '@deepseek-ai/dsh-client-ui-theme/client'
 import {
   apply as applyConversation, inject as injectConversation,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import { apply as applyChat, inject as injectChat } from '@x1a0f3n9/dsh-client-ui-chat/client'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import { apply as applyChat, inject as injectChat } from '@deepseek-ai/dsh-client-ui-chat/client'
 import { AccountPlatformHost, type AccountPlatformHostInjected } from '../src/client/AccountPlatformHost.tsx'
 import { AccountQuotaNotice, type AccountQuotaNoticeInjected } from '../src/client/AccountQuotaNotice.tsx'
 import { AccountSection, type AccountSectionInjected, type AccountSnapshot } from '../src/client/AccountSection.tsx'
@@ -52,7 +52,7 @@ const storedView: AccountView = {
   links: { usageUrl: 'http://localhost:8081/usage', topUpUrl: 'http://localhost:8081/top_up' },
 }
 const theme: ThemeSnapshot = {
-  preference: 'light', fontSize: 14, active: { id: 'light', colorScheme: 'light', tokens: {} }, themes: [], revision: 0,
+  preference: 'light', fontSizes: { text: 14, code: 11, terminal: 13 }, fontFamilies: { text: '', code: '', terminal: '' }, active: { id: 'light', colorScheme: 'light', tokens: {} }, themes: [], revision: 0,
 }
 
 /** The account settings commands, trimmed to what this composition renders. */
@@ -64,6 +64,7 @@ function sectionOperations(account: AccountSnapshot, pages: PlatformPages): Acco
     },
     openPlatformPage: pages.open,
     refreshAccount: async () => {},
+    avatarFailed: () => {},
     bonusNoticeShown: () => {}, bonusNoticeDismissed: () => {},
     hasRunningAccountTasks: async () => false,
     contactUs: () => {}, showLogin: () => {}, setOnboarding: () => {},
@@ -119,7 +120,7 @@ async function bench() {
   runtime.ctx.uiSession.provide = (next) => { descriptor ??= next; return provide(next) }
   await runtime.mount({ inject: [...injectChat], apply: applyChat })
   if (descriptor === undefined) throw new Error('ui-chat did not provide its standard source')
-  const accountSnapshot = createSnapshotStore<AccountSnapshot>({ view: storedView, details: undefined, failed: false })
+  const accountSnapshot = createSnapshotStore<AccountSnapshot>({ view: storedView, details: undefined, avatar: undefined, failed: false })
   const account = {
     getSnapshot: () => accountSnapshot.getSnapshot(),
     subscribe: (listener: () => void) => accountSnapshot.subscribe(listener),
@@ -160,6 +161,7 @@ async function bench() {
     name: 'shell.overlay', id: 'desktop-onboarding', locale: 'settings.account',
     inject: (): DesktopOnboardingInjected => ({
       hooks: { onboarding, account },
+      setVisible: () => {},
       openPlatformPage: pages.open,
       update: async () => true, complete: async () => true, retry: async () => true,
     }),
@@ -365,7 +367,7 @@ describe('shared Platform page ownership', () => {
     await act(async () => { screen.getByRole('button', { name: en.quotaTopUp }).click() })
     expect(b.platform.open).toHaveBeenCalledOnce()
 
-    act(() => { b.account.set({ view: { ...storedView, status: 'signed-out' }, details: undefined, failed: false }) })
+    act(() => { b.account.set({ view: { ...storedView, status: 'signed-out' }, details: undefined, avatar: undefined, failed: false }) })
     expect(b.platform.close).toHaveBeenCalledOnce()
     expect(screen.queryByRole('button', { name: en.backToHarness })).toBeNull()
 

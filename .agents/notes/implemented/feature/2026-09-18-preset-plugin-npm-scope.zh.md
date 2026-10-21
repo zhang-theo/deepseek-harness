@@ -10,16 +10,16 @@ fork 出来的 xfdsh 预装包仍在用上游 npm 名：`dshmarket`、`dsh-reaso
 
 ## Decision
 
-每个 fork 预装都发布为 `@x1a0f3n9/<name>`。catalog 的 `packageName`、web-app 依赖键和 cordis loader 的 `name` 都用这个 npm 名。客户端 `__ModuleLoader__` id 跟随包名。settings 命名空间和 Cordis `export const name` 仍用原来的短 id，这样已有用户设置不会丢。catalog 的 `homepage` 仍是 LunFengChen 的 GitHub 地址；包名副标题就是这个链接。
+每个 fork 预装都发布为 `@deepseek-ai/<name>`。catalog 的 `packageName`、web-app 依赖键和 cordis loader 的 `name` 都用这个 npm 名。客户端 `__ModuleLoader__` id 跟随包名。settings 命名空间和 Cordis `export const name` 仍用原来的短 id，这样已有用户设置不会丢。catalog 的 `homepage` 仍是 LunFengChen 的 GitHub 地址；包名副标题就是这个链接。
 
 当前 pin：
 
-- `@x1a0f3n9/dsh-reasoning-effort` → `0.7.3`
-- `@x1a0f3n9/dsh-context` → `0.49.7`
-- `@x1a0f3n9/dsh-better-sidebar` → `0.19.3`
-- `@x1a0f3n9/dshmarket` → `1.45.2`
-- `@x1a0f3n9/hindsight-coding-agents` → `0.5.2-xfdsh.4`，loader `@x1a0f3n9/hindsight-coding-agents/dsh`
-- `@x1a0f3n9/dsh-skills-manager` → `0.1.53-xfdsh.1`
+- `@deepseek-ai/dsh-reasoning-effort` → `0.7.3`
+- `@deepseek-ai/dsh-context` → `0.49.7`
+- `@deepseek-ai/dsh-better-sidebar` → `0.19.3`
+- `@deepseek-ai/dshmarket` → `1.45.2`
+- `@deepseek-ai/hindsight-coding-agents` → `0.5.2-xfdsh.4`，loader `@deepseek-ai/hindsight-coding-agents/dsh`
+- `@deepseek-ai/dsh-skills-manager` → `0.1.53-xfdsh.1`
 
 这推翻了 [fork Hindsight coding agents](2026-09-12-fork-hindsight-coding-agents.zh.md) 里“保留上游 npm 名”，以及 [pin remaining prebundled plugins](2026-09-11-pin-prebundled-plugin-forks.zh.md) 里“cordis 行保持 `dshmarket`”。
 
@@ -33,6 +33,6 @@ fork 出来的 xfdsh 预装包仍在用上游 npm 名：`dshmarket`、`dsh-reaso
 
 ## Consequences
 
-- Settings → xfdsh预置插件 显示 `@x1a0f3n9/...`，点进去打开 LunFengChen 的 GitHub 仓库。
+- Settings → xfdsh预置插件 显示 `@deepseek-ai/...`，点进去打开 LunFengChen 的 GitHub 仓库。
 - `pnpm install` 解析这些 pin 之前，对应 npm 版本必须已经发布。
 - 官方 `@deepseek-ai/dsh` 不变。

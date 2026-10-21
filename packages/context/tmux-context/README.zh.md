@@ -3,7 +3,7 @@ description: "可选的按轮次 tmux 位置上下文，供启用或调优 agent
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-tmux-context
+# @deepseek-ai/dsh-tmux-context
 
 [English](README.md) | 中文
 
@@ -36,7 +36,7 @@ kind: "package-reference"
 最小挂载无需任何配置。`refreshIntervalMs` 为正值时，会额外抑制距最近一次注入不足该毫秒数的注入；省略或设为 `0` 时，只要 tmux 状态自上次注入以来发生变化就注入。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-tmux-context'
+- name: '@deepseek-ai/dsh-tmux-context'
   config:
     refreshIntervalMs: 60000
 ```
@@ -70,7 +70,6 @@ kind: "package-reference"
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：第一步监听器、shell 查询、变化抑制、调度 |
-| — | 不发布运行时不变式伴生入口；每次读取都是外部 tmux 状态的单轮快照，会话没有可检查的跨事件关系；调度与格式由流水线测试负责。 |
 
 ### 主要流程
 

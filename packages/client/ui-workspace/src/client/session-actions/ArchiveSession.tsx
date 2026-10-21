@@ -7,15 +7,15 @@
  * callbacks, not here.
  */
 import { useState } from 'react'
-import type { SessionActivity } from '@x1a0f3n9/dsh-api-workspace-controller/client'
+import type { SessionActivity } from '@deepseek-ai/dsh-api-workspace-controller/client'
 // Type-only: the family keys each provider merges; a key this program did not compile takes the generic line.
-import type {} from '@x1a0f3n9/dsh-agent/types'
-import type {} from '@x1a0f3n9/dsh-jobs/view'
-import type {} from '@x1a0f3n9/dsh-schedule/client'
-import type {} from '@x1a0f3n9/dsh-subagent/client'
+import type {} from '@deepseek-ai/dsh-agent/types'
+import type {} from '@deepseek-ai/dsh-jobs/view'
+import type {} from '@deepseek-ai/dsh-schedule/client'
+import type {} from '@deepseek-ai/dsh-subagent/client'
 import {
   Button, IconArchiveOutlineRegular, IconUnarchiveOutlineRegular, MenuItemButton, Modal,
-} from '@x1a0f3n9/dsh-client-ui-primitives'
+} from '@deepseek-ai/dsh-client-ui-primitives'
 import type {
   ArchiveSessionInjected, SessionArchiveConfirmInjected, SessionArchiveConfirmProps, SessionArchiveConfirmRequest,
   SessionMenuItemProps,
@@ -44,6 +44,29 @@ export function ArchiveSessionMenuItem({
     >
       {t(archived ? 'menu.unarchiveSession' : 'menu.archiveSession')}
     </MenuItemButton>
+  )
+}
+
+/**
+ * Hover button (order 100): archive, or restore an archived row.
+ * @param props - owner share and the archive share.
+ * @returns the button.
+ */
+export function ArchiveSessionRowButton({
+  sessionId, useArchived, archiveSession, unarchiveSession, t,
+}: SessionRowActionProps<ArchiveSessionInjected>) {
+  const archived = useArchived(set => set.has(sessionId))
+  return (
+    <Tooltip label={t(archived ? 'actions.unarchive' : 'actions.archive')} side="bottom" align="end" delayMs={500} portal>
+      <button
+        type="button"
+        className={css.iconButton}
+        aria-label={t(archived ? 'menu.unarchiveSession' : 'menu.archiveSession')}
+        onClick={() => { (archived ? unarchiveSession : archiveSession)(sessionId) }}
+      >
+        {archived ? <IconUnarchiveOutlineRegular size={14} /> : <IconArchiveOutlineRegular size={14} />}
+      </button>
+    </Tooltip>
   )
 }
 

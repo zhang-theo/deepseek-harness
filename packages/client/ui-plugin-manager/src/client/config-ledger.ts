@@ -7,7 +7,7 @@
  */
 
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
-import { resolveSlotLabel, type HostObservable } from '@x1a0f3n9/dsh-client-ui-slots'
+import { resolveSlotLabel, type HostObservable } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from './slot-contract.ts'
 
 /** One official plugin as the page lists it: its registration id and its title in the active locale. */

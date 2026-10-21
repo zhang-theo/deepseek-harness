@@ -1,7 +1,7 @@
 /** Host configuration for the account settings client. */
 import type { Context, Volatile } from '@deepseek-ai/cordis'
-import type {} from '@x1a0f3n9/dsh-host-webserver'
-import type {} from '@x1a0f3n9/dsh-settings'
+import type {} from '@deepseek-ai/dsh-host-webserver'
+import type {} from '@deepseek-ai/dsh-settings'
 import { type ContactConfig, ContactConfigFields, CONTACT_CONFIG_GLOBAL } from './contact-config.ts'
 import z from '@deepseek-ai/schemastery'
 import { OnboardingSettingsFields, type OnboardingStep, type OnboardingPurpose, type OnboardingProcess } from './onboarding-settings.ts'

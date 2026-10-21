@@ -47,10 +47,10 @@
 /x1a0f3n9-dsh-subprocess/understand-the-implementation/design-concept:
   en: 07201ec2256c25f6
   zh: 046109cfa92194f3
-/x1a0f3n9-dsh-subprocess/understand-the-implementation/source-map:
-  en: 30de3ce459e02570
-  zh: ff32b0cb28da5772
-/x1a0f3n9-dsh-subprocess/understand-the-implementation/data-model-and-flow:
+/deepseek-ai-dsh-subprocess/understand-the-implementation/source-map:
+  en: 85e3d2109f49356d
+  zh: 071ccfef37e8e33f
+/deepseek-ai-dsh-subprocess/understand-the-implementation/data-model-and-flow:
   en: 9998dc0a990fbcf1
   zh: ba179617f60cb9bc
 /x1a0f3n9-dsh-subprocess/understand-the-implementation/lifecycle-and-invariants:

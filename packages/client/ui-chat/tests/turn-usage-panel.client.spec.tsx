@@ -2,8 +2,8 @@
 
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, fireEvent, render } from '@testing-library/react'
-import { makeTranslate } from '@x1a0f3n9/dsh-client-test-runtime'
-import { en as commonEn } from '@x1a0f3n9/dsh-client-locale/src/locales/en.ts'
+import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { en as commonEn } from '@deepseek-ai/dsh-client-locale/src/locales/en.ts'
 import { TurnUsagePanel } from '../src/client/chat/TurnUsagePanel.tsx'
 import type { TurnTokenUsage } from '../src/client/contract/chat-nodes.ts'
 import { en } from '../src/client/locale.ts'
@@ -93,6 +93,15 @@ describe('TurnUsagePanel', () => {
     fireEvent.pointerDown(view.getByRole('dialog'))
     expect(view.queryByRole('dialog')).toBeTruthy()
     fireEvent.pointerDown(document.body)
+    expect(view.queryByRole('dialog')).toBeNull()
+  })
+
+  it('closes on an outside click without pointerdown, as keyboard activation elsewhere fires', () => {
+    const view = render(<TurnUsagePanel usage={{ uncachedInputTokens: 1, outputTokens: 1, totalTokens: 2 }} t={t} />)
+    fireEvent.click(view.getByRole('button'))
+    fireEvent.click(view.getByRole('dialog'))
+    expect(view.queryByRole('dialog')).toBeTruthy()
+    fireEvent.click(document.body)
     expect(view.queryByRole('dialog')).toBeNull()
   })
 })

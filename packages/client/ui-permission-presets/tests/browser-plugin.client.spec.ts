@@ -9,18 +9,18 @@
  */
 import { Context } from '@deepseek-ai/cordis'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
-import { SlotRegistry } from '@x1a0f3n9/dsh-client-ui-renderer/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import { LocaleRuntime } from '@x1a0f3n9/dsh-client-locale/client'
-import { TestRemote } from '@x1a0f3n9/dsh-client-test-runtime'
-import { remoteDefaultResponses } from '@x1a0f3n9/dsh-client-test-runtime/src/assembly/remote-default-responses.ts'
-import { RemoteMock } from '@x1a0f3n9/dsh-remote-mock'
-import { apply as settingsApply, inject as settingsInject } from '@x1a0f3n9/dsh-client-ui-settings/client'
-import type { CommandDecoration, PopupSelectSpec } from '@x1a0f3n9/dsh-client-ui-commands/client'
-import { PopupSelectController } from '@x1a0f3n9/dsh-client-ui-commands/client'
+import { SlotRegistry } from '@deepseek-ai/dsh-client-ui-renderer/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
+import { TestRemote } from '@deepseek-ai/dsh-client-test-runtime'
+import { remoteDefaultResponses } from '@deepseek-ai/dsh-client-test-runtime/src/assembly/remote-default-responses.ts'
+import { RemoteMock } from '@deepseek-ai/dsh-remote-mock'
+import { apply as settingsApply, inject as settingsInject } from '@deepseek-ai/dsh-client-ui-settings/client'
+import type { CommandDecoration, PopupSelectSpec } from '@deepseek-ai/dsh-client-ui-commands/client'
+import { PopupSelectController } from '@deepseek-ai/dsh-client-ui-commands/client'
 import type {
   PermissionCatalog, PermissionSelection,
-} from '@x1a0f3n9/dsh-permission-presets/client'
+} from '@deepseek-ai/dsh-permission-presets/client'
 import {
   PermissionRow, type PermissionRowInjected,
 } from '../src/client/PermissionRow.tsx'
@@ -225,7 +225,7 @@ describe('ui-permission browser plugin', () => {
     })
     b.locale.setLocale('zh')
     const localized = await b.popup().options(proj, new AbortController().signal)
-    expect(localized.map(option => option.label)).toEqual(['仅可查看', '工作区内修改', '完全权限', 'Auto review'])
+    expect(localized.map(option => option.label)).toEqual(['仅可查看', '工作区内修改', '完全权限', '自动审查'])
     expect(localized.find(option => option.id === 'danger-full-access')?.confirmation).toEqual({
       title: '确认启用完全权限？',
       description: accessZh['confirm.description'],

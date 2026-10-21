@@ -14,22 +14,22 @@
 /x1a0f3n9-dsh-terminal-bash/table-of-contents:
   en: d152484eb41ac6b4
   zh: 09388d293f9be9cb
-/x1a0f3n9-dsh-terminal-bash/use-this-package:
-  en: cc5475a804a983d9
-  zh: 36416d22c6758aac
-/x1a0f3n9-dsh-terminal-bash/use-this-package/when-to-choose-it:
+/deepseek-ai-dsh-terminal-bash/use-this-package:
+  en: d8e828f8e99fe4f1
+  zh: 75c5823fe6364a11
+/deepseek-ai-dsh-terminal-bash/use-this-package/when-to-choose-it:
   en: f4304ced55e55d4f
   zh: 739d7a16691e4cc0
 /x1a0f3n9-dsh-terminal-bash/use-this-package/composition:
   en: 71449ef1985b2f1b
   zh: 562e9b5ef73cd5e1
-/x1a0f3n9-dsh-terminal-bash/use-this-package/configuration:
-  en: 229375735e02e80a
-  zh: 347c617ae312643a
-/x1a0f3n9-dsh-terminal-bash/use-this-package/shell-dialects-and-readiness:
-  en: bab340c3347f1794
-  zh: a4c32b651fea000d
-/x1a0f3n9-dsh-terminal-bash/use-this-package/sandboxing-and-safe-operation:
+/deepseek-ai-dsh-terminal-bash/use-this-package/configuration:
+  en: 2a10fc681cee698d
+  zh: ac60c8918bae3c85
+/deepseek-ai-dsh-terminal-bash/use-this-package/shell-dialects-and-readiness:
+  en: 2cab01d85f524e3d
+  zh: 0d00b3e399a935b1
+/deepseek-ai-dsh-terminal-bash/use-this-package/sandboxing-and-safe-operation:
   en: 39e0f0b429b024a7
   zh: 440171193664d13b
 /x1a0f3n9-dsh-terminal-bash/use-this-package/observable-outcomes-and-failures:
@@ -38,10 +38,10 @@
 /x1a0f3n9-dsh-terminal-bash/understand-the-implementation:
   en: 97f4f07114f5a995
   zh: d30b07058a3103c7
-/x1a0f3n9-dsh-terminal-bash/understand-the-implementation/design-concept:
-  en: 5808eba7c8ff1993
-  zh: c85f1ab0a869c177
-/x1a0f3n9-dsh-terminal-bash/understand-the-implementation/source-map:
+/deepseek-ai-dsh-terminal-bash/understand-the-implementation/design-concept:
+  en: 1801aaa763743049
+  zh: b8c8158a63ed6055
+/deepseek-ai-dsh-terminal-bash/understand-the-implementation/source-map:
   en: 9a525f7a7228a09b
   zh: d57537edfacc9f8b
 /x1a0f3n9-dsh-terminal-bash/understand-the-implementation/readiness-model:
@@ -53,10 +53,10 @@
 /x1a0f3n9-dsh-terminal-bash/understand-the-implementation/sandbox-mode-fence:
   en: a88b693ec539ac28
   zh: a309bbe671166027
-/x1a0f3n9-dsh-terminal-bash/further-exploration:
-  en: 648ee87712ed5c66
-  zh: 6444df8b1fabbc17
-/x1a0f3n9-dsh-terminal-bash/model-experience:
+/deepseek-ai-dsh-terminal-bash/further-exploration:
+  en: 0c44b6dab2f819b7
+  zh: bdd3da50d9180977
+/deepseek-ai-dsh-terminal-bash/model-experience:
   en: 215e7ba838619b7b
   zh: a311da3843709f90
 /x1a0f3n9-dsh-terminal-bash/model-experience/indirect-consumer:
@@ -86,6 +86,6 @@
 /x1a0f3n9-dsh-terminal-bash/known-limitations-and-deferred-work:
   en: 2dc221de0d3a76a7
   zh: 822cef044e765459
-/x1a0f3n9-dsh-terminal-bash/known-limitations-and-deferred-work/dev-note:
-  en: 979c4600ed8a81d5
-  zh: 4016ea615f638036
+/deepseek-ai-dsh-terminal-bash/known-limitations-and-deferred-work/dev-note:
+  en: e67f633dc6fe7773
+  zh: 3bb0c20c93f16f98

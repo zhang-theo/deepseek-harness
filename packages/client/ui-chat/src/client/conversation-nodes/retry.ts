@@ -1,8 +1,8 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type {
   ConversationLocation, ConversationMatch, ConversationNodeDefinition, ModelRetryNode,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type {} from '@x1a0f3n9/dsh-llm-retry/types'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type {} from '@deepseek-ai/dsh-llm-retry/types'
 import type { RetryChatData } from '../contract/chat-nodes.ts'
 import { chatNode } from './common.ts'
 
@@ -84,7 +84,7 @@ export const retryDefinition: ConversationNodeDefinition<RetryState> = {
     const current = attempts.at(-1)
     if (current === undefined) return null
     const data: RetryChatData = { attempts, current }
-    return chatNode(context, 'model-retry', attempts[0]?.seq ?? current.seq, data)
+    return chatNode(context, 'model-retry', attempts[0]?.seq ?? current.seq, data, { groupTree: 'process' })
   },
 }
 

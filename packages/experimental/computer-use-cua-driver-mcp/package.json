@@ -1,7 +1,7 @@
 {
-  "name": "@x1a0f3n9/dsh-experimental-computer-use-cua-driver-mcp",
+  "name": "@deepseek-ai/dsh-experimental-computer-use-cua-driver-mcp",
   "description": "Experimental computer use through an installed Cua Driver MCP executable",
-  "version": "0.1.7-rc.4",
+  "version": "0.2.1-rc.2",
   "publishConfig": {
     "access": "public"
   },
@@ -30,24 +30,24 @@
   "license": "MIT",
   "dependencies": {
     "@deepseek-ai/schemastery": "workspace:~",
-    "@x1a0f3n9/dsh-mcp-client": "workspace:*"
+    "@deepseek-ai/dsh-mcp-client": "workspace:*"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "workspace:~",
-    "@x1a0f3n9/dsh-computer-use": "workspace:*"
+    "@deepseek-ai/dsh-computer-use": "workspace:*"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:~",
     "@deepseek-ai/cordis-plugin-loader": "workspace:~",
     "@deepseek-ai/cordis-plugin-include": "workspace:~",
-    "@x1a0f3n9/dsh-computer-use": "workspace:*",
-    "@x1a0f3n9/dsh-system-prompt": "workspace:*",
-    "@x1a0f3n9/dsh-tools": "workspace:*",
-    "@x1a0f3n9/dsh-llm": "workspace:*",
-    "@x1a0f3n9/dsh-session": "workspace:*",
-    "@x1a0f3n9/dsh-agent": "workspace:*",
-    "@x1a0f3n9/dsh-agent-loop": "workspace:*",
-    "@x1a0f3n9/dsh-attachment-local": "workspace:*",
-    "@x1a0f3n9/dsh-session-projection": "workspace:*"
+    "@deepseek-ai/dsh-computer-use": "workspace:*",
+    "@deepseek-ai/dsh-system-prompt": "workspace:*",
+    "@deepseek-ai/dsh-tools": "workspace:*",
+    "@deepseek-ai/dsh-llm": "workspace:*",
+    "@deepseek-ai/dsh-session": "workspace:*",
+    "@deepseek-ai/dsh-agent": "workspace:*",
+    "@deepseek-ai/dsh-agent-loop": "workspace:*",
+    "@deepseek-ai/dsh-attachment-local": "workspace:*",
+    "@deepseek-ai/dsh-session-projection": "workspace:*"
   }
 }

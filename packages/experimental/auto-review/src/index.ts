@@ -5,12 +5,13 @@
  * Under the `ask` approval policy a reviewer denial asks the user; under
  * `never` it is final.
  *
- * @module @x1a0f3n9/dsh-experimental-auto-review
+ * @module @deepseek-ai/dsh-experimental-auto-review
  */
 
+import type {} from '@deepseek-ai/dsh-working-directory'
 import type { Context } from '@deepseek-ai/cordis'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import type {} from '@x1a0f3n9/dsh-agent-instructions'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import type {} from '@deepseek-ai/dsh-agent-instructions'
 import {
   BlockAssembler,
   type ContentBlock,
@@ -19,17 +20,17 @@ import {
   type StreamChunk,
   type ToolCallId,
   type ToolSchema,
-} from '@x1a0f3n9/dsh-llm'
-import { deepFreeze } from '@x1a0f3n9/dsh-util-values'
-import { AUTO_PRESET } from '@x1a0f3n9/dsh-permission-presets'
-import type { SessionEvent } from '@x1a0f3n9/dsh-session'
-import type {} from '@x1a0f3n9/dsh-subagent'
-import type {} from '@x1a0f3n9/dsh-user-approval'
+} from '@deepseek-ai/dsh-llm'
+import { deepFreeze } from '@deepseek-ai/dsh-util-values'
+import { AUTO_PRESET } from '@deepseek-ai/dsh-permission-presets'
+import type { SessionEvent } from '@deepseek-ai/dsh-session'
+import type {} from '@deepseek-ai/dsh-subagent'
+import type {} from '@deepseek-ai/dsh-user-approval'
 import {
   RUN_CODE_NAME,
   type PreToolDecision,
   type ToolExecution,
-} from '@x1a0f3n9/dsh-tools'
+} from '@deepseek-ai/dsh-tools'
 
 /** Structured error name persisted for every final reviewer denial. */
 const AUTO_REVIEW_DENIED_ERROR_NAME = 'AutoReviewDeniedError'
@@ -123,7 +124,7 @@ interface ScopedPtcStart {
 /** Cordis plugin name used by loader diagnostics. */
 export const name = 'experimental-auto-review'
 /** Complete host services required before Auto may be advertised. */
-export const inject = ['approval', 'llm', 'permissionPresets', 'sessions', 'tools']
+export const inject = ['approval', 'llm', 'permissionPresets', 'sessions', 'tools', 'workingDirectory']
 
 /** Return JSON text for one immutable logged value. */
 function json(value: unknown): string {
@@ -358,7 +359,7 @@ function ptcAction(
  * @param exec - immutable pending execution.
  * @returns the exact route and four data sections paired with {@link REVIEW_POLICY}.
  */
-function snapshotAutoReview(agent: Agent, exec: ToolExecution): ReviewSnapshot {
+function snapshotAutoReview(agent: Agent, exec: ToolExecution, cwd: string): ReviewSnapshot {
   const { session } = agent
   // The reviewer's risk inputs are the whole action history: earlier native calls
   // and PTC starts carry the authorizations and duplicate identities this call is
@@ -370,10 +371,6 @@ function snapshotAutoReview(agent: Agent, exec: ToolExecution): ReviewSnapshot {
   const header = session.requestHeader()
   if (header === undefined || header.config.provider.length === 0 || header.config.model.length === 0) {
     throw new Error('auto-review: no complete request-header route is available')
-  }
-  const cwd = session.header.cwd
-  if (cwd === undefined || cwd.length === 0) {
-    throw new Error('auto-review: the session has no working directory')
   }
 
   const nativeCalls = events.filter((event): event is NativeCallEvent => event.type === 'tool/call')
@@ -621,7 +618,8 @@ async function classifyRisk(
   exec: ToolExecution,
   signal: AbortSignal,
 ): Promise<AutoReviewDecision> {
-  const snapshot = snapshotAutoReview(agent, exec)
+  const cwd = await ctx.workingDirectory.ensure(agent, signal)
+  const snapshot = snapshotAutoReview(agent, exec, cwd)
   // This review prompt is sent only through ctx.llm.stream and never enters a Session log.
   const options: GenerateOptions = deepFreeze({
     provider: snapshot.provider,

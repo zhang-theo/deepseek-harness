@@ -1,12 +1,12 @@
 /**
  * Schema-dump entry: inspect the composed profile without applying its plugins.
  * Imports and lazy schema builders execute trusted module code.
- * @module @x1a0f3n9/dsh/dump-config-schema
+ * @module @deepseek-ai/dsh/dump-config-schema
  */
 
 /* v8 ignore file -- built-bin acceptance drives schema collection and output. */
 
-import { generateConfigSchema, type ConfigSchemaDump } from '@x1a0f3n9/dsh-app-boot'
+import { generateConfigSchema, type ConfigSchemaDump } from '@deepseek-ai/dsh-app-boot'
 import { collectConfigDumpLayers } from './dump-config.ts'
 import { INSTALL_ANCHOR, prepareProfile } from './profile-boot.ts'
 
@@ -19,7 +19,7 @@ const NAME = 'dsh'
  * During schema generation, ordinary stdout writes are redirected to stderr.
  * @param profile - the profile name.
  * @param patches - overlay paths, in argv order.
- * @param fromDefaultProfile - shipped template used once to initialize a missing profile.
+ * @param fromDefaultProfile - shipped template that replaces the profile before loading it.
  * @returns after collection and output, with diagnostics also written to stderr.
  */
 export async function runDumpConfigSchema(

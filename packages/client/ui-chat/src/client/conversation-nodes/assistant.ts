@@ -2,10 +2,10 @@ import type { Context } from '@deepseek-ai/cordis'
 import type {
   AssistantBlock, AssistantMessageNode, ConversationLocation, ConversationMatch,
   ConversationNodeContext, ConversationNodeDefinition,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { StreamChunk } from '@x1a0f3n9/dsh-llm'
-import type {} from '@x1a0f3n9/dsh-llm-retry/types'
-import type { SessionEvent } from '@x1a0f3n9/dsh-session/types'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { StreamChunk } from '@deepseek-ai/dsh-llm'
+import type {} from '@deepseek-ai/dsh-llm-retry/types'
+import type { SessionEvent } from '@deepseek-ai/dsh-session/types'
 import type { AssistantChatData } from '../contract/chat-nodes.ts'
 import { CHAT_SYNTHETIC_SEQ_OFFSETS, chatNode } from './common.ts'
 import {
@@ -19,7 +19,7 @@ declare module '../contract/chat-nodes.ts' {
   }
 }
 
-declare module '@x1a0f3n9/dsh-client-ui-conversation/client' {
+declare module '@deepseek-ai/dsh-client-ui-conversation/client' {
   interface ConversationStepDataMap {
     /** Streaming, settled, or interrupted Assistant material for this Step. */
     'assistant-step': AssistantChatData
@@ -92,6 +92,12 @@ function updateChunk(
   seq: number,
   time: number,
 ): AssistantState {
+  if (chunk.type === 'tool-call-delta') {
+    const previous = state.blocks[chunk.index]
+    if (previous?.kind === 'tool-call' && previous.callId !== ''
+      && (chunk.name === undefined || chunk.name === previous.name)
+      && (state.firstTokenTime !== undefined || !isTokenDelta(chunk))) return state
+  }
   const blocks = [...state.blocks]
   let changedIndex = -1
   let previousVisible = false
@@ -119,14 +125,12 @@ function updateChunk(
       const previous = blocks[chunk.index]
       changedIndex = chunk.index
       previousVisible = blockIsVisible(previous)
-      const base = previous?.kind === 'tool-call'
-        ? previous
-        : { kind: 'tool-call' as const, callId: '', name: '', argsRaw: '' }
+      // Tool Nodes own streamed arguments; Assistant protocol blocks retain identity until full settlement.
       blocks[chunk.index] = {
         kind: 'tool-call',
-        callId: base.callId || String(chunk.id),
-        name: chunk.name ?? base.name,
-        argsRaw: base.argsRaw + chunk.argumentsDelta,
+        callId: (previous?.kind === 'tool-call' ? previous.callId : '') || String(chunk.id),
+        name: chunk.name ?? (previous?.kind === 'tool-call' ? previous.name : ''),
+        argsRaw: previous?.kind === 'tool-call' ? previous.argsRaw : '',
       }
       break
     }
@@ -356,5 +360,14 @@ export const assistantDefinition: ConversationNodeDefinition<AssistantState> = {
  * @param ctx - owning UI Conversation context.
  */
 export function registerAssistantConversationNode(ctx: Context): void {
-  ctx.uiConversation.events.register(assistantDefinition)
+  const match = assistantDefinition.match.bind(assistantDefinition)
+  ctx.uiConversation.events.register({
+    ...assistantDefinition,
+    match: {
+      'step/start': match,
+      'assistant/live-chunk': match,
+      'assistant/message': match,
+      'llm/retry': match,
+    },
+  })
 }

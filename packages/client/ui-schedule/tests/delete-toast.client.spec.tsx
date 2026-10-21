@@ -2,7 +2,7 @@
 /** The app-wide deletion toast: one outcome store behind one overlay banner. */
 import { act, cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { makeTranslate } from '@x1a0f3n9/dsh-client-test-runtime'
+import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import {
   createDeleteToastSource, ScheduleDeleteToast,
   type DeleteToastState, type ScheduleDeleteToastProps,

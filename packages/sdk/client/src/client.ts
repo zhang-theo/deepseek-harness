@@ -1,7 +1,7 @@
 /**
  * Low-level JSON-RPC client for a DeepSeek Harness SDK runtime subprocess.
  * {@link HarnessClient} owns the child process: it spawns the runtime, speaks
- * the `@x1a0f3n9/dsh-sdk-protocol` wire over the child's stdio, fans
+ * the `@deepseek-ai/dsh-sdk-protocol` wire over the child's stdio, fans
  * server notifications out to subscriptions, and tears the child down to
  * quiescence through a private EOF → SIGTERM → SIGKILL ladder. The design
  * twin is the Python SDK's `HarnessClient` (`python/sdk`); both drive the
@@ -9,7 +9,7 @@
  * spawns directly rather than through the `dsh-subprocess` service — the
  * seam's documented exception for SDK-managed transports.
  *
- * @module @x1a0f3n9/dsh-sdk-client/client
+ * @module @deepseek-ai/dsh-sdk-client/client
  */
 
 import { spawn, type ChildProcess } from 'node:child_process'
@@ -20,7 +20,7 @@ import {
   type InitializeResult,
   type SessionPromptParams,
   type SdkPromptContentBlock,
-} from '@x1a0f3n9/dsh-sdk-protocol'
+} from '@deepseek-ai/dsh-sdk-protocol'
 import { disposeRuntimeProcess } from './dispose.ts'
 import { resolveDshLaunch, type RuntimeProcessOptions } from './launch.ts'
 import type { HarnessClientOptions, HarnessNotification, NotificationFilter } from './types.ts'
@@ -295,6 +295,42 @@ export class HarnessClient {
       throw new SdkProtocolError(`session/prompt returned no message id: ${JSON.stringify(result)}`)
     }
     return result.messageId
+  }
+
+  /**
+   * Restore persisted history without sending a prompt; failures propagate without creating a session.
+   * @param sessionId - persisted identity in this runtime's configured persistence store.
+   * @returns after the session is ready for prompts.
+   */
+  async resumeSession(sessionId: string): Promise<void> {
+    await this.request('session/resume', { sessionId })
+  }
+
+  /**
+   * Read a Session's effective working directory, recovering it if missing.
+   * @param sessionId - target Session; an unknown id creates it.
+   * @returns the absolute effective directory.
+   */
+  getWorkingDirectory(sessionId: string): Promise<string> {
+    return this.workingDirectoryRequest('session/working-directory/get', { sessionId })
+  }
+
+  /**
+   * Change a Session's effective directory without changing origin or permissions.
+   * @param sessionId - target Session; an unknown id creates it.
+   * @param path - absolute or Session-current-directory-relative path.
+   * @returns the validated absolute directory.
+   */
+  setWorkingDirectory(sessionId: string, path: string): Promise<string> {
+    return this.workingDirectoryRequest('session/working-directory/set', { sessionId, path })
+  }
+
+  private async workingDirectoryRequest(method: string, params: object): Promise<string> {
+    const result = await this.request(method, params)
+    if (!isRecord(result) || typeof result.cwd !== 'string') {
+      throw new SdkProtocolError(`${method} returned no working directory: ${JSON.stringify(result)}`)
+    }
+    return result.cwd
   }
 
   /**

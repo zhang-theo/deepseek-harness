@@ -3,7 +3,7 @@ description: "The Web feedback surface: the Like/Dislike pair in the finalized a
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-client-ui-message-feedback
+# @deepseek-ai/dsh-client-ui-message-feedback
 
 English | [中文](README.zh.md)
 
@@ -89,5 +89,3 @@ These limits define the current feedback surface. They are current package const
 None.
 
 </details>
-
-**Runtime invariant:** No companion is published. The plugin owns two slot registrations, one command decoration, the `feedbackUi` service, and one per-session controller-pair map, all released with the owning plugin fiber. The lifecycle spec verifies that the registrations and service are withdrawn and every controller pair is dropped when the fiber is disposed, so no second authority exists to check at runtime.

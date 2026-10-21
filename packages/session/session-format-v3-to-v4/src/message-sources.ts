@@ -1,7 +1,7 @@
 /** Native source admission preserves unknown attribution and refuses retired plugin wrappers. */
 
-import { SessionFormatError, isSessionFormatJsonObject } from '@x1a0f3n9/dsh-session-format'
-import type { SessionFormatEvent, SessionFormatJsonObject } from '@x1a0f3n9/dsh-session-format'
+import { SessionFormatError, isSessionFormatJsonObject } from '@deepseek-ai/dsh-session-format'
+import type { SessionFormatEvent, SessionFormatJsonObject } from '@deepseek-ai/dsh-session-format'
 import { mapEventMessages, rewritePluginSource } from './sources.ts'
 
 function jsonObject(value: object): SessionFormatJsonObject {

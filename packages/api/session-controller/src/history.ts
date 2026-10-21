@@ -1,13 +1,13 @@
 /** Cold Session history pagination and live-event source. */
 
 import type { Context } from '@deepseek-ai/cordis'
-import { Deque } from '@x1a0f3n9/dsh-deque'
-import type { AssistantStreamFrame } from '@x1a0f3n9/dsh-agent'
+import { Deque } from '@deepseek-ai/dsh-deque'
+import type { AssistantStreamFrame } from '@deepseek-ai/dsh-agent'
 import {
   isAppendSurfaceEvent,
   SessionLogOffset,
   SessionSeq,
-} from '@x1a0f3n9/dsh-session'
+} from '@deepseek-ai/dsh-session'
 import type {
   Session,
   SessionEvent,
@@ -15,17 +15,17 @@ import type {
   SessionId,
   SessionLogOffset as SessionLogOffsetType,
   SessionSeqCursor,
-} from '@x1a0f3n9/dsh-session'
+} from '@deepseek-ai/dsh-session'
 import {
   SessionPersistenceNotFoundError,
   type SessionHistorySuffix,
   type SessionHistorySuffixOptions,
-} from '@x1a0f3n9/dsh-session-persistence'
-import type {} from '@x1a0f3n9/dsh-session-projection-cache'
-import { SessionQueryError, type SessionObservation } from '@x1a0f3n9/dsh-session-query'
-import type {} from '@x1a0f3n9/dsh-subagent'
-import { RemoteError } from '@x1a0f3n9/dsh-typert-protocol'
-import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
+} from '@deepseek-ai/dsh-session-persistence'
+import type {} from '@deepseek-ai/dsh-session-projection-cache'
+import { SessionQueryError, type SessionObservation } from '@deepseek-ai/dsh-session-query'
+import type {} from '@deepseek-ai/dsh-subagent'
+import { RemoteError } from '@deepseek-ai/dsh-typert-protocol'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 import type {
   SessionAddress,
   SessionAssistantStreamFrame,

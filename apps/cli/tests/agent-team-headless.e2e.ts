@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { execa } from 'execa'
 import { describe, expect, it } from 'vitest'
-import { resolveExampleLaunch } from '@x1a0f3n9/dsh-loader-smoke'
+import { resolveExampleLaunch } from '@deepseek-ai/dsh-loader-smoke'
 
 const dshBinScript = fileURLToPath(new URL('../src/bin.ts', import.meta.url))
 const tsconfigPath = fileURLToPath(new URL('../../../tsconfig.json', import.meta.url))
@@ -17,7 +17,7 @@ function records(content: string): Record<string, unknown>[] {
 }
 
 describe('dsh run with Agent Teams enabled', () => {
-  it('runs two teammates, durable peer mail, dependent tasks, waiting, and final aggregation', async () => {
+  it('runs two teammates, direct peer messages, dependent tasks, waiting, and final aggregation', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'dsh-agent-team-headless-'))
     try {
       const home = join(cwd, '.dsh')
@@ -28,14 +28,14 @@ describe('dsh run with Agent Teams enabled', () => {
         name: 'dsh-profile-headless',
         private: true,
         dependencies: {
-          '@x1a0f3n9/dsh-experimental-agent-team-profile': 'workspace:^',
+          '@deepseek-ai/dsh-experimental-agent-team-profile': 'workspace:^',
         },
         dsh: {
           profile: {
             bundles: [
-              '@x1a0f3n9/dsh-base',
-              '@x1a0f3n9/dsh-headless',
-              '@x1a0f3n9/dsh-experimental-agent-team-profile',
+              '@deepseek-ai/dsh-base',
+              '@deepseek-ai/dsh-headless',
+              '@deepseek-ai/dsh-experimental-agent-team-profile',
             ],
           },
         },
@@ -88,11 +88,11 @@ describe('dsh run with Agent Teams enabled', () => {
       expect(files).toHaveLength(4)
       const logs = await Promise.all(files.map(file => readFile(join(sessions, file), 'utf8')))
       const parsed = logs.map(records)
-      const workflowChild = parsed.find(log => log.some(record => record.type === 'subagent/descriptor'
-        && (record.data as { mode: string }).mode === 'one-shot'))
+      const workflowChild = parsed.find(log => log.some(record => record.type === 'user/message'
+        && JSON.stringify((record.data as { content: unknown }).content) === JSON.stringify([{ type: 'text', text: 'TEAM_WORKFLOW_CHILD' }])))
       expect(workflowChild).toBeDefined()
       expect(workflowChild!.find(record => record.type === 'subagent/descriptor')?.data)
-        .toMatchObject({ mode: 'one-shot', provider: 'spawn' })
+        .toMatchObject({ mode: 'continuable', provider: 'spawn' })
       expect(workflowChild!.filter(record => record.type === 'user/message'
         && (record.data as { source: { kind: string } }).source.kind === 'user').map(record => record.data))
         .toEqual([expect.objectContaining({ content: [{ type: 'text', text: 'TEAM_WORKFLOW_CHILD' }] })])
@@ -103,8 +103,11 @@ describe('dsh run with Agent Teams enabled', () => {
       expect(root).toBeDefined()
       const eventTypes = root!.map(record => record.type)
       expect(eventTypes.filter(type => type === 'team/member')).toHaveLength(4)
-      expect(eventTypes).toContain('team/message/queued')
-      expect(eventTypes).toContain('team/message/delivered')
+      expect(eventTypes).not.toContain('team/message/queued')
+      expect(eventTypes).not.toContain('team/message/delivered')
+      const peerMessages = parsed.flatMap(log => log.filter(record => record.type === 'user/message'
+        && (record.data as { source: { kind: string } }).source.kind === 'agent-message'))
+      expect(peerMessages).toHaveLength(2)
       const taskEvents = root!.filter(record => record.type === 'team/task')
       expect(taskEvents.filter((record) => {
         const data = record.data as { task?: { status?: string } } | undefined

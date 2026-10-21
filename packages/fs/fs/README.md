@@ -3,7 +3,7 @@ description: "The ctx.fs filesystem service contract for deployments choosing or
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-fs
+# @deepseek-ai/dsh-fs
 
 English | [中文](README.zh.md)
 

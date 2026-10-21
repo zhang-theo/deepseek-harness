@@ -1,8 +1,8 @@
 /** Shared event metadata and semantic-document projection. */
 
-import { currentSessionMessageProjections } from '@x1a0f3n9/dsh-session-format-catalog/message-projections'
-import { foldSurface } from '@x1a0f3n9/dsh-session'
-import type { SessionEvent, SessionId, SessionSeq } from '@x1a0f3n9/dsh-session'
+import { currentSessionMessageProjections } from '@deepseek-ai/dsh-session-format-catalog/message-projections'
+import { foldSurface } from '@deepseek-ai/dsh-session'
+import type { SessionEvent, SessionId, SessionSeq } from '@deepseek-ai/dsh-session'
 import type { SessionEventRecord, SessionEventSearchDocument, SessionEventSurface } from './types.ts'
 import { SessionQueryError } from './config.ts'
 import { extractSessionEventText } from './extraction.ts'

@@ -1,10 +1,10 @@
 /**
  * Official and fork package names for the same dsh product package.
- * @module @x1a0f3n9/dsh-client-modules/package-alias
+ * @module @deepseek-ai/dsh-client-modules/package-alias
  */
 
 const OFFICIAL_PREFIX = '@deepseek-ai/dsh-'
-const FORK_PREFIX = '@x1a0f3n9/dsh-'
+const FORK_PREFIX = '@deepseek-ai/dsh-'
 
 /**
  * Return the opposite published name for an official or fork dsh package.

@@ -3,7 +3,7 @@ description: "The skill provider registry for users and maintainers choosing, co
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-skill
+# @deepseek-ai/dsh-skill
 
 English | [中文](README.zh.md)
 
@@ -36,7 +36,7 @@ Use `dsh-skill` when agents should load skills from more than one source through
 Load the plugin like any Cordis plugin. The only configuration limits how many completed provider catalogs are kept in memory; everything else is provider behavior.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-skill'
+- name: '@deepseek-ai/dsh-skill'
 ```
 
 | Field | Default | Meaning |
@@ -88,7 +88,6 @@ The registry is host+per-scope layered, the shape the tools registry established
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry, `SkillRegistry` service, candidate and definition validation, shared model-facing rendering |
-| — | No runtime invariant companion is published; provider/runtime maps and revisioned caches mutate atomically inside the registry, which exposes no independent change event or snapshot for cross-checking them. |
 
 ### Catalog collection
 
@@ -115,7 +114,7 @@ Read these pages when the package-level contract is not enough. They move from t
 - [skill-filesystem package](../skill-filesystem/README.md) — the shipped local provider that discovers skills from disk.
 - [tool-skill package](../tool-skill/README.md) — the consumer that renders the session catalog and the `skill` tool.
 - [Generated configuration catalog](../../../docs/config-catalog.md#deepseek-aidsh-skill) — every config field and its source declaration.
-- [Skill invocation policy Agent Note](../../../.agents/notes/implemented/feature/2026-07-28-skill-invocation-policy.md) — the rationale for the model and user invocation controls.
+- [historical Skill invocation policy Agent Note](../../../.agents/notes/archived/feature/2026-07-28-skill-invocation-policy.md) — the rationale for the model and user invocation controls.
 
 -----
 

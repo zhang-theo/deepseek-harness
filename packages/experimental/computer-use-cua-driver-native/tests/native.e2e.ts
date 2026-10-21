@@ -2,10 +2,10 @@
 
 import { expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import ComputerUseRegistry from '@x1a0f3n9/dsh-computer-use'
-import { ToolCallId } from '@x1a0f3n9/dsh-llm'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import ToolRuntime from '@x1a0f3n9/dsh-tools'
+import ComputerUseRegistry from '@deepseek-ai/dsh-computer-use'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import ToolRuntime from '@deepseek-ai/dsh-tools'
 import * as NativeProvider from '../src/index.ts'
 
 it.skipIf(process.env.DSH_COMPUTER_USE_NATIVE_E2E !== '1')(

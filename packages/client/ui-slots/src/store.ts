@@ -14,4 +14,4 @@ export type {
   StoreHandle,
   StoreInstance,
   StoreSpec,
-} from '@x1a0f3n9/dsh-client-store'
+} from '@deepseek-ai/dsh-client-store'

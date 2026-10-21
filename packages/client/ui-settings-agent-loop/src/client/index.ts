@@ -6,13 +6,13 @@
  */
 
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
-import type {} from '@x1a0f3n9/dsh-client-locale/client'
+import type {} from '@deepseek-ai/dsh-client-locale/client'
 // Type-only: the ctx.configForms Context merge. Cross-plugin collaboration
 // goes through the service, never a value import (client bundle purity gate).
-import type {} from '@x1a0f3n9/dsh-client-ui-settings/client'
+import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 // Type-only: the Plugins page's SlotMap merge (the 'plugins.item' entry).
-import type {} from '@x1a0f3n9/dsh-client-ui-plugin-manager/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-renderer/client'
+import type {} from '@deepseek-ai/dsh-client-ui-plugin-manager/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import { AgentLoopCard } from './AgentLoopCard.tsx'
 import { AGENT_LOOP_NS, AgentLoopCardController } from './agent-loop-card-controller.ts'
@@ -22,7 +22,7 @@ export type { AgentLoopCardProps } from './AgentLoopCard.tsx'
 export type { AgentLoopCardFace, AgentLoopCardState, AgentLoopSettings } from './agent-loop-card-controller.ts'
 export type { AgentLoopSettingsLocaleKey } from './locales.ts'
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** Agent loop settings page copy. */
     'settings.agentLoop': AgentLoopSettingsLocaleKey
@@ -45,6 +45,6 @@ export function apply(ctx: ClientContext): void {
   const card = new AgentLoopCardController(ctx.configForms.get(AGENT_LOOP_NS))
   ctx.effect(() => () => { card.dispose() }, 'ui-settings-agent-loop: form subscription')
   ctx.effect(() => ctx.configForms.whileServed([AGENT_LOOP_NS], () => ctx.slots.inject('plugins.item', () => ctx.slots.register({
-    name: 'plugins.item', id: 'agent-loop', order: 20, label: () => t('title'), locale: NS, inject: () => card.inject(),
+    name: 'plugins.item', id: 'agent-loop', order: 30, label: () => t('title'), locale: NS, inject: () => card.inject(),
   }, AgentLoopCard))), 'ui-settings-agent-loop: page')
 }

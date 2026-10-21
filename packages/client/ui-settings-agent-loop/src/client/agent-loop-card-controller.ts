@@ -1,10 +1,10 @@
 /** The agent-loop page's staged form over the `agent-loop` settings namespace. */
 
-import type { SnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import type { SnapshotStore } from '@deepseek-ai/dsh-client-store'
 import {
   SettingsFormModel, settingsNumberField,
   type SettingsFieldState, type SettingsFormActions, type SettingsFormScope, type SettingsFormShell,
-} from '@x1a0f3n9/dsh-client-ui-primitives'
+} from '@deepseek-ai/dsh-client-ui-primitives'
 
 /**
  * Namespace of the agent loop's user-owned settings. Spelled here rather than

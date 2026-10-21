@@ -1,11 +1,11 @@
 /**
  * Result-time contextual diff presentation for write and edit. Storage returns before/after
  * text; this model-facing layer derives one three-line-context card per applied hunk.
- * @module @x1a0f3n9/dsh-tool-fs/src/diff
+ * @module @deepseek-ai/dsh-tool-fs/src/diff
  */
 
 import { structuredPatch } from 'diff'
-import type { FileDiff } from '@x1a0f3n9/dsh-tools'
+import type { FileDiff } from '@deepseek-ai/dsh-tools'
 
 /** Context lines shown on each side of an applied hunk. */
 export const DIFF_CONTEXT = 3
@@ -78,4 +78,15 @@ export function diffsFromMeta(meta: unknown): FileDiff[] | undefined {
   const diffs = (meta as Record<string, unknown>).diffs
   if (!Array.isArray(diffs) || diffs.length === 0 || !diffs.every(isFileDiff)) return undefined
   return diffs
+}
+
+/**
+ * Read the operation's file path even when the applied diff is empty.
+ * @param meta - opaque persisted result metadata.
+ * @returns the recorded path, or undefined for old or malformed metadata.
+ */
+export function pathFromMeta(meta: unknown): string | undefined {
+  if (typeof meta !== 'object' || meta === null || Array.isArray(meta)) return undefined
+  const path = (meta as Record<string, unknown>).path
+  return typeof path === 'string' && path.length > 0 ? path : undefined
 }

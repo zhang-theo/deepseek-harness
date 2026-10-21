@@ -3,7 +3,7 @@ description: "Discover and read MCP resources on demand with shared tools, expli
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-mcp-resources
+# @deepseek-ai/dsh-mcp-resources
 
 English | [中文](README.zh.md)
 
@@ -51,7 +51,7 @@ The [base](../../bundle/base/README.md) and standalone [sdk-minimal](../../bundl
 
 ```yaml
 - id: mcp-resources
-  name: '@x1a0f3n9/dsh-mcp-resources'
+  name: '@deepseek-ai/dsh-mcp-resources'
 ```
 
 The first provider in a scope registers its shared tools; removing the last removes those local registrations, while inherited providers and tools remain visible. The resource service owns the shared tool effects independently of the first provider's plugin, so unloading that provider cannot remove tools needed by another server. Provider selection and the server-name prompt use the same scoped registry. Each call resolves its server before dispatch.
@@ -64,8 +64,6 @@ Canonical results retain the complete JSON for programmatic callers. The pure te
 | [`src/tools.ts`](src/tools.ts) | Shared resource operations and argument schemas |
 | [`src/render.ts`](src/render.ts) | Attributed text projection without inline binary payloads |
 
-No runtime invariant companion is published: tools, prompt names, and dispatch derive from the same effect-owned provider registrations. They supply no independent observation to reconcile; registry-effect checks are not runtime invariants.
-
 </details>
 
 -----
@@ -77,8 +75,8 @@ These pages cover server configuration, execution, and the decisions behind reso
 
 - [MCP client](../mcp-client/README.md) — server transports, instructions, and connection lifecycle.
 - [Tools subsystem](../../../docs/subsystems/tools.md) — canonical values and model-visible results.
-- [Resource visibility decision](../../../.agents/notes/implemented/feature/2026-09-13-mcp-resources-in-profiles.md) — shared profile mounting and visibility from configured servers.
-- [Resources and instructions decision](../../../.agents/notes/implemented/feature/2026-09-12-mcp-resources-and-instructions.md) — scope, on-demand access, and excluded mechanisms.
+- [Resource visibility reference](README.md) — shared profile mounting and visibility from configured servers.
+- [Resources and instructions reference](README.md) — scope, on-demand access, and excluded mechanisms.
 
 -----
 

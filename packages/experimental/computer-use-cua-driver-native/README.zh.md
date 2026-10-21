@@ -3,7 +3,7 @@ description: "通过原生 npm SDK 运行 Cua Driver 的电脑操作工具，持
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-experimental-computer-use-cua-driver-native
+# @deepseek-ai/dsh-experimental-computer-use-cua-driver-native
 
 [English](README.md) | 中文
 
@@ -30,8 +30,8 @@ kind: "package-reference"
 ### 最小配置
 
 ```yaml
-- name: '@x1a0f3n9/dsh-computer-use'
-- name: '@x1a0f3n9/dsh-experimental-computer-use-cua-driver-native'
+- name: '@deepseek-ai/dsh-computer-use'
+- name: '@deepseek-ai/dsh-experimental-computer-use-cua-driver-native'
 ```
 
 此提供者没有配置字段。它加载 [package.json](package.json) 声明的确切 Cua Driver npm 版本，并采用其进程内默认配置。原生模块导入、运行时初始化、目录格式、工具重名或电脑操作注册冲突会使激活失败，并回滚所拥有的资源。注册的提供者名称为 `cua-driver-native`。
@@ -63,7 +63,6 @@ env -u NODE_USE_ENV_PROXY DSH_COMPUTER_USE_NATIVE_E2E=1 node node_modules/vitest
 | 文件 | 职责 |
 |---|---|
 | [src/index.ts](src/index.ts) | 原生运行时所有权、目录校验、工具注册和提供者指导文本 |
-| — | 不发布运行时不变量伴随模块；资源所有权没有可独立观测并比较的状态。 |
 
 工具定义复用现有 MCP 结果适配器。Cua Driver 的 JSON 目录决定 schema，其原始结果提供规范文本、结构化输出和图像字节。电脑操作服务只保存提供者名称并保证独占注册。
 

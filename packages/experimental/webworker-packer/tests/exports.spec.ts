@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { expect, it, type TestContext } from 'vitest'
 import { packVfsImage, type PackOptions } from '../src/pack.ts'
 
-const SUBJECT = '@x1a0f3n9/dsh-image-export-fixture'
+const SUBJECT = '@deepseek-ai/dsh-image-export-fixture'
 
 function fixture(test: TestContext, face: unknown, source = 'export const value = 1'): PackOptions {
   const root = mkdtempSync(join(tmpdir(), 'dsh-image-exports-'))
@@ -24,8 +24,8 @@ function fixture(test: TestContext, face: unknown, source = 'export const value 
   writeFileSync(join(root, 'lib/index.d.ts'), 'export declare const value: number')
   writeFileSync(join(root, 'lib/contract.js'), 'export const value = 2')
   return {
-    config: `- id: subject\n  name: '${SUBJECT}'\n`,
     profile: 'export-check',
+    roster: [SUBJECT],
     workspaces: new Map([[SUBJECT, root]]),
     resolveFrom: root,
     entries: [],

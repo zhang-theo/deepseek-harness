@@ -14,16 +14,16 @@
 /x1a0f3n9-dsh-client-ui-sidebar-documentpreview/table-of-contents:
   en: 0dd8c3a22e28aacf
   zh: c27c11bf4b5cceba
-/x1a0f3n9-dsh-client-ui-sidebar-documentpreview/what-it-registers:
-  en: b080ba9806628cfa
-  zh: ec2b0217a07503da
-/x1a0f3n9-dsh-client-ui-sidebar-documentpreview/addresses:
-  en: 949156aa02ec8b07
-  zh: d3675754e2a37b5d
-/x1a0f3n9-dsh-client-ui-sidebar-documentpreview/how-it-reads:
-  en: 5d8bf2e43d9b6dd0
-  zh: b0d2d1d5a6f520db
-/x1a0f3n9-dsh-client-ui-sidebar-documentpreview/excel-preview:
+/deepseek-ai-dsh-client-ui-sidebar-documentpreview/what-it-registers:
+  en: 54a50f4a3a6e4d45
+  zh: af905ed570812432
+/deepseek-ai-dsh-client-ui-sidebar-documentpreview/addresses:
+  en: 57942270e23d3a8e
+  zh: 6617124e652b3f67
+/deepseek-ai-dsh-client-ui-sidebar-documentpreview/how-it-reads:
+  en: b056bbe0f74fe328
+  zh: fd9ac88f08825afc
+/deepseek-ai-dsh-client-ui-sidebar-documentpreview/excel-preview:
   en: b99b0e0b8efc2853
   zh: 4327352d1334fc6b
 /x1a0f3n9-dsh-client-ui-sidebar-documentpreview/office-preview:
@@ -41,6 +41,6 @@
 /x1a0f3n9-dsh-client-ui-sidebar-documentpreview/known-limitations-and-deferred-work:
   en: 7be2ad2e198131f8
   zh: 21b35eae72a49ad2
-/x1a0f3n9-dsh-client-ui-sidebar-documentpreview/known-limitations-and-deferred-work/dev-note:
-  en: 3d8904cb970145a3
-  zh: a0c0cddcfedf9e42
+/deepseek-ai-dsh-client-ui-sidebar-documentpreview/known-limitations-and-deferred-work/dev-note:
+  en: e67f633dc6fe7773
+  zh: e88aeb617ffb74ea

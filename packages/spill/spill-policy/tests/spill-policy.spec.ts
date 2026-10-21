@@ -11,26 +11,27 @@
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
-import { createUserMessage, ToolCallId } from '@x1a0f3n9/dsh-llm'
-import { estimateContent } from '@x1a0f3n9/dsh-token-meter/estimate'
-import type { ContentBlock } from '@x1a0f3n9/dsh-llm'
-import type { ContextFormed } from '@x1a0f3n9/dsh-llm'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import ToolRuntime, { defineContentToolFixture } from '@x1a0f3n9/dsh-tools'
-import type { ToolDefinition } from '@x1a0f3n9/dsh-tools'
-import type { PostToolDecision, ToolExecution, ToolExecutionToken } from '@x1a0f3n9/dsh-tools'
-import { SpillLocator, SpillStore } from '@x1a0f3n9/dsh-spill'
-import type { SaveTextSpill, SpillRef } from '@x1a0f3n9/dsh-spill'
-import * as SpillPolicy from '@x1a0f3n9/dsh-spill-policy'
-import NodeRuntime, { type Config as NodeRuntimeConfig } from '@x1a0f3n9/dsh-ptc-runtime-node'
-import FileSystem from '@x1a0f3n9/dsh-fs-local'
-import Subprocess from '@x1a0f3n9/dsh-subprocess-local'
-import Sandbox from '@x1a0f3n9/dsh-sandbox-local'
-import SandboxPolicy from '@x1a0f3n9/dsh-sandbox-policy'
-import SessionProjections from '@x1a0f3n9/dsh-session-projection'
+import { provideWorkingDirectoryFixture } from '@deepseek-ai/dsh-agent-loop-testkit'
+import { createUserMessage, ToolCallId } from '@deepseek-ai/dsh-llm'
+import { estimateContent } from '@deepseek-ai/dsh-token-meter/estimate'
+import type { ContentBlock } from '@deepseek-ai/dsh-llm'
+import type { ContextFormed } from '@deepseek-ai/dsh-llm'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import ToolRuntime, { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
+import type { ToolDefinition } from '@deepseek-ai/dsh-tools'
+import type { PostToolDecision, ToolExecution, ToolExecutionToken } from '@deepseek-ai/dsh-tools'
+import { SpillLocator, SpillStore } from '@deepseek-ai/dsh-spill'
+import type { SaveTextSpill, SpillRef } from '@deepseek-ai/dsh-spill'
+import * as SpillPolicy from '@deepseek-ai/dsh-spill-policy'
+import NodeRuntime, { type Config as NodeRuntimeConfig } from '@deepseek-ai/dsh-ptc-runtime-node'
+import FileSystem from '@deepseek-ai/dsh-fs-local'
+import Subprocess from '@deepseek-ai/dsh-subprocess-local'
+import Sandbox from '@deepseek-ai/dsh-sandbox-local'
+import SandboxPolicy from '@deepseek-ai/dsh-sandbox-policy'
+import SessionProjections from '@deepseek-ai/dsh-session-projection'
 
-declare module '@x1a0f3n9/dsh-llm' {
+declare module '@deepseek-ai/dsh-llm' {
   interface MessageSourceMap {
     'test': { kind: 'test' } & ContextFormed
   }
@@ -39,6 +40,7 @@ declare module '@x1a0f3n9/dsh-llm' {
 async function mountRuntime(ctx: Context, config: NodeRuntimeConfig = {}): Promise<void> {
   onTestFinished(async () => { await ctx.fiber.dispose() })
   if (!ctx.get('sessions')) await ctx.plugin(SessionStore)
+  provideWorkingDirectoryFixture(ctx)
   if (!ctx.get('fs')) await ctx.plugin(FileSystem)
   if (!ctx.get('subprocess')) await ctx.plugin(Subprocess)
   if (!ctx.get('sandbox')) await ctx.plugin(Sandbox, {})
@@ -50,7 +52,7 @@ async function mountRuntime(ctx: Context, config: NodeRuntimeConfig = {}): Promi
 function observedAgent(ctx: Context, id: string, observe: (type: string, data: unknown) => void) {
   const session = ctx.sessions.create(SessionId(id), { meta: { cwd: process.cwd() } })
   ctx.on('session/event', (owner, event) => { if (owner === session) observe(event.type, event.data) })
-  return { session }
+  return { ctx, session }
 }
 
 const testToolSignal = new AbortController().signal

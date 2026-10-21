@@ -12,7 +12,7 @@ Web 统计行原先从当前已加载的会话节点推导 token 总量。该窗
 
 ## 决策
 
-这两个值都是普通的持久会话投影状态。当 `ctx.sessionProjections` 存在时，`@x1a0f3n9/dsh-token-meter` 会注册两个单元。
+这两个值都是普通的持久会话投影状态。当 `ctx.sessionProjections` 存在时，`@deepseek-ai/dsh-token-meter` 会注册两个单元。
 
 `tokenUsage` 将完整持久日志归并为未缓存输入、输出、缓存读取和缓存写入四类计数项。它会展开每个 `assistant/message` 或 `assistant/attempt` stream 并采用最后一个 usage sample；message 顶层 usage 优先于其嵌入式 sample，因此不会重复计数。`assistant/attempt` 由此保留失败请求的 usage。匹配的 `llm/retry-started` 边界会打开新 attempt，因此复用同一 `(turn, step)` 的重试会单独贡献用量。推理（reasoning）仍是输出的细分项。compaction 和 surface replacement 不会抹除先前计费。
 
@@ -26,7 +26,7 @@ token-meter 还拥有在持久事件上运行的共享纯 attempt／Turn fold。
 
 两个单元都沿用标准投影生命周期：历史尾页基线、`session/projection` 实时帧、seq 高者胜的客户端存储、JSON 检查点、缓存恢复和单元卸载。系统没有任何 token 专用的历史字段、mux 帧、投影器、修订计数器或客户端栅栏。
 
-Web [`StatsPills`](../feature/2026-09-07-composer-session-stats-pills.zh.md) 通过标准 `useProjection` 席位读取两者。窗口内节点仍作为无投影回退提供轮次和步骤计数，以及 LLM（大语言模型）与工具的墙钟时间：它们回答的是「屏幕上有什么」，按窗口作用域正是正确的。压缩使可见 assistant 步骤归零后，持久用量 pill 仍会保留。缓存写入会计入计费输入和缓存命中率分母。未部署 token-meter 时会去掉用量 pill；上下文占用率由输入框旁的 ContextMeter 圆环承载。精确 token 数字显示在用量 pill 点击展开的弹层里，而非悬停提示。
+Web [`StatsPills`](../../../../packages/client/ui-chat/src/client/chat/StatsPills.tsx) 通过标准 `useProjection` 席位读取 `tokenUsage`。窗口内节点仍作为无投影回退提供轮次和步骤计数，以及 LLM（大语言模型）与工具的墙钟时间：它们回答的是「屏幕上有什么」，按窗口作用域正是正确的。压缩使可见 assistant 步骤归零后，持久用量 pill 仍会保留。缓存写入会计入计费输入和缓存命中率分母。未部署 token-meter 时会去掉用量 pill；上下文占用率由输入框旁的 ContextMeter 圆环承载。精确 token 数字显示在用量 pill 点击展开的弹层里，而非悬停提示。
 
 ## 上下文占用率是近似值，而这正是决策本身
 

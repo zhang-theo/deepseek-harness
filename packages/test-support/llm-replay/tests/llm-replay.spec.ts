@@ -3,10 +3,10 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { SESSION_FORMAT_VERSION, SessionSeq } from '@x1a0f3n9/dsh-session'
-import type { SessionEvent } from '@x1a0f3n9/dsh-session'
-import { CompactionId } from '@x1a0f3n9/dsh-compaction'
-import DeepSeekLlmApiExtensionRegistry from '@x1a0f3n9/dsh-deepseek-llm-api-extensions'
+import { SESSION_FORMAT_VERSION, SessionSeq } from '@deepseek-ai/dsh-session'
+import type { SessionEvent } from '@deepseek-ai/dsh-session'
+import { CompactionId } from '@deepseek-ai/dsh-compaction'
+import DeepSeekLlmApiExtensionRegistry from '@deepseek-ai/dsh-deepseek-llm-api-extensions'
 import LlmRuntime, {
   AssistantStreamAccumulator,
   BlockAssembler,
@@ -18,7 +18,7 @@ import LlmRuntime, {
   LlmAdapter,
   StreamChunk,
   type ToolResultMessage,
-} from '@x1a0f3n9/dsh-llm'
+} from '@deepseek-ai/dsh-llm'
 import {
   type Config,
   type ReplayEntry,
@@ -36,7 +36,7 @@ import {
   resolveScriptedEntry,
 } from '../src/index.ts'
 
-declare module '@x1a0f3n9/dsh-deepseek-llm-api-extensions/types' {
+declare module '@deepseek-ai/dsh-deepseek-llm-api-extensions/types' {
   interface DeepSeekLlmApiExtensionMap {
     test_replay: { readonly version: 1 }
   }
@@ -232,8 +232,8 @@ async function drain(iter: AsyncIterable<StreamChunk>): Promise<StreamChunk[]> {
 describe('Session format package parity', () => {
   it('refuses catalog and Session version skew at module load', async () => {
     vi.resetModules()
-    vi.doMock('@x1a0f3n9/dsh-session-format-catalog', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('@x1a0f3n9/dsh-session-format-catalog')>()
+    vi.doMock('@deepseek-ai/dsh-session-format-catalog', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('@deepseek-ai/dsh-session-format-catalog')>()
       return {
         ...actual,
         sessionFormatCatalog: {
@@ -246,7 +246,7 @@ describe('Session format package parity', () => {
       await expect(import('../src/index.ts'))
         .rejects.toThrow(`format catalog v${SESSION_FORMAT_VERSION + 1} does not match Session v${SESSION_FORMAT_VERSION}`)
     } finally {
-      vi.doUnmock('@x1a0f3n9/dsh-session-format-catalog')
+      vi.doUnmock('@deepseek-ai/dsh-session-format-catalog')
       vi.resetModules()
     }
   })
@@ -255,8 +255,8 @@ describe('Session format package parity', () => {
 describe('fixture format diagnostics', () => {
   it('attaches the header line to a restore-construction failure', async () => {
     vi.resetModules()
-    vi.doMock('@x1a0f3n9/dsh-session-format-catalog', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('@x1a0f3n9/dsh-session-format-catalog')>()
+    vi.doMock('@deepseek-ai/dsh-session-format-catalog', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('@deepseek-ai/dsh-session-format-catalog')>()
       return {
         ...actual,
         createSessionFormatCatalogWithChildren: () => ({
@@ -274,15 +274,15 @@ describe('fixture format diagnostics', () => {
       expect(() => replay.parseSessionLog(sessionJsonl([])))
         .toThrow('session snapshot line 1: decoder exploded')
     } finally {
-      vi.doUnmock('@x1a0f3n9/dsh-session-format-catalog')
+      vi.doUnmock('@deepseek-ai/dsh-session-format-catalog')
       vi.resetModules()
     }
   })
 
   it('attaches the header line to a restore-finalization failure', async () => {
     vi.resetModules()
-    vi.doMock('@x1a0f3n9/dsh-session-format-catalog', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('@x1a0f3n9/dsh-session-format-catalog')>()
+    vi.doMock('@deepseek-ai/dsh-session-format-catalog', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('@deepseek-ai/dsh-session-format-catalog')>()
       return {
         ...actual,
         createSessionFormatCatalogWithChildren: () => ({
@@ -305,15 +305,15 @@ describe('fixture format diagnostics', () => {
       expect(() => replay.parseSessionLog(sessionJsonl([])))
         .toThrow('session snapshot line 1: Session event 99 restore finalization failed')
     } finally {
-      vi.doUnmock('@x1a0f3n9/dsh-session-format-catalog')
+      vi.doUnmock('@deepseek-ai/dsh-session-format-catalog')
       vi.resetModules()
     }
   })
 
   it('falls back to the header when a source-range diagnostic has no matching physical prefix', async () => {
     vi.resetModules()
-    vi.doMock('@x1a0f3n9/dsh-session-format-catalog', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('@x1a0f3n9/dsh-session-format-catalog')>()
+    vi.doMock('@deepseek-ai/dsh-session-format-catalog', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('@deepseek-ai/dsh-session-format-catalog')>()
       return {
         ...actual,
         createSessionFormatCatalogWithChildren: () => ({
@@ -336,15 +336,15 @@ describe('fixture format diagnostics', () => {
       expect(() => replay.parseSessionLog(sessionJsonl([])))
         .toThrow('session snapshot line 1: sourceEventSeqs synthetic unmatched failure')
     } finally {
-      vi.doUnmock('@x1a0f3n9/dsh-session-format-catalog')
+      vi.doUnmock('@deepseek-ai/dsh-session-format-catalog')
       vi.resetModules()
     }
   })
 
   it('maps a non-Error row failure to its physical row', async () => {
     vi.resetModules()
-    vi.doMock('@x1a0f3n9/dsh-session-format-catalog', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('@x1a0f3n9/dsh-session-format-catalog')>()
+    vi.doMock('@deepseek-ai/dsh-session-format-catalog', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('@deepseek-ai/dsh-session-format-catalog')>()
       let row = 0
       return {
         ...actual,
@@ -373,7 +373,7 @@ describe('fixture format diagnostics', () => {
       expect(() => replay.parseSessionLog(sessionJsonl(events)))
         .toThrow('session snapshot line 3: row decoder exploded')
     } finally {
-      vi.doUnmock('@x1a0f3n9/dsh-session-format-catalog')
+      vi.doUnmock('@deepseek-ai/dsh-session-format-catalog')
       vi.resetModules()
     }
   })
@@ -387,8 +387,8 @@ describe('fixture format diagnostics', () => {
     ['out-of-range logical event', 'Session event 99 is malformed', 1],
   ])('maps a %s finalization diagnostic to its source line', async (_label, message, line) => {
     vi.resetModules()
-    vi.doMock('@x1a0f3n9/dsh-session-format-catalog', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('@x1a0f3n9/dsh-session-format-catalog')>()
+    vi.doMock('@deepseek-ai/dsh-session-format-catalog', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('@deepseek-ai/dsh-session-format-catalog')>()
       return {
         ...actual,
         createSessionFormatCatalogWithChildren: () => ({
@@ -410,7 +410,7 @@ describe('fixture format diagnostics', () => {
       expect(() => replay.parseSessionLog(sessionJsonl([event])))
         .toThrow(`session snapshot line ${line}: ${message}`)
     } finally {
-      vi.doUnmock('@x1a0f3n9/dsh-session-format-catalog')
+      vi.doUnmock('@deepseek-ai/dsh-session-format-catalog')
       vi.resetModules()
     }
   })
@@ -427,7 +427,7 @@ describe('parseSessionLog', () => {
       message: {
         id: expect.stringMatching(/^v2-to-v3-system-/) as unknown,
         role: 'system',
-        source: { kind: 'plugin', plugin: '@x1a0f3n9/dsh-system-prompt' },
+        source: { kind: 'plugin', plugin: '@deepseek-ai/dsh-system-prompt' },
         content: [],
       },
     },
@@ -1470,7 +1470,11 @@ describe('installLlmReplay (through the real LlmRuntime)', () => {
       maxDelayMs: 10_000,
       jitterRatio: 0.1,
     })
-    expect(await drain(ctx.llm.stream({ provider: 'deepseek', model: 'pro', messages: [] }))).toEqual(TEXT_CHUNKS)
+    const prepared = await ctx.llm.prepareCall({
+      provider: 'deepseek', model: 'flash',
+    }, undefined, (controls, model) => ({ ...controls, reasoningEffort: model.reasoning!.efforts[0]!.id }))
+    expect(prepared.config.reasoningEffort).toBe('off')
+    expect(await drain(prepared.stream({ ...prepared.config, messages: [] }))).toEqual(TEXT_CHUNKS)
 
     dispose()
     expect(ctx.llm.listProviders()).toEqual([])
@@ -2155,7 +2159,13 @@ describe('apply (the plugin entry)', () => {
     apply(ctx, {
       file,
       providers: [
-        { id: 'm', models: [{ id: 'm', inputModalities: ['image'] }, { id: 'text' }] },
+        {
+          id: 'm',
+          models: [
+            { id: 'm', inputModalities: ['image'], reasoningEfforts: ['low'] },
+            { id: 'text' },
+          ],
+        },
         { id: 'empty' },
       ],
       paceMs: 1,

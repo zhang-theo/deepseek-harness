@@ -7,9 +7,9 @@ import { fileURLToPath } from 'node:url'
 import type { Browser, Page } from 'playwright'
 import { chromium } from 'playwright'
 import { afterEach, describe, expect, it, onTestFailed } from 'vitest'
-import { parseSessionLog } from '@x1a0f3n9/dsh-llm-replay'
-import type { SessionEvent, SessionId } from '@x1a0f3n9/dsh-session'
-import type {} from '@x1a0f3n9/dsh-goal'
+import { parseSessionLog } from '@deepseek-ai/dsh-llm-replay'
+import type { SessionEvent, SessionId } from '@deepseek-ai/dsh-session'
+import type {} from '@deepseek-ai/dsh-goal'
 import {
   assertFixtureInventory, captureExpandedTurnProcessAria, captureStableAria, compareOrRefreshGolden,
   launchWebScaffold, recordFixture, watchConsole, webSnapshotMode, type WebScaffold,
@@ -28,20 +28,20 @@ const COMMAND = `/goal ${PROMPT}`
 
 const PACKAGE_FILES: Readonly<Record<string, string>> = {
   'packages/client/ui-conversation/README.md': '# UI conversation\n',
-  'packages/client/ui-conversation/package.json': '{"name":"@x1a0f3n9/dsh-client-ui-conversation"}\n',
+  'packages/client/ui-conversation/package.json': '{"name":"@deepseek-ai/dsh-client-ui-conversation"}\n',
   'packages/client/ui-conversation/src/client.ts': 'export {}\n',
   'packages/client/ui-chat/tests/chat-view.client.spec.tsx': 'export {}\n',
   'packages/context/session-reference/README.md': '# Session reference\n',
-  'packages/context/session-reference/package.json': '{"name":"@x1a0f3n9/dsh-session-reference"}\n',
+  'packages/context/session-reference/package.json': '{"name":"@deepseek-ai/dsh-session-reference"}\n',
   'packages/context/session-reference/src/index.ts': 'export {}\n',
   'packages/context/session-reference/src/uri.ts': 'export {}\n',
   'packages/context/session-reference/tests/session-reference.spec.ts': 'export {}\n',
   'packages/llm/token-meter/README.md': '# Token meter\n',
-  'packages/llm/token-meter/package.json': '{"name":"@x1a0f3n9/dsh-token-meter"}\n',
+  'packages/llm/token-meter/package.json': '{"name":"@deepseek-ai/dsh-token-meter"}\n',
   'packages/llm/token-meter/src/index.ts': 'export {}\n',
   'packages/llm/token-meter/tests/token-meter.spec.ts': 'export {}\n',
   'packages/skill/skill-filesystem/README.md': '# Local skill provider\n',
-  'packages/skill/skill-filesystem/package.json': '{"name":"@x1a0f3n9/dsh-skill-filesystem"}\n',
+  'packages/skill/skill-filesystem/package.json': '{"name":"@deepseek-ai/dsh-skill-filesystem"}\n',
   'packages/skill/skill-filesystem/src/index.ts': 'export {}\n',
   'packages/skill/skill-filesystem/src/invariant.ts': 'export {}\n',
   'packages/skill/skill-filesystem/tests/skill-filesystem.spec.ts': 'export {}\n',
@@ -155,6 +155,32 @@ describe('web e2e: Goal keeps one assistant action row per completed turn', () =
     expect(sessionEvents.flatMap(event =>
       event.type === 'request/header' ? [event.data.reason] : [])).toEqual(['initial', 'series'])
     await expect.poll(() => page.locator('[data-turn-process]').count(), { timeout: 15_000 }).toBe(2)
+    const trigger = page.locator('[data-turn-trigger]').first()
+    const process = page.locator('[data-turn-process]').first()
+    const originalFontSize = await page.evaluate(() => document.body.style.getPropertyValue('--dsh-content-font-size'))
+    await process.click()
+    try {
+      for (const fontSize of [10, 14, 22]) {
+        await scaffold!.ctx.settings.update('ui-theme', { fontSize })
+        await expect.poll(() => page.evaluate(() => document.body.style.getPropertyValue('--dsh-content-font-size')))
+          .toBe(`${String(fontSize)}px`)
+        const group = page.locator('[data-process-activity]:visible').first()
+        const groupFontSize = await group.evaluate(element => getComputedStyle(element).fontSize)
+        expect(groupFontSize).toBe(`${String(fontSize)}px`)
+        expect(await process.evaluate(element => getComputedStyle(element).fontSize)).toBe(groupFontSize)
+        expect(await trigger.getByText('Continuing goal', { exact: true })
+          .evaluate(element => getComputedStyle(element).fontSize)).toBe(groupFontSize)
+        expect(await process.evaluate(element => element.getBoundingClientRect().top))
+          .toBe(await trigger.evaluate(element => element.getBoundingClientRect().bottom) + 16)
+        expect(await group.evaluate(element => element.getBoundingClientRect().top))
+          .toBe(await process.evaluate(element => element.getBoundingClientRect().bottom) + 16)
+      }
+    } finally {
+      await scaffold!.ctx.settings.update('ui-theme', { fontSize: Number.parseFloat(originalFontSize) })
+      await expect.poll(() => page.evaluate(() => document.body.style.getPropertyValue('--dsh-content-font-size')))
+        .toBe(originalFontSize)
+      await process.click()
+    }
     expect(await page.getByRole('button', { name: 'System prompt' }).count()).toBe(0)
     expect(await page.locator(
       '[data-chat-flow-kind="system-prompt"]',

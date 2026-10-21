@@ -3,7 +3,7 @@ description: "Expose bounded transient transcription through the authenticated W
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-experimental-api-speech-to-text
+# @deepseek-ai/dsh-experimental-api-speech-to-text
 
 English | [中文](README.zh.md)
 
@@ -37,7 +37,7 @@ Compose with the speech Service Definition and Typert. `maxAudioBytes` and `maxD
 <details>
 <summary>Maintainer details — click to expand</summary>
 
-`catalog()` exposes provider identities, the default selection and recording limits. `transcribe()` validates canonical base64 and 16 kHz mono PCM16 WAV before resolving the selected provider. The existing gateway owns authentication and cancellation transport. Audio is transient, never a Session event or attachment; only the user’s later ordinary submission records recognized text. No runtime invariant companion is published because validation is stateless and preparation belongs to the provider.
+`catalog()` exposes provider identities, the default selection and recording limits. `transcribe()` validates canonical base64 and 16 kHz mono PCM16 WAV before resolving the selected provider. The existing gateway owns authentication and cancellation transport. Audio is transient, never a Session event or attachment; only the user’s later ordinary submission records recognized text.
 
 `follow()` streams complete catalogs, including preparation states and current preferences. `prepare()` starts or joins a Host task; `cancelPreparation()` explicitly cancels it. `configure()` persists the supplied preference fields. A disconnected observer does not cancel preparation.
 

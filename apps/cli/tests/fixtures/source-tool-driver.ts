@@ -3,10 +3,10 @@
 import { randomUUID } from 'node:crypto'
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/cordis-plugin-loader'
-import type {} from '@x1a0f3n9/dsh-agent'
-import type {} from '@x1a0f3n9/dsh-cmdline'
-import { createUserMessage } from '@x1a0f3n9/dsh-llm'
-import { SessionId, type SessionEvent } from '@x1a0f3n9/dsh-session'
+import type {} from '@deepseek-ai/dsh-agent'
+import type {} from '@deepseek-ai/dsh-cmdline'
+import { createUserMessage } from '@deepseek-ai/dsh-llm'
+import { SessionId, type SessionEvent } from '@deepseek-ai/dsh-session'
 
 /** Observations from one isolated Agent's run through the shipped headless profile. */
 export interface SourceToolEvidence {

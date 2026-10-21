@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { SessionFormatEventCollector } from '@x1a0f3n9/dsh-session-format'
-import type { SessionFormatEvent, SessionFormatJsonObject } from '@x1a0f3n9/dsh-session-format'
-import { sessionFormatCatalog } from '@x1a0f3n9/dsh-session-format-catalog'
-import { releasedV2SessionFormatCodec } from '@x1a0f3n9/dsh-session-format-v2-to-v3'
+import { SessionFormatEventCollector } from '@deepseek-ai/dsh-session-format'
+import type { SessionFormatEvent, SessionFormatJsonObject } from '@deepseek-ai/dsh-session-format'
+import { sessionFormatCatalog } from '@deepseek-ai/dsh-session-format-catalog'
+import { releasedV2SessionFormatCodec } from '@deepseek-ai/dsh-session-format-v2-to-v3'
 import { assertReleasedV4Header, assertV4RowAdmission, releasedV4SessionFormatCodec, restoreReleasedV4Artifact } from '../src/index.ts'
 
 const header = { version: 4, id: 'parent', createdAt: 1, isSeeded: false, delegationDepth: 0 }
@@ -159,4 +159,23 @@ describe('V4 framing and restoration', () => {
       events: [catalog, { type: 'session/end-seed', seq: 1, time: 2, data: { inherited: true } }, { ...catalog, seq: 2 }] }
     expect(restoreReleasedV4Artifact(artifact, types)).toBe(artifact)
   })
+})
+
+
+it('restores external membership and rejects duplicate catalog children', () => {
+  const data = { ...(catalog.data as SessionFormatJsonObject), version: 2, mode: 'external', label: 'External' }
+  const entry = { ...catalog, data }
+  expect(restore([entry]).events).toEqual([entry])
+  expect(() => restore([entry, { ...entry, seq: 1 }])).toThrow('duplicate catalog child')
+})
+
+it.each([
+  { version: 0, mode: 'external' },
+  { version: 1, mode: 'external' },
+  { version: 2, mode: 'one-shot' },
+  { version: 2, mode: 'continuable' },
+  { version: 2, mode: 'unknown' },
+])('rejects a catalog mode outside its payload version: %j', (descriptor) => {
+  const data = { ...(catalog.data as SessionFormatJsonObject), ...descriptor }
+  expect(() => restore([{ ...catalog, data }])).toThrow('supported versioned catalog fact')
 })

@@ -1,5 +1,5 @@
 {
-  "name": "@x1a0f3n9/dsh-web-search-pool",
+  "name": "@deepseek-ai/dsh-web-search-pool",
   "description": "Multi-key failover search provider for the DeepSeek Harness web capability seam (ctx.web)",
   "version": "0.1.7-rc.4",
   "publishConfig": {
@@ -27,11 +27,11 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "@x1a0f3n9/dsh-launch-environment": "workspace:*",
-    "@x1a0f3n9/dsh-web": "workspace:*",
-    "@x1a0f3n9/dsh-web-search-exa": "workspace:*",
-    "@x1a0f3n9/dsh-web-search-free": "workspace:*",
-    "@x1a0f3n9/dsh-web-search-perplexity": "workspace:*",
+    "@deepseek-ai/dsh-launch-environment": "workspace:*",
+    "@deepseek-ai/dsh-web": "workspace:*",
+    "@deepseek-ai/dsh-web-search-exa": "workspace:*",
+    "@deepseek-ai/dsh-web-search-free": "workspace:*",
+    "@deepseek-ai/dsh-web-search-perplexity": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~"
   },
   "dependencies": {
@@ -40,12 +40,12 @@
   "devDependencies": {
     "@deepseek-ai/cordis-plugin-include": "workspace:~",
     "@deepseek-ai/cordis-plugin-loader": "workspace:~",
-    "@x1a0f3n9/dsh-launch-environment": "workspace:*",
-    "@x1a0f3n9/dsh-web": "workspace:*",
-    "@x1a0f3n9/dsh-web-search-exa": "workspace:*",
-    "@x1a0f3n9/dsh-web-search-free": "workspace:*",
-    "@x1a0f3n9/dsh-web-search-perplexity": "workspace:*",
+    "@deepseek-ai/dsh-launch-environment": "workspace:*",
+    "@deepseek-ai/dsh-web": "workspace:*",
+    "@deepseek-ai/dsh-web-search-exa": "workspace:*",
+    "@deepseek-ai/dsh-web-search-free": "workspace:*",
+    "@deepseek-ai/dsh-web-search-perplexity": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~",
-    "@x1a0f3n9/dsh-http-proxy": "workspace:*"
+    "@deepseek-ai/dsh-http-proxy": "workspace:*"
   }
 }

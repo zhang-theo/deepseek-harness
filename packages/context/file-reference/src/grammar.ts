@@ -1,7 +1,7 @@
 /**
  * Browser-safe `@file` token grammar shared by terminal and web clients.
  *
- * @module @x1a0f3n9/dsh-file-reference/grammar
+ * @module @deepseek-ai/dsh-file-reference/grammar
  */
 
 import type { FileReferenceCandidate } from './types.ts'

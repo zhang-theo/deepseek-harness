@@ -1,14 +1,14 @@
 /** Deterministic Messages fixtures and loopback transport with explicit teardown. */
 import { Context } from '@deepseek-ai/cordis'
-import AttachmentStore from '@x1a0f3n9/dsh-attachment'
+import AttachmentStore from '@deepseek-ai/dsh-attachment'
 import type { ModuleLoaderV2 } from '@deepseek-ai/cordis-plugin-loader'
-import type { AnonymousUserId } from '@x1a0f3n9/dsh-anonymous-user-id'
+import type { AnonymousUserId } from '@deepseek-ai/dsh-anonymous-user-id'
 import { createServer } from 'node:http'
 import type { IncomingHttpHeaders, ServerResponse } from 'node:http'
 import { once } from 'node:events'
 import { object } from '../src/replay.ts'
-import { BlockAssembler, createAssistantMessage, createUserMessage } from '@x1a0f3n9/dsh-llm'
-import type { GenerateOptions, StreamChunk } from '@x1a0f3n9/dsh-llm'
+import { BlockAssembler, createAssistantMessage, createUserMessage } from '@deepseek-ai/dsh-llm'
+import type { GenerateOptions, StreamChunk } from '@deepseek-ai/dsh-llm'
 import { resolveAdapterOptions } from '../src/index.ts'
 import { DeepSeekAdapter } from '../src/adapter.ts'
 import type { Options as Config } from '../src/config.ts'
@@ -47,12 +47,26 @@ export function adapter(config: Config = {}, dependencies: Partial<DeepSeekAdapt
   const files = new DeepSeekFileStore()
   return new DeepSeekAdapter({ options: () => resolveAdapterOptions(config), resolveAuth: () => Promise.resolve({ headers: { 'x-api-key': 'test-key' } }), resolveUserId: () => 'test-user' as AnonymousUserId, resolveAttachments: () => undefined, resolveImageAccess: () => undefined, resolveFiles: () => files, prepareExtensions, ...dependencies })
 }
-export async function server(reply: (response: ServerResponse, count: number) => void = response => response.end(sse(textEvents))) {
+/**
+ * Loopback Messages endpoint recording each model request.
+ * @param reply - answers each Messages request.
+ * @param listing - JSON body served for `GET /models`; omission leaves that request unanswered like any other.
+ * @returns the endpoint base URL, recorded requests, and teardown.
+ */
+export async function server(
+  reply: (response: ServerResponse, count: number) => void = response => response.end(sse(textEvents)),
+  listing?: unknown,
+) {
   const requests: { path: string; headers: IncomingHttpHeaders; body: Record<string, unknown> }[] = []
   const http = createServer((request, response) => {
     void handle(request, response).catch((error: unknown) => response.destroy(error as Error))
   })
   async function handle(request: import('node:http').IncomingMessage, response: ServerResponse) {
+    if (listing !== undefined && request.method === 'GET' && request.url === '/models') {
+      response.setHeader('content-type', 'application/json')
+      response.end(JSON.stringify(listing))
+      return
+    }
     const parts: Buffer[] = []
     for await (const part of request as AsyncIterable<Buffer>) parts.push(part)
     requests.push({ path: request.url!, headers: request.headers, body: object(JSON.parse(Buffer.concat(parts).toString())) })

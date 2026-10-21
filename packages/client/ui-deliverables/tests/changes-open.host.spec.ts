@@ -2,15 +2,15 @@
 import { mkdtemp, rm, writeFile, mkdir, realpath, unlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { LocalFileSystem } from '@x1a0f3n9/dsh-fs-local'
-import { WorkspaceFiles } from '@x1a0f3n9/dsh-api-workspace-files'
+import { LocalFileSystem } from '@deepseek-ai/dsh-fs-local'
+import { WorkspaceFiles } from '@deepseek-ai/dsh-api-workspace-files'
 import { Context } from '@deepseek-ai/cordis'
-import { HostConnectionService } from '@x1a0f3n9/dsh-client-connection'
-import type { BrowserAuth } from '@x1a0f3n9/dsh-client-connection/src/browser-auth.ts'
-import { SessionId } from '@x1a0f3n9/dsh-session'
-import { SessionQueryError } from '@x1a0f3n9/dsh-session-query'
-import type { SessionEventReadRequest } from '@x1a0f3n9/dsh-session-query'
-import type { WorkspaceChangedFile, WorkspaceChangesSummary, WorkspaceFileDiff } from '@x1a0f3n9/dsh-workspace-changes/types'
+import { HostConnectionService } from '@deepseek-ai/dsh-client-connection'
+import type { BrowserAuth } from '@deepseek-ai/dsh-client-connection/src/browser-auth.ts'
+import { SessionId } from '@deepseek-ai/dsh-session'
+import { SessionQueryError } from '@deepseek-ai/dsh-session-query'
+import type { SessionEventReadRequest } from '@deepseek-ai/dsh-session-query'
+import type { WorkspaceChangedFile, WorkspaceChangesSummary, WorkspaceFileDiff } from '@deepseek-ai/dsh-workspace-changes/types'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { registerPresentOpen } from '../src/present-open.ts'
 import {
@@ -69,10 +69,13 @@ async function fixture() {
     apply: registerPresentOpen,
   })
   const handler = connection.createSharedFetchHandler('/api')
-  const open = (query = '?sessionId=owner&seq=9&index=0') => handler.fetch(new Request(`http://localhost${CHANGES_OPEN_PATH}${query}`, { method: 'POST' }))
-  const read = (query = '?sessionId=owner&seq=9') => handler.fetch(new Request(`http://localhost${CHANGED_FILES_PATH}${query}`))
-  const compare = (query = '?sessionId=owner&seq=9&index=0') => handler.fetch(new Request(`http://localhost${CHANGES_DIFF_PATH}${query}`))
-  return { handler, applications, root, cwd, ctx, data, readEvent, open, read, compare, comparison, diff, opener, outside, summary }
+  const open = (query = '?sessionId=owner&seq=9&index=0') => handler.fetch(new Request(`http://localhost${CHANGES_OPEN_PATH}${query}`, { method: 'POST' }), connection.browserPeer)
+  const read = (query = '?sessionId=owner&seq=9') => handler.fetch(new Request(`http://localhost${CHANGED_FILES_PATH}${query}`), connection.browserPeer)
+  const compare = (query = '?sessionId=owner&seq=9&index=0') => handler.fetch(new Request(`http://localhost${CHANGES_DIFF_PATH}${query}`), connection.browserPeer)
+  return {
+    browserPeer: connection.browserPeer, handler, applications, root, cwd, ctx, data, readEvent, open, read, compare, comparison, diff,
+    opener, outside, summary,
+  }
 }
 
 describe('change summary route', () => {
@@ -203,17 +206,17 @@ describe('changed files native open route', () => {
 
 
 it('queries handlers only after file authorization and forwards explicit application choices', async () => {
-  const { handler, applications, opener, open, ctx } = await fixture()
+  const { browserPeer, handler, applications, opener, open, ctx } = await fixture()
   const url = 'http://localhost/api/changes.open?sessionId=owner&seq=9&index=0'
-  const response = await handler.fetch(new Request(url))
+  const response = await handler.fetch(new Request(url), browserPeer)
   expect(response.status).toBe(200)
   expect(await response.json()).toEqual([{ id: 'player', name: 'Player', default: true, icon: null }])
   expect(opener).not.toHaveBeenCalled()
   expect((await open('?sessionId=owner&seq=9&index=0&application=player')).status).toBe(204)
   expect(opener.mock.lastCall?.[0]).toMatchObject({ application: 'player' })
-  expect((await handler.fetch(new Request(url.replace('index=0', 'index=999')))).status).toBe(404)
+  expect((await handler.fetch(new Request(url.replace('index=0', 'index=999')), browserPeer)).status).toBe(404)
   vi.spyOn(ctx.fs, 'processPathFromHostPath').mockReturnValue(undefined)
-  expect((await handler.fetch(new Request(url))).status).toBe(422)
+  expect((await handler.fetch(new Request(url), browserPeer)).status).toBe(422)
   expect(applications).toHaveBeenCalledOnce()
 })
 

@@ -3,7 +3,7 @@ description: "面向开发者与维护者的 shell 执行器 seam 说明，用�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-shell
+# @deepseek-ai/dsh-shell
 
 [English](README.md) | 中文
 
@@ -57,7 +57,7 @@ seam 本身不是执行器：每个组合只挂载一个提供方，工具即可
 
 ```yaml
 - id: bash
-  name: '@x1a0f3n9/dsh-bash-local'
+  name: '@deepseek-ai/dsh-bash-local'
   config:
     cwd: /path/to/workspace
 ```
@@ -90,7 +90,6 @@ seam 本身不是执行器：每个组合只挂载一个提供方，工具即可
 | [`src/index.ts`](src/index.ts) | 插件入口：抽象 `ShellExecutor` 服务与共享设置命名空间 |
 | [`src/types.ts`](src/types.ts) | 请求/spec 词汇、`ShellExecution`、`ShellRunResult` 与沙箱事实 |
 | [`src/render.ts`](src/render.ts) | `parseExitStatus`：shell 工具共享的退出状态标记约定 |
-| — | 不发布运行时不变式伴生入口；该无状态 Service Definition 负责请求／结果类型，执行器与策略负责观察。 |
 
 ### 设置命名空间
 

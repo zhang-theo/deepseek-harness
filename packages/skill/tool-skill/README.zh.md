@@ -3,7 +3,7 @@ description: "面向模型的 skill（技能）目录与加载工具，供希望
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-tool-skill
+# @deepseek-ai/dsh-tool-skill
 
 [English](README.md) | 中文
 
@@ -25,6 +25,8 @@ agent 可以在会话期间发现并加载 skill。在首次请求前，如果�
 <a id="use-this-package"></a>
 ## 使用本包
 
+技能发现、目录更新与显式技能调用均使用 Session 的当前工作目录。
+
 与 skill 注册表一起挂载该插件，即可让 agent 拥有会话 skill 目录和 `skill` 加载工具。它需要 `ctx.agents`、`ctx.tools` 与 `ctx.skills`。
 
 ### 何时选择
@@ -36,9 +38,9 @@ agent 可以在会话期间发现并加载 skill。在首次请求前，如果�
 与 skill 注册表和至少一个提供方一起加载该插件。唯一配置项限制目录中渲染的规范化描述长度。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-skill'
-- name: '@x1a0f3n9/dsh-skill-filesystem'
-- name: '@x1a0f3n9/dsh-tool-skill'
+- name: '@deepseek-ai/dsh-skill'
+- name: '@deepseek-ai/dsh-skill-filesystem'
+- name: '@deepseek-ai/dsh-tool-skill'
 ```
 
 | 字段 | 默认值 | 含义 |
@@ -77,7 +79,6 @@ agent 可以在会话期间发现并加载 skill。在首次请求前，如果�
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：工具注册、目录与手势 pre-step 监听器、渲染与 digest |
-| — | 不发布运行时不变式伴生入口；这个面向模型的适配器没有独立的生命周期流；执行关系由它调用的能力 seam 负责。 |
 
 ### 目录生命周期
 
@@ -110,7 +111,7 @@ agent 可以在会话期间发现并加载 skill。在首次请求前，如果�
 
 #### 模型看到什么
 
-如果存在模型可调用 skill，且可见的正是这个 `skill` 工具，agent 会在第一个请求之前收到下方目录模板，其中包含每个已排序 skill 的一条随数据而定的条目。该目录是一条持久的用户角色消息。后续成员关系、描述或可见性的变化会使用同一个 `<available_skills>` 信封追加完整替换；删除所有 skill 时，会追加一个空信封，并明确指示不得使用旧名称。模板的结尾一句是防止双重加载的规则：用户显式的手势边界（下文的 pre-step 监听器）会把同一份 `renderSkillContent` 输出（共享自 `@x1a0f3n9/dsh-skill`）内联注入，目录则告诉模型遵循该块，而不是再经工具重新加载该 skill；替换目录模板的两个分支——包括清空后的目录——都携带同一条防双重加载规则。
+如果存在模型可调用 skill，且可见的正是这个 `skill` 工具，agent 会在第一个请求之前收到下方目录模板，其中包含每个已排序 skill 的一条随数据而定的条目。该目录是一条持久的用户角色消息。后续成员关系、描述或可见性的变化会使用同一个 `<available_skills>` 信封追加完整替换；删除所有 skill 时，会追加一个空信封，并明确指示不得使用旧名称。模板的结尾一句是防止双重加载的规则：用户显式的手势边界（下文的 pre-step 监听器）会把同一份 `renderSkillContent` 输出（共享自 `@deepseek-ai/dsh-skill`）内联注入，目录则告诉模型遵循该块，而不是再经工具重新加载该 skill；替换目录模板的两个分支——包括清空后的目录——都携带同一条防双重加载规则。
 
 ##### Skill 目录模板
 

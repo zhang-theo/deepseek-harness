@@ -10,7 +10,7 @@ English | [中文](2026-09-19-failover-queue-circuit-failback.zh.md)
 
 ## Decision
 
-`v0.1.11` gives each route a Closed / Open / HalfOpen breaker. `agent/request` overlays the first available P (P1 first). Immediate codes prepend past `llm-retry`, open the circuit, and retry the next P; [503 / timeout / transport join that set in v0.1.12](2026-09-20-failover-queue-server-immediate.md). A completed `assistant/message` records success; two HalfOpen successes close the breaker so the next pick is P1. Queue rows show green / yellow / red health. xfdsh pins `@x1a0f3n9/dsh-failover-queue@0.1.12`.
+`v0.1.11` gives each route a Closed / Open / HalfOpen breaker. `agent/request` overlays the first available P (P1 first). Immediate codes prepend past `llm-retry`, open the circuit, and retry the next P; [503 / timeout / transport join that set in v0.1.12](2026-09-20-failover-queue-server-immediate.md). A completed `assistant/message` records success; two HalfOpen successes close the breaker so the next pick is P1. Queue rows show green / yellow / red health. xfdsh pins `@deepseek-ai/dsh-failover-queue@0.1.12`.
 
 ## Verification
 

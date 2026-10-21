@@ -3,7 +3,7 @@ description: "The shell executor seam for developers and maintainers choosing, c
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-shell
+# @deepseek-ai/dsh-shell
 
 English | [中文](README.zh.md)
 
@@ -57,7 +57,7 @@ The seam is not an executor: mount exactly one provider per composition, and the
 
 ```yaml
 - id: bash
-  name: '@x1a0f3n9/dsh-bash-local'
+  name: '@deepseek-ai/dsh-bash-local'
   config:
     cwd: /path/to/workspace
 ```
@@ -90,7 +90,6 @@ The package is one role of a standard capability seam: the Service Definition th
 | [`src/index.ts`](src/index.ts) | Plugin entry: abstract `ShellExecutor` service and the shared settings namespace |
 | [`src/types.ts`](src/types.ts) | Request/spec vocabulary, `ShellExecution`, `ShellRunResult`, and sandbox facts |
 | [`src/render.ts`](src/render.ts) | `parseExitStatus`: the exit-status marker contract the shell tools share |
-| — | No runtime invariant companion is published; this stateless Service Definition owns request/result types, while executors and policy own observations. |
 
 ### Settings namespace
 

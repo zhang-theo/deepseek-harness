@@ -6,7 +6,7 @@ English | [中文](2026-09-17-omit-catalog-author-byline.zh.md)
 
 ## Problem
 
-Optional-plugin cards showed a catalog `author` line under `@scope/name`. For fork pins that line repeated `LunFengChen` next to `@x1a0f3n9/dsh-session-timeline`, so the owner was written twice and the extra row looked like a second identity.
+Optional-plugin cards showed a catalog `author` line under `@scope/name`. For fork pins that line repeated `LunFengChen` next to `@deepseek-ai/dsh-session-timeline`, so the owner was written twice and the extra row looked like a second identity.
 
 ## Decision
 

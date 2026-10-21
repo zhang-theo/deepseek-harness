@@ -3,7 +3,7 @@ description: "面向实现或排查 Windows ACL 沙箱与普通子进程 Job run
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-win32-process
+# @deepseek-ai/dsh-win32-process
 
 [English](README.md) | 中文
 
@@ -87,5 +87,3 @@ Koffi 的 `STARTUPINFOW` 与 `PROCESS_INFORMATION` 定义还会在模块加载�
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。操作只持有调用内的原生句柄。

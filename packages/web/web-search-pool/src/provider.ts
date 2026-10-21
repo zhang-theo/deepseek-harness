@@ -1,11 +1,11 @@
 /**
  * `SearchPoolProvider`: one `WebSearchProvider` that fails over across vendor
  * adapters and per-adapter key lists, with a quota-aware circuit.
- * @module @x1a0f3n9/dsh-web-search-pool/provider
+ * @module @deepseek-ai/dsh-web-search-pool/provider
  */
 
-import { WebError } from '@x1a0f3n9/dsh-web'
-import type { WebSearchProvider, WebSearchRequest, WebSearchResult } from '@x1a0f3n9/dsh-web'
+import { WebError } from '@deepseek-ai/dsh-web'
+import type { WebSearchProvider, WebSearchRequest, WebSearchResult } from '@deepseek-ai/dsh-web'
 import { classifyAdapterError, searchWithAdapter } from './backends.ts'
 import { SearchPoolCircuit } from './circuit.ts'
 import type {

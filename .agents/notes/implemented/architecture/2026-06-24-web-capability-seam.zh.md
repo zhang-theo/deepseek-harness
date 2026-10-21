@@ -18,9 +18,9 @@ harness 需要面向模型的 web 工具，但不能将模型约定绑定到某�
 
 Web 访问是一个一等能力 seam，遵循[能力 seam Agent Note](2026-06-13-capability-seams.zh.md)：
 
-1. `@x1a0f3n9/dsh-web`（`packages/web/web`）拥有 `ctx.web`、提供方注册、提供方选择、共享的请求/结果词汇，以及 web 特有的错误。
-2. 提供方包实现具体后端并向 `ctx.web` 注册能力，例如 `@x1a0f3n9/dsh-web-search-exa`、`@x1a0f3n9/dsh-web-search-perplexity`、`@x1a0f3n9/dsh-web-search-deepseek` 和 `@x1a0f3n9/dsh-web-fetch-http`。
-3. `@x1a0f3n9/dsh-tool-web`（`packages/web/tool-web`）拥有面向模型的 `web_search` 和 `web_fetch` 工具 schema、提示词段落、参数校验、结果格式化，以及通过 `ctx.web` 实现的工具展示。
+1. `@deepseek-ai/dsh-web`（`packages/web/web`）拥有 `ctx.web`、提供方注册、提供方选择、共享的请求/结果词汇，以及 web 特有的错误。
+2. 提供方包实现具体后端并向 `ctx.web` 注册能力，例如 `@deepseek-ai/dsh-web-search-exa`、`@deepseek-ai/dsh-web-search-perplexity`、`@deepseek-ai/dsh-web-search-deepseek` 和 `@deepseek-ai/dsh-web-fetch-http`。
+3. `@deepseek-ai/dsh-tool-web`（`packages/web/tool-web`）拥有面向模型的 `web_search` 和 `web_fetch` 工具 schema、提示词段落、参数校验、结果格式化，以及通过 `ctx.web` 实现的工具展示。
 
 提供方不注册工具。提供方注册能力。`dsh-tool-web` 是面向模型的名称、描述、提示词引导、JSON Schema、展示的唯一所有者。
 
@@ -43,13 +43,13 @@ Web 访问是一个一等能力 seam，遵循[能力 seam Agent Note](2026-06-13
 依赖方向与 bash 和 filesystem 一致：
 
 ```text
-@x1a0f3n9/dsh-tool-web  --depends on-->  @x1a0f3n9/dsh-web  <--depends on--  @x1a0f3n9/dsh-web-search-exa
+@deepseek-ai/dsh-tool-web  --depends on-->  @deepseek-ai/dsh-web  <--depends on--  @deepseek-ai/dsh-web-search-exa
         consumer                                 interface                       implementation
-                                                                 <--depends on--  @x1a0f3n9/dsh-web-search-perplexity
+                                                                 <--depends on--  @deepseek-ai/dsh-web-search-perplexity
                                                                                   implementation
-                                                                 <--depends on--  @x1a0f3n9/dsh-web-search-deepseek
+                                                                 <--depends on--  @deepseek-ai/dsh-web-search-deepseek
                                                                                   implementation
-                                                                 <--depends on--  @x1a0f3n9/dsh-web-fetch-http
+                                                                 <--depends on--  @deepseek-ai/dsh-web-fetch-http
                                                                                   implementation
 ```
 
@@ -57,27 +57,28 @@ Web 访问是一个一等能力 seam，遵循[能力 seam Agent Note](2026-06-13
 
 ```mermaid
 flowchart LR
-  exa["@x1a0f3n9/dsh-web-search-exa"] -->|registerSearchProvider| web["@x1a0f3n9/dsh-web / ctx.web"]
-  perplexity["@x1a0f3n9/dsh-web-search-perplexity"] -->|registerSearchProvider| web
-  deepseek["@x1a0f3n9/dsh-web-search-deepseek"] -->|registerSearchProvider| web
-  fetchLocal["@x1a0f3n9/dsh-web-fetch-http"] -->|registerFetchProvider| web
-  toolWeb["@x1a0f3n9/dsh-tool-web"] -->|search/fetch| web
+  exa["@deepseek-ai/dsh-web-search-exa"] -->|registerSearchProvider| web["@deepseek-ai/dsh-web / ctx.web"]
+  perplexity["@deepseek-ai/dsh-web-search-perplexity"] -->|registerSearchProvider| web
+  deepseek["@deepseek-ai/dsh-web-search-deepseek"] -->|registerSearchProvider| web
+  deepseekApi["@deepseek-ai/dsh-web-deepseek-api"] -->|registerSearchProvider / registerFetchProvider| web
+  fetchLocal["@deepseek-ai/dsh-web-fetch-http"] -->|registerFetchProvider| web
+  toolWeb["@deepseek-ai/dsh-tool-web"] -->|search/fetch| web
   toolWeb -->|ctx.tools.register| webSearch["tool: web_search"]
   toolWeb -->|ctx.tools.register| webFetch["tool: web_fetch"]
 ```
 
-`@x1a0f3n9/dsh-web` 仅依赖 Cordis 和底层 harness 支持。它声明 `ctx.web`、提供方接口、请求/结果类型、提供方可用性约定和错误码。它不导入工具、agent（智能体）、会话、LLM 或提供方包。
+`@deepseek-ai/dsh-web` 仅依赖 Cordis 和底层 harness 支持。它声明 `ctx.web`、提供方接口、请求/结果类型、提供方可用性约定和错误码。它不导入工具、agent（智能体）、会话、LLM 或提供方包。
 
 提供方包仅依赖 `dsh-web` 和 Cordis。它们拥有凭证、端点、协议格式映射、解析和 `WebError` 转换，使用平台 `fetch`。每个提供方注入共享服务并注册后端；只有 `dsh-web` 拥有 `ctx.web` 键。提供方私有的协议形状不会产生对 `ctx.llm` 或 Cordis HTTP 服务的依赖。
 
-`@x1a0f3n9/dsh-tool-web` 依赖 `@x1a0f3n9/dsh-web`、`@x1a0f3n9/dsh-tools`、`@x1a0f3n9/dsh-system-prompt` 和 Cordis。它从不导入具体的提供方包。
+`@deepseek-ai/dsh-tool-web` 依赖 `@deepseek-ai/dsh-web`、`@deepseek-ai/dsh-tools`、`@deepseek-ai/dsh-system-prompt` 和 Cordis。它从不导入具体的提供方包。
 
 ## `ctx.web` 约定
 
 `ctx.web` 是一个提供方注册表加上一个带提供方选择的执行 API。注册表部分与 `LlmRuntime` 保持接近：每种能力类别一个 `Map<id, provider>`，`registerSearchProvider`/`registerFetchProvider` 方法返回 disposer，重复 id 抛出 `WebError`，执行时解析在选定提供方缺失或不可用时抛出异常。权威签名见 `packages/web/web/src/types.ts`；seam 的形状：
 
 ```ts
-import type { WebFetchRequest, WebFetchResult, WebSearchRequest, WebSearchResult } from '@x1a0f3n9/dsh-web'
+import type { WebFetchRequest, WebFetchResult, WebSearchRequest, WebSearchResult } from '@deepseek-ai/dsh-web'
 
 interface WebSearchProvider {
   readonly id: string
@@ -128,28 +129,30 @@ interface WebRuntime {
 
 ```yaml
 - id: web
-  name: '@x1a0f3n9/dsh-web'
+  name: '@deepseek-ai/dsh-web'
   config:
     searchProvider: exa
     fetchProvider: http
 
 - id: web-search-exa
-  name: '@x1a0f3n9/dsh-web-search-exa'
+  name: '@deepseek-ai/dsh-web-search-exa'
 
 - id: web-search-perplexity
-  name: '@x1a0f3n9/dsh-web-search-perplexity'
+  name: '@deepseek-ai/dsh-web-search-perplexity'
 
 - id: web-search-deepseek
-  name: '@x1a0f3n9/dsh-web-search-deepseek'
+  name: '@deepseek-ai/dsh-web-search-deepseek'
 
 - id: web-fetch-http
-  name: '@x1a0f3n9/dsh-web-fetch-http'
+  name: '@deepseek-ai/dsh-web-fetch-http'
 
 - id: tool-web
-  name: '@x1a0f3n9/dsh-tool-web'
+  name: '@deepseek-ai/dsh-tool-web'
 ```
 
 运维覆盖走同一条显式选择路径：`DSH_WEB_SEARCH_PROVIDER=perplexity` 等同于配置 `searchProvider: perplexity`，而非 `dsh-tool-web` 内部的隐式优先级链。
+
+每次搜索或抓取在执行时读取配置的 id，因此保存的设置变更无需重新挂载 `dsh-web` 即对下一次操作选择另一个提供方。网页搜索设置页的开关借此把两种能力同时切换到 [DeepSeek Search 与 Fetch API](../feature/2026-10-15-deepseek-search-fetch-api.zh.md)。
 
 `ctx.web.search()` 和 `ctx.web.fetch()` 在执行时按上述选择规则解析提供方。如果选定的能力不可用，它们抛出带有结构化代码的 `WebError`，如 `WEB_PROVIDER_UNAVAILABLE`、`WEB_PROVIDER_CONFIGURED_MISSING`、`WEB_PROVIDER_CONFIGURED_UNAVAILABLE` 或 `WEB_PROVIDER_AMBIGUOUS`。如果未显式配置提供方且不存在可用提供方，执行错误是通用的 `WEB_PROVIDER_UNAVAILABLE` 情况；刻意不提供对每个不可用提供方的诊断汇总。
 

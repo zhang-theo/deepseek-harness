@@ -2,21 +2,22 @@
 /** Recorded detail cards, conservative fallback, and standard row interactions. */
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { ToolResultNode } from '@x1a0f3n9/dsh-client-ui-chat/client'
-import { IconUsersOutlineRegular } from '@x1a0f3n9/dsh-client-ui-primitives'
-import { makeTranslate } from '@x1a0f3n9/dsh-client-test-runtime'
-import { en } from '@x1a0f3n9/dsh-client-ui-conversation/src/client/locales.ts'
-import { en as commonEn } from '@x1a0f3n9/dsh-client-locale/src/locales/en.ts'
+import type { ToolResultNode } from '@deepseek-ai/dsh-client-ui-chat/client'
+import { IconUsersOutlineRegular } from '@deepseek-ai/dsh-client-ui-primitives'
+import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { en } from '@deepseek-ai/dsh-client-ui-conversation/src/client/locales.ts'
+import { en as commonEn } from '@deepseek-ai/dsh-client-locale/src/locales/en.ts'
 import { detailsCardModel, todosDetail } from '../src/client/tool/models/details-card-model.ts'
 import { DetailsRow, detailsToolview } from '../src/client/tool/toolviews/details-row.tsx'
-import { useDisclosure } from '@x1a0f3n9/dsh-client-ui-chat/src/client/chat/use-disclosure.ts'
+import { useDisclosure } from '@deepseek-ai/dsh-client-ui-chat/src/client/chat/use-disclosure.ts'
+import { PartialArguments } from '@deepseek-ai/dsh-util-values'
 
 const t = makeTranslate(en, commonEn)
 const goal = { id: 'goal-1', revision: 2, objective: 'Ship compact cards', phase: 'active', roundsStarted: 2, maxGoalRounds: 8 }
 const schedule = { id: 'schedule-1', prompt: 'Review the build', kind: 'every', everySeconds: 3600, scheduledAt: '2026-09-10T09:00:00.000Z', state: 'scheduled', deliveryMode: 'session-local' }
 
 function result(name: string, value: unknown, args = '{}'): ToolResultNode {
-  return { kind: 'tool-result', seq: 10, time: 2000, callTime: 1000, callId: 'c1', call: { name, argsRaw: args }, content: [{ type: 'text', text: JSON.stringify(value) }], isError: false, subCalls: [] }
+  return { kind: 'tool-result', seq: 10, time: 2000, callTime: 1000, callId: 'c1', name, args: PartialArguments.fromText(args), call: { name, argsRaw: args }, content: [{ type: 'text', text: JSON.stringify(value) }], isError: false, subCalls: [] }
 }
 
 afterEach(cleanup)
@@ -94,7 +95,7 @@ describe('detailsCardModel', () => {
     expect(detailsCardModel({ ...block, call: { name: 'create_goal', argsRaw: '{' } }, t, 'en')).toBeNull()
     expect(detailsCardModel({ ...block, content: [{ type: 'text', text: 'partial {' }] }, t, 'en')).toBeNull()
     expect(detailsCardModel({ ...block, content: [...block.content, { type: 'text', text: 'Extra result' }] }, t, 'en')).toBeNull()
-    expect(detailsCardModel({ phase: 'start' as const, callId: 'c1', name: 'create_goal', argsRaw: '{}', turn: 1, step: 1, time: 1000, subCalls: [] }, t, 'en')).toBeNull()
+    expect(detailsCardModel({ phase: 'start' as const, args: PartialArguments.fromText('{}'), callId: 'c1', name: 'create_goal', argsRaw: '{}', turn: 1, step: 1, time: 1000, subCalls: [] }, t, 'en')).toBeNull()
     expect(detailsCardModel({ ...block, parentCallId: 'parent' }, t, 'en')?.items[0]?.title).toBe(goal.objective)
   })
 })

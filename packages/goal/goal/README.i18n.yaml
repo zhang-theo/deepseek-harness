@@ -38,19 +38,19 @@
 /x1a0f3n9-dsh-goal/understand-the-implementation:
   en: 592af7e68423bd1c
   zh: 9b1f08393db1b14e
-/x1a0f3n9-dsh-goal/understand-the-implementation/design:
-  en: e0ade76e16155d52
-  zh: 0552302d2e26a61e
-/x1a0f3n9-dsh-goal/understand-the-implementation/source-map:
-  en: f0451101cf73da7d
-  zh: 73176ab69bb63a7f
-/x1a0f3n9-dsh-goal/understand-the-implementation/events-and-attribution:
+/deepseek-ai-dsh-goal/understand-the-implementation/design:
+  en: 6f19e891ffc79754
+  zh: 9599e3b142f1e6b5
+/deepseek-ai-dsh-goal/understand-the-implementation/source-map:
+  en: aef62dff93f32796
+  zh: dba79da0466218a7
+/deepseek-ai-dsh-goal/understand-the-implementation/events-and-attribution:
   en: 502cf61dba8b22ca
   zh: 2b6f672bb2ac84ba
-/x1a0f3n9-dsh-goal/further-exploration:
-  en: d94098c1e3f3c8cf
-  zh: f4be4de55703097a
-/x1a0f3n9-dsh-goal/model-experience:
+/deepseek-ai-dsh-goal/further-exploration:
+  en: 11e7ecd3115d0b6b
+  zh: d1dff8b7d05a2f09
+/deepseek-ai-dsh-goal/model-experience:
   en: 215e7ba838619b7b
   zh: a311da3843709f90
 /x1a0f3n9-dsh-goal/model-experience/goal-state-mutations:

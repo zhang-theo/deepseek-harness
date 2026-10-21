@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { cleanup, render } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { StateDot } from '@x1a0f3n9/dsh-client-ui-primitives'
-import type { StateDotState } from '@x1a0f3n9/dsh-client-ui-primitives'
+import { StateDot } from '@deepseek-ai/dsh-client-ui-primitives'
+import type { StateDotState } from '@deepseek-ai/dsh-client-ui-primitives'
 
 afterEach(cleanup)
 
@@ -77,6 +77,20 @@ describe('StateDot ongoing phase', () => {
       expect(animations.map(animation => animation.startTime)).toEqual([0, 0])
       unmount()
       expect(getAnimations).toHaveBeenCalledTimes(1)
+    } finally {
+      delete proto.getAnimations
+    }
+  })
+
+  it('re-pins animations that restart after mount', () => {
+    const animations = [{ startTime: 0 }]
+    const proto = SVGElement.prototype as { getAnimations?: () => { startTime: number }[] }
+    proto.getAnimations = () => animations
+    try {
+      const { container } = render(<StateDot state="ongoing" />)
+      animations[0]!.startTime = 438
+      container.querySelector('circle')!.dispatchEvent(new Event('animationstart', { bubbles: true }))
+      expect(animations[0]!.startTime).toBe(0)
     } finally {
       delete proto.getAnimations
     }

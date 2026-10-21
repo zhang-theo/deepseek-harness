@@ -1,6 +1,6 @@
 /** Keeps Electron's private Platform credentials bound to the active account provider. */
 import type { Context } from '@deepseek-ai/cordis'
-import type { PlatformSession } from '@x1a0f3n9/dsh-deepseek-account'
+import type { PlatformSession } from '@deepseek-ai/dsh-deepseek-account'
 
 /**
  * Publish account sessions for each provider lifetime, clearing them on removal or stream termination.
@@ -14,7 +14,7 @@ export function installPlatformSessionPublisher(ctx: Context, publish: (session:
       const lifetime = new AbortController()
       const updates = (async () => {
         try {
-          for await (const _state of account.watch(lifetime.signal)) {
+          for await (const _state of account.watch(lifetime.signal, true)) {
             if (lifetime.signal.aborted) break
             const session = await account.getPlatformSession()
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Disposal can abort during the credential read.

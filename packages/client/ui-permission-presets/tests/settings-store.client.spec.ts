@@ -1,8 +1,8 @@
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 import { describe, expect, it, vi } from 'vitest'
-import type { SettingsNamespaceView } from '@x1a0f3n9/dsh-api-remotes/client'
-import { SettingsDescribeMirror } from '@x1a0f3n9/dsh-client-ui-settings/src/client/settings-mirror.ts'
-import { RemoteError } from '@x1a0f3n9/dsh-client-test-runtime'
+import type { SettingsNamespaceView } from '@deepseek-ai/dsh-api-remotes/client'
+import { SettingsDescribeMirror } from '@deepseek-ai/dsh-client-ui-settings/src/client/settings-mirror.ts'
+import { RemoteError } from '@deepseek-ai/dsh-client-test-runtime'
 import {
   PermissionPresetSettingsController, permissionDefaultOf,
 } from '../src/client/settings-store.ts'
@@ -159,19 +159,6 @@ describe('permission settings store', () => {
     expect(malformed.store.getSnapshot()).toMatchObject({
       status: 'error', error: 'catalog disconnected',
     })
-  })
-
-  it('hides the row in a remote browser instead of loading forever', async () => {
-    const describeCall = vi.fn()
-    const mutate = vi.fn()
-    const ctx = { remote: { settings: { describe: describeCall, mutate } } } as never
-    const mirror = new SettingsDescribeMirror(ctx, 'memory')
-    const controller = new PermissionPresetSettingsController(mirror, ctx, directory)
-    await controller.load()
-    expect(controller.store.getSnapshot().status).toBe('unavailable')
-    await controller.select('workspace-write')
-    expect(describeCall).not.toHaveBeenCalled()
-    expect(mutate).not.toHaveBeenCalled()
   })
 
   it('follows a mirror refresh without an own read once loaded', async () => {

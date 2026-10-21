@@ -1,9 +1,9 @@
-/** API-key authentication and discovery for the official DeepSeek route. */
+/** API-key authentication and credential-gated discovery for the official DeepSeek route. */
 import type { Context } from '@deepseek-ai/cordis'
-import { assertUsableApiKey, LlmError } from '@x1a0f3n9/dsh-llm'
+import { assertUsableApiKey, LlmError } from '@deepseek-ai/dsh-llm'
 import type {} from '@deepseek-ai/cordis-plugin-loader'
-import { launchEnvironmentOf } from '@x1a0f3n9/dsh-launch-environment'
-import { registerDeepSeekProvider, catalogModelInfo } from '@x1a0f3n9/dsh-llm-deepseek'
+import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
+import { registerDeepSeekProvider, catalogModelInfo } from '@deepseek-ai/dsh-llm-deepseek'
 import { Config, plainOptions, resolveAdapterOptions } from './config.ts'
 import type { ResolvedDeepSeekOptions } from './config.ts'
 
@@ -39,9 +39,14 @@ export function apply(ctx: Context, config: Config): void {
   registerDeepSeekProvider(ctx, PROVIDER, {
     options, providerName: 'DeepSeek',
     resolveAuth: async connection => ({ headers: { 'x-api-key': await resolveApiKey(connection) } }),
-    discoverModels: (provider) => {
+    discoverModels: async (provider) => {
       const connection = options()
-      return Promise.resolve(connection.models.map(model => catalogModelInfo(provider, model)))
+      try { await resolveApiKey(connection) }
+      catch (error) {
+        if (error instanceof LlmError && error.code === 'MISSING_CREDENTIAL') return []
+        throw error
+      }
+      return connection.models.map(model => catalogModelInfo(provider, model))
     },
   })
 }

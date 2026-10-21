@@ -3,7 +3,7 @@ description: "dsh app bin 的应用自有命令行：应用从启动器剩余参
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-cmdline
+# @deepseek-ai/dsh-cmdline
 
 [English](README.md) | 中文
 
@@ -45,14 +45,14 @@ kind: "package-library"
 
 ```yaml
 - id: web-startup
-  name: '@x1a0f3n9/dsh-web-app/startup'
+  name: '@deepseek-ai/dsh-web-app/startup'
 ```
 
 由解析值配置的行注入发布的服务，并在其配置中直接读取它：
 
 ```yaml
 - id: webserver
-  name: '@x1a0f3n9/dsh-host-webserver'
+  name: '@deepseek-ai/dsh-host-webserver'
   inject: [webStartup]
   config:
     host: !!js ctx.webStartup.host ?? '127.0.0.1'
@@ -97,7 +97,6 @@ kind: "package-library"
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | `CmdlineArgs`/`AppExit` 类型、`provideCmdline`、`parseCmdline`、commander 退出／输出路由 |
-| — | 不发布运行时不变式配套条目；`cmdlineArgs` 是不可变的启动器事实，任意数量的普通插件都可以读取它。应用自有提供方与消费方使用普通 Cordis 服务注入；Loader 结算已会报告缺失的依赖。 |
 
 </details>
 

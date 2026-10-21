@@ -3,7 +3,7 @@ description: "使用并排查实验性 Web Agent Teams roster、共享任务板�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-experimental-client-ui-agent-team
+# @deepseek-ai/dsh-experimental-client-ui-agent-team
 
 [English](README.md) | 中文
 
@@ -25,7 +25,7 @@ kind: "package-reference"
 <a id="use-this-package"></a>
 ## 使用本包
 
-通过 [`@x1a0f3n9/dsh-experimental-agent-team-profile`](../agent-team-profile/README.zh.md) 启用本包。这个组合包同时提供团队服务、工具与 Web 界面。Web Client loader 挂载 `/client` export；root Host export 不执行行为，本包也没有用户配置字段。
+通过 [`@deepseek-ai/dsh-experimental-agent-team-profile`](../agent-team-profile/README.zh.md) 启用本包。这个组合包同时提供团队服务、工具与 Web 界面。Web Client loader 挂载 `/client` export；root Host export 不执行行为，本包也没有用户配置字段。
 
 ### 检查并导航 roster
 
@@ -100,5 +100,3 @@ Client export 通过 Cordis effect 注册 locale dictionary 与一个 conversati
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。Host 投影是权威来源，本包只持有一个可释放的 slot 注册。

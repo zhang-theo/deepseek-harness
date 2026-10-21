@@ -1,8 +1,8 @@
 /** Session-owned observable state excluding Conversation target data. */
-import type { FileAttachmentRef } from '@x1a0f3n9/dsh-attachment'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { SubagentAddress } from '@x1a0f3n9/dsh-subagent/client'
-import type { RemoteFailure } from '@x1a0f3n9/dsh-typert-protocol'
+import type { FileAttachmentRef } from '@deepseek-ai/dsh-attachment'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { SubagentAddress } from '@deepseek-ai/dsh-subagent/client'
+import type { RemoteFailure } from '@deepseek-ai/dsh-typert-protocol'
 import type { SessionRequestId } from '../../types.ts'
 
 /** One image displayed by a local submission echo before durable admission. */

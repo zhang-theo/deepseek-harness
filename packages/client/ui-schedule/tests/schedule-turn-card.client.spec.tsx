@@ -6,17 +6,18 @@
  */
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { makeTranslate } from '@x1a0f3n9/dsh-client-test-runtime'
+import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import {
   ConversationNodeAssembler, type ConversationLocationDataSource, type ConversationLocationDataStore,
   type ConversationMatch, type ConversationNodeDefinition, type ConversationStartMatch,
   type ConversationTimelineSnapshot, type ConversationTurnDataMap,
   type ConversationViewDefinition, type ConversationViewNode, type ToolResultNode, type TurnLocation,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { SessionLiveEventEntry } from '@x1a0f3n9/dsh-api-session-controller/client'
-import { createToolResultMessage, ToolCallId } from '@x1a0f3n9/dsh-llm'
-import type { SessionEvent } from '@x1a0f3n9/dsh-session/types'
-import type { ScheduleCatalogEntry, ScheduleId } from '@x1a0f3n9/dsh-schedule/client'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { SessionLiveEventEntry } from '@deepseek-ai/dsh-api-session-controller/client'
+import { createToolResultMessage, ToolCallId } from '@deepseek-ai/dsh-llm'
+import type { SessionEvent } from '@deepseek-ai/dsh-session/types'
+import type { ScheduleCatalogEntry, ScheduleId } from '@deepseek-ai/dsh-schedule/client'
+import { PartialArguments } from '@deepseek-ai/dsh-util-values'
 import { ScheduleTurnCard, type ScheduleTurnCardProps } from '../src/client/ScheduleTurnCard.tsx'
 import { zoneLabel } from '../src/client/schedule-format.ts'
 import {
@@ -160,6 +161,7 @@ function scheduleOf(value: ConversationNodeAssembler, turn = 1): Readonly<Schedu
 function settledBlock(task: unknown, callId = CALL): ToolResultNode {
   return {
     kind: 'tool-result', seq: 3, time: 3_000, callId,
+    name: 'schedule_create', args: PartialArguments.fromText(JSON.stringify(ARGS)),
     call: { name: 'schedule_create', argsRaw: JSON.stringify(ARGS) },
     callTime: 2_000,
     content: [{ type: 'text', text: JSON.stringify(task) }],

@@ -2,11 +2,11 @@
  * Exact rule snapshots, editable timing fields, the injected task update callback, and Host
  * failure mapping; zone interpretation belongs to the Host.
  */
-import type { RemoteResult } from '@x1a0f3n9/dsh-api-remotes/client'
+import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
 import type {
   ScheduleRecord, ScheduleUpdateRequest, ScheduleUpdateResult,
-} from '@x1a0f3n9/dsh-schedule/client'
-import { assertNever } from '@x1a0f3n9/dsh-util-values'
+} from '@deepseek-ai/dsh-schedule/client'
+import { assertNever } from '@deepseek-ai/dsh-util-values'
 import type { TaskManagerKey } from './task-manager-locales.ts'
 
 /** Task mutation callback injected by the task catalog owner. */
@@ -189,6 +189,7 @@ export function timingError(code: Extract<ScheduleUpdateResult, { code: string }
     case 'schedule_conflict': return 'timing.conflict'
     case 'schedule_ended': return 'timing.inactive'
     case 'schedule_not_found': return 'timing.notFound'
+    case 'subagent_session': return 'timing.subagentSession'
     case 'invalid_time_zone': return 'timing.invalidZone'
     case 'not_future': return 'timing.notFuture'
     case 'frequency_too_high': return 'timing.invalidInterval'

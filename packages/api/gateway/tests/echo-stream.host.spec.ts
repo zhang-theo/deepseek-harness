@@ -2,12 +2,14 @@ import { once } from 'node:events'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import WebSocket, { type RawData } from 'ws'
 import { Context } from '@deepseek-ai/cordis'
-import { apply as applyConnection, inject as connectionInject } from '@x1a0f3n9/dsh-client-connection'
-import WebServer from '@x1a0f3n9/dsh-host-webserver'
-import { Remote, TypertRemoteService, type RemoteStream } from '@x1a0f3n9/dsh-typert-protocol'
-import TypertRegistry from '@x1a0f3n9/dsh-typert-registry'
-import TypertGatewayService from '@x1a0f3n9/dsh-api-gateway'
+import { apply as applyConnection, inject as connectionInject } from '@deepseek-ai/dsh-client-connection'
+import WebServer from '@deepseek-ai/dsh-host-webserver'
+import { Remote, TypertRemoteService, type RemoteStream } from '@deepseek-ai/dsh-typert-protocol'
+import TypertRegistry from '@deepseek-ai/dsh-typert-registry'
+import TypertGatewayService from '@deepseek-ai/dsh-api-gateway'
+import RemoteAccessService from '@deepseek-ai/dsh-api-remote-access'
 import { browserCookie, provideBrowserCredentials } from './browser-credentials.ts'
+import { ownerPeer } from './peer.ts'
 
 /** The smallest Remote stream that reads its uplink: every carrier has to serve it alike. */
 class EchoService extends TypertRemoteService {
@@ -36,6 +38,7 @@ describe('the echo stream on each carrier', () => {
   it('echoes uplink items through the in-process carrier', async () => {
     const ctx = await setup(false)
     const replies = await ctx.typertGateway.stream({
+      peer: ownerPeer(ctx),
       namespace: 'echo', method: 'echo', args: { prefix: '> ' }, uplink: items(['a', 'b']),
     })
     await expect(collect(replies)).resolves.toEqual(['> a', '> b'])
@@ -73,6 +76,7 @@ async function setup(transport: boolean): Promise<Context> {
     provideBrowserCredentials(ctx)
   }
   await ctx.plugin(TypertRegistry)
+  await ctx.plugin(RemoteAccessService)
   await ctx.plugin(TypertGatewayService, {})
   if (transport) await ctx.plugin({ inject: [...connectionInject], apply: applyConnection })
   await ctx.plugin(EchoService)

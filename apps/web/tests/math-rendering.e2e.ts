@@ -2,9 +2,9 @@ import { fileURLToPath } from 'node:url'
 import type { Browser, Page } from 'playwright'
 import { chromium } from 'playwright'
 import { afterAll, beforeAll, describe, expect, it, onTestFailed } from 'vitest'
-import { createMessage, createUserMessage } from '@x1a0f3n9/dsh-llm'
-import { SESSION_FORMAT_VERSION, Session, SessionId } from '@x1a0f3n9/dsh-session'
-import type {} from '@x1a0f3n9/dsh-session-title'
+import { createMessage, createUserMessage } from '@deepseek-ai/dsh-llm'
+import { SESSION_FORMAT_VERSION, Session, SessionId } from '@deepseek-ai/dsh-session'
+import type {} from '@deepseek-ai/dsh-session-title'
 import {
   assertFixtureInventory,
   captureStableAria,
@@ -122,6 +122,13 @@ describe('web e2e: settled Markdown math rendering', () => {
     await expect.poll(() => page.locator('.katex').count(), { timeout: 10_000 }).toBe(6)
     await expect.poll(() => page.locator('.katex-display').count(), { timeout: 10_000 }).toBe(2)
     expect(await page.locator('.katex-error').count()).toBe(0)
+    const fonts = await page.evaluate(async () => {
+      const faces = [...document.fonts].filter(face => face.family.includes('KaTeX_'))
+      await Promise.all(faces.map(face => face.load()))
+      return faces.map(face => face.status)
+    })
+    expect(fonts).toHaveLength(20)
+    expect(fonts.every(status => status === 'loaded')).toBe(true)
     await expect.poll(
       () => page.getByText('1 turns 1 steps', { exact: false }).count(),
       { timeout: 10_000 },

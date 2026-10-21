@@ -1,6 +1,6 @@
 /** Stable React identities for the two grouping reference kinds. */
-import type { RenderEntry } from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import { assertNever } from '@x1a0f3n9/dsh-util-values'
+import type { RenderEntry } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import { assertNever } from '@deepseek-ai/dsh-util-values'
 
 /**
  * Identify a rendering position independently of presentation mode.

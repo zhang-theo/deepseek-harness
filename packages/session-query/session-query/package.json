@@ -1,7 +1,7 @@
 {
-  "name": "@x1a0f3n9/dsh-session-query",
+  "name": "@deepseek-ai/dsh-session-query",
   "description": "Combined session query service contract with concrete reads, traces, and filters",
-  "version": "0.1.7-rc.4",
+  "version": "0.2.1-rc.2",
   "publishConfig": {
     "access": "public"
   },
@@ -27,39 +27,39 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "@x1a0f3n9/dsh-brand": "workspace:*",
-    "@x1a0f3n9/dsh-llm": "workspace:*",
-    "@x1a0f3n9/dsh-session": "workspace:*",
-    "@x1a0f3n9/dsh-session-title": "workspace:*",
-    "@x1a0f3n9/dsh-tool-todo": "workspace:*",
-    "@x1a0f3n9/dsh-session-persistence": "workspace:*",
-    "@x1a0f3n9/dsh-session-projection": "workspace:*",
-    "@x1a0f3n9/dsh-session-projection-cache": "workspace:*",
+    "@deepseek-ai/dsh-brand": "workspace:*",
+    "@deepseek-ai/dsh-llm": "workspace:*",
+    "@deepseek-ai/dsh-session": "workspace:*",
+    "@deepseek-ai/dsh-session-title": "workspace:*",
+    "@deepseek-ai/dsh-tool-todo": "workspace:*",
+    "@deepseek-ai/dsh-session-persistence": "workspace:*",
+    "@deepseek-ai/dsh-session-projection": "workspace:*",
+    "@deepseek-ai/dsh-session-projection-cache": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~"
   },
   "peerDependenciesMeta": {
-    "@x1a0f3n9/dsh-session-persistence": {
+    "@deepseek-ai/dsh-session-persistence": {
       "optional": true
     },
-    "@x1a0f3n9/dsh-session-projection": {
+    "@deepseek-ai/dsh-session-projection": {
       "optional": true
     },
-    "@x1a0f3n9/dsh-session-projection-cache": {
+    "@deepseek-ai/dsh-session-projection-cache": {
       "optional": true
     }
   },
   "devDependencies": {
-    "@x1a0f3n9/dsh-brand": "workspace:*",
-    "@x1a0f3n9/dsh-llm": "workspace:*",
-    "@x1a0f3n9/dsh-session": "workspace:*",
-    "@x1a0f3n9/dsh-session-title": "workspace:*",
-    "@x1a0f3n9/dsh-tool-todo": "workspace:*",
-    "@x1a0f3n9/dsh-session-persistence": "workspace:*",
-    "@x1a0f3n9/dsh-session-projection": "workspace:*",
-    "@x1a0f3n9/dsh-session-projection-cache": "workspace:*",
+    "@deepseek-ai/dsh-brand": "workspace:*",
+    "@deepseek-ai/dsh-llm": "workspace:*",
+    "@deepseek-ai/dsh-session": "workspace:*",
+    "@deepseek-ai/dsh-session-title": "workspace:*",
+    "@deepseek-ai/dsh-tool-todo": "workspace:*",
+    "@deepseek-ai/dsh-session-persistence": "workspace:*",
+    "@deepseek-ai/dsh-session-projection": "workspace:*",
+    "@deepseek-ai/dsh-session-projection-cache": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~"
   },
   "dependencies": {
-    "@x1a0f3n9/dsh-session-format-catalog": "workspace:*"
+    "@deepseek-ai/dsh-session-format-catalog": "workspace:*"
   }
 }

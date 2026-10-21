@@ -1,7 +1,7 @@
 /** A single-line file path whose trailing characters remain visible in narrow toolbars. */
 import { useLayoutEffect, useRef, type HTMLAttributes } from 'react'
 import clsx from 'clsx'
-import { pathPartsOf } from '@x1a0f3n9/dsh-util-workspace-path'
+import { pathPartsOf } from '@deepseek-ai/dsh-util-workspace-path'
 import css from './PathLabel.module.css'
 
 /**

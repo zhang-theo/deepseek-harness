@@ -2,7 +2,7 @@
  * Process streams the runner reads and writes, kept out of the package entry so
  * substituting them in tests adds no public package API. The shape matches the
  * runner's own IO carrier structurally.
- * @module @x1a0f3n9/dsh-headless/runner-internals
+ * @module @deepseek-ai/dsh-headless/runner-internals
  */
 
 /** The process streams the runner reads and writes; tests substitute captures. */

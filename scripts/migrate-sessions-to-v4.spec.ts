@@ -6,7 +6,7 @@ import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { afterEach, describe, expect, it } from 'vitest'
 import { execa } from 'execa'
-import type { SessionFormatJsonObject } from '@x1a0f3n9/dsh-session-format'
+import type { SessionFormatJsonObject } from '@deepseek-ai/dsh-session-format'
 import { encodeSegment, generationLogFilename, type JsonlCompression } from '../packages/session/session-persistence-jsonl/src/format.ts'
 import { compressZstdFrame, decompressZstdFrame, scanZstdFrames } from '../packages/session/session-persistence-jsonl/src/zstd.ts'
 import { runMigrationJobs } from './migrate-sessions-to-v4.ts'
@@ -334,11 +334,20 @@ describe('one-time V4 migration command', () => {
     const backendUrl = pathToFileURL(join(repository, 'packages/session/session-persistence-jsonl/src/index.ts')).href
     const generationUrl = pathToFileURL(join(repository, 'packages/session/session-persistence-jsonl/src/generation.ts')).href
     await writeFile(entrypoint, `
-      const { default: Backend } = await import(${JSON.stringify(backendUrl)});
+      const Backend = await import(${JSON.stringify(backendUrl)});
+      const { Context } = await import(${JSON.stringify(pathToFileURL(join(repository, 'vendor/cordis/src/index.ts')).href)});
       const { JsonlGenerationSourceChangedError } = await import(${JSON.stringify(generationUrl)});
-      const open = Backend.prototype.open;
+      const ctx = new Context();
+      let prototype;
+      try {
+        await ctx.plugin(Backend, { root: ${JSON.stringify(temporaryRoot())} });
+        prototype = Object.getPrototypeOf(ctx.sessionPersistence);
+      } finally {
+        await ctx.fiber.dispose();
+      }
+      const open = prototype.open;
       let changed = false;
-      Backend.prototype.open = async function(id, access, options) {
+      prototype.open = async function(id, access, options) {
         if (id === 'a-parent' && access === 'write' && !changed) {
           changed = true;
           throw new JsonlGenerationSourceChangedError(${JSON.stringify(child.path)});

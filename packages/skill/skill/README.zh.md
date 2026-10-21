@@ -3,7 +3,7 @@ description: "skill（技能）提供方注册表，供选择、配置或排查�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-skill
+# @deepseek-ai/dsh-skill
 
 [English](README.md) | 中文
 
@@ -36,7 +36,7 @@ kind: "package-reference"
 像任何 Cordis 插件一样加载即可。唯一配置项限制内存中保留的已完成提供方目录数量；其余都是提供方行为。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-skill'
+- name: '@deepseek-ai/dsh-skill'
 ```
 
 | 字段 | 默认值 | 含义 |
@@ -88,7 +88,6 @@ Skill 摘要保留胜出提供方可选的指令文件 `path`，供提供文件�
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口、`SkillRegistry` 服务、候选项与定义验证、共享的面向模型渲染 |
-| — | 不发布运行时不变式伴生入口；提供方／运行时 map 与带 revision 的 cache 在注册表内原子变更，且没有独立变更事件或快照可供交叉核对。 |
 
 ### 目录收集
 
@@ -115,7 +114,7 @@ Skill 摘要保留胜出提供方可选的指令文件 `path`，供提供文件�
 - [skill-filesystem 包](../skill-filesystem/README.zh.md)——从磁盘发现 skill 的随附本地提供方。
 - [tool-skill 包](../tool-skill/README.zh.md)——渲染会话目录与 `skill` 工具的消费方。
 - [生成配置目录](../../../docs/config-catalog.zh.md#deepseek-aidsh-skill)——每个配置字段及其源声明。
-- [skill 调用策略 Agent Note](../../../.agents/notes/implemented/feature/2026-07-28-skill-invocation-policy.zh.md)——模型与用户调用控制的依据。
+- [历史skill 调用策略 Agent Note](../../../.agents/notes/archived/feature/2026-07-28-skill-invocation-policy.md)——模型与用户调用控制的依据。
 
 -----
 

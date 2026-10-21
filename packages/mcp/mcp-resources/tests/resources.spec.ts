@@ -1,12 +1,12 @@
 import { setImmediate as nextEventLoopTurn } from 'node:timers/promises'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import SystemPrompt, { renderPrompt } from '@x1a0f3n9/dsh-system-prompt'
-import ToolRuntime, { defineTool, type Config as ToolConfig } from '@x1a0f3n9/dsh-tools'
-import { ToolCallId } from '@x1a0f3n9/dsh-llm'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import { bindScopeParent, createScope, type Scope } from '@x1a0f3n9/dsh-scope'
-import { PtcRuntime, type PtcRunRequest, type PtcRunResult, type PtcRunSpec } from '@x1a0f3n9/dsh-ptc-runtime'
+import SystemPrompt, { renderPrompt } from '@deepseek-ai/dsh-system-prompt'
+import ToolRuntime, { defineTool, type Config as ToolConfig } from '@deepseek-ai/dsh-tools'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import { bindScopeParent, createScope, type Scope } from '@deepseek-ai/dsh-scope'
+import { PtcRuntime, type PtcRunRequest, type PtcRunResult, type PtcRunSpec } from '@deepseek-ai/dsh-ptc-runtime'
 import McpResources, { type McpResourceProvider } from '../src/index.ts'
 
 const resourceToolNames = ['list_mcp_resources', 'list_mcp_resource_templates', 'read_mcp_resource']
@@ -63,7 +63,7 @@ function call(ctx: Context, name: string, args: unknown, agent?: Agent) {
 }
 
 describe('MCP resource tools', () => {
-  it.each(['native', 'ptc', 'both'] as const)('omits every MCP contribution with no servers in %s mode', async (mode) => {
+  it.each(['native', 'ptc'] as const)('omits every MCP contribution with no servers in %s mode', async (mode) => {
     const ctx = await setup(mode)
     expect(visibleResourceTools(ctx)).toEqual([])
     const assembly = await ctx.systemPrompt.assemble()

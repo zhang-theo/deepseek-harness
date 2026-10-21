@@ -38,10 +38,10 @@
 /x1a0f3n9-dsh-terminal/understand-the-implementation/design-concept:
   en: 6bae42fb7275816f
   zh: 5f75e1b26074108c
-/x1a0f3n9-dsh-terminal/understand-the-implementation/source-map:
-  en: a958f52bab5cf58d
-  zh: 5ae1e96dc2a5a09c
-/x1a0f3n9-dsh-terminal/understand-the-implementation/data-model-and-lifecycle:
+/deepseek-ai-dsh-terminal/understand-the-implementation/source-map:
+  en: 48dab6fe2f770ced
+  zh: 9bbfd23bcc5ac2b3
+/deepseek-ai-dsh-terminal/understand-the-implementation/data-model-and-lifecycle:
   en: a2adfa2708882e19
   zh: 002f257fd8c4addb
 /x1a0f3n9-dsh-terminal/understand-the-implementation/ownership-and-cleanup-rules:
@@ -50,10 +50,10 @@
 /x1a0f3n9-dsh-terminal/understand-the-implementation/send-reservation:
   en: 5815723cd0c6089c
   zh: 0c612ffa4b8c466c
-/x1a0f3n9-dsh-terminal/further-exploration:
-  en: 0e744f900665e8ad
-  zh: bd7b20a82fad207e
-/x1a0f3n9-dsh-terminal/model-experience:
+/deepseek-ai-dsh-terminal/further-exploration:
+  en: 8459a3b70a9f8bad
+  zh: 21372aa8939d2182
+/deepseek-ai-dsh-terminal/model-experience:
   en: 215e7ba838619b7b
   zh: a311da3843709f90
 /x1a0f3n9-dsh-terminal/model-experience/indirect-consumer:

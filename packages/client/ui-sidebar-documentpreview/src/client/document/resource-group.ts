@@ -1,6 +1,6 @@
 /** File-resource membership and invalidation for one document preview. */
-import type { Resources, ResourceSnapshot } from '@x1a0f3n9/dsh-client-resources/client'
-import type { WorkspaceFileStat } from '@x1a0f3n9/dsh-api-workspace-files/types'
+import type { Resources, ResourceSnapshot } from '@deepseek-ai/dsh-client-resources/client'
+import type { WorkspaceFileStat } from '@deepseek-ai/dsh-api-workspace-files/types'
 
 /** Forwards member metadata changes to one document preview. */
 export class ResourceGroup {

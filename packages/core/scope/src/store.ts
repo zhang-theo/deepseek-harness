@@ -1,7 +1,7 @@
 /**
  * Shared insertion-ordered storage and effect ownership for scope-aware registries.
  *
- * @module @x1a0f3n9/dsh-scope
+ * @module @deepseek-ai/dsh-scope
  */
 
 import type { Context } from '@deepseek-ai/cordis'

@@ -3,7 +3,7 @@ description: "Built-in plugins settings section for the dsh web client: the Sett
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-client-ui-settings-plugins
+# @deepseek-ai/dsh-client-ui-settings-plugins
 
 English | [中文](README.zh.md)
 
@@ -67,7 +67,6 @@ None; this package neither assembles nor sends a provider request.
 <a id="known-limitations-and-deferred-work"></a>
 
 - **The section has no tab of its own** — it renders its empty line until a feature plugin registers one; the shell cannot fill the section alone.
-- **Runtime invariant:** No companion is published. The section owns no relationship beyond the slot ledger it projects.
 
 <a id="dev-note"></a>
 ### Dev Note

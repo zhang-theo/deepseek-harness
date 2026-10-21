@@ -3,13 +3,13 @@ description: "供运行时包使用的无损 JSON 校验、分离式快照、深
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-util-values
+# @deepseek-ai/dsh-util-values
 
 [English](README.md) | 中文
 
 ## 概述
 
-`dsh-util-values` 为运行时包提供统一的无损 JSON 值、不可变对象图、JSON 结构相等和封闭联合类型穷尽失败实现。调用方可以校验不受信任的值、创建分离的 JSON 快照、冻结待发布值、比较 JSON 兼容数据，或终止不可达分支，而无需导入某个能力包。这些 helper 不持有共享注册表、constructor identity 或可变模块状态。
+调用方可以校验无损 JSON、读取流式参数、创建分离的 JSON 快照、冻结待发布值、比较 JSON 兼容数据，或终止不可达分支，而无需导入某个能力包。每次流式调用使用独立的 `PartialArguments` 读器；`PartialArguments.EMPTY` 是不含字段的共用封存视图。
 
 ## 目录
 
@@ -29,13 +29,19 @@ kind: "package-library"
 需要 predicate 时使用 `isJsonValue()`，还需要分离副本时使用 `snapshotJsonValue()`。两者只接受无损 JSON 根值：`null`、布尔值、除负零外的有限数字、字符串、稠密的内建数组，以及只含可枚举字符串键的普通或 null-prototype 记录。循环、稀疏数组、自有 symbol 属性或自有不可枚举属性、函数和 class 实例都会被拒绝。
 
 ```ts
-import { isJsonValue, snapshotJsonValue, type JsonValue } from '@x1a0f3n9/dsh-util-values'
+import { isJsonValue, snapshotJsonValue, type JsonValue } from '@deepseek-ai/dsh-util-values'
 
 declare const input: unknown
 
 if (!isJsonValue(input)) throw new TypeError('expected lossless JSON')
 const snapshot = snapshotJsonValue(input) as JsonValue
 ```
+
+### 读取流式参数
+
+`PartialArguments` 懒读取 JSON 对象的顶层字段。`append()` 分别保留分片，不扫描也不拼接。读器为新的键值范围建立索引，跳过未请求的内容；仅在请求时解码或计数字符串，仅在请求时解析已完整的非字符串值。`complete()` 表示结束分隔符已到达，不代表内容已校验；`invalid` 报告索引或内容读取已经发现的错误。它不能替代工具入参校验。
+
+`refresh()` 在发布点报告已观察答案的变化；期间的读取不会确认待发布的变化。它先读取内容再比较完成状态，避免解码错误吞掉完成状态更新。字符串读器提供解码文本、有界前缀和精确 UTF-16 长度，并可为变化判定指定步长和偏移量。`settle(finalText)` 直接将分片与完整文本比较：输入相同时封存原视图并保留缓存，分片缺失或冲突时创建新的封存视图。`fromText()` 和 `fromObject()` 也创建拒绝追加的封存视图。`isSealed` 读取这一追加限制，不扫描或观察内容；`closed()` 还包含外层对象闭合或索引失败的情况。返回值区别见[读器定义](src/partial-json.ts)。
 
 ### 发布、比较或保留键控值
 
@@ -55,14 +61,14 @@ const snapshot = snapshotJsonValue(input) as JsonValue
 <details>
 <summary>实现细节——点击展开</summary>
 
-JSON 校验器使用显式工作栈，并只跟踪当前祖先链，因此深层嵌套值不会消耗 JavaScript 调用栈，重复但无循环的引用仍然有效。快照写入使用自有数据属性，包括 `__proto__` 等名称。值操作的结果只取决于传入参数；`WeakMapWithValues` 仅保存实例自有的关联。
+JSON 校验器使用显式工作栈，并只跟踪当前祖先链，因此深层嵌套值不会消耗 JavaScript 调用栈，重复但无循环的引用仍然有效。内建数组与普通对象通过当前引擎的原生构造器文本表示进行跨 JavaScript realm 识别。快照写入使用自有数据属性，包括 `__proto__` 等名称。值操作的结果只取决于传入参数；`WeakMapWithValues` 仅保存实例自有的关联。
 
 ### 源码地图
 
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | JSON 值类型、校验与快照遍历、结构相等、深度冻结、弱键/强值关联和穷尽联合类型失败 |
-| — | 不发布运行时不变量伴生入口；这些值操作没有共享运行时状态，其代数行为由单元测试覆盖。 |
+| [`src/partial-json.ts`](src/partial-json.ts) | 懒扫描顶层参数，并检测已读取答案的变化 |
 
 </details>
 

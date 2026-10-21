@@ -1,9 +1,9 @@
 /** Resumable desktop onboarding and preference application over Host settings. */
-import type { TranscriptViewMode } from '@x1a0f3n9/dsh-client-ui-chat/client'
-import { createSnapshotStore, shallowEqual } from '@x1a0f3n9/dsh-client-store'
+import type { TranscriptViewMode } from '@deepseek-ai/dsh-client-ui-chat/client'
+import { createSnapshotStore, shallowEqual } from '@deepseek-ai/dsh-client-store'
 import { hasOnboardingCredit } from './onboarding-balance.ts'
-import type { HostObservable } from '@x1a0f3n9/dsh-client-ui-slots'
-import type { SettingsDescribeFace, ConfigForm } from '@x1a0f3n9/dsh-client-ui-settings/client'
+import type { HostObservable } from '@deepseek-ai/dsh-client-ui-slots'
+import type { SettingsDescribeFace, ConfigForm } from '@deepseek-ai/dsh-client-ui-settings/client'
 import type { OnboardingProgress, OnboardingSettings } from '../onboarding-settings.ts'
 import type { AccountSnapshot } from './AccountSection.tsx'
 import type { DesktopOnboardingState, OnboardingChange } from './onboarding-contract.ts'
@@ -41,7 +41,7 @@ export class DesktopOnboardingController {
    */
   constructor(
     private readonly progress: ConfigForm<OnboardingSettings>,
-    private readonly chat: ConfigForm<{ transcriptView: TranscriptViewMode; performanceUsage: 'compact' | 'detailed' }>,
+    private readonly chat: ConfigForm<{ transcriptView?: TranscriptViewMode | null; performanceUsage: 'compact' | 'detailed' }>,
     private readonly setDeveloperTools: (enabled: boolean) => Promise<void>,
     private readonly account: HostObservable<AccountSnapshot>,
     private readonly readApiKeyPresence: () => Promise<boolean>,

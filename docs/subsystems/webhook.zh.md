@@ -2,7 +2,7 @@
 
 [English](webhook.md) | 中文
 
-Webhook 子系统会把已通过身份验证的外部交付转换为可选的普通根 Session。提供方适配器拥有身份验证与通用 JSON 接收；受信任的程序化规则拥有条件与外部调用；`ctx.webhookRuntime` 拥有回调生命周期以及基于 Workspace 的 Session 创建。[已实现决策](../../.agents/notes/implemented/feature/2026-08-22-fire-and-forget-webhook-sessions.zh.md)记录了 runtime 为何不保留交付或完成状态。
+Webhook 子系统会把已通过身份验证的外部交付转换为可选的普通根 Session。提供方适配器拥有身份验证与通用 JSON 接收；受信任的程序化规则拥有条件与外部调用；`ctx.webhookRuntime` 拥有回调生命周期以及基于 Workspace 的 Session 创建。[历史已实现决策](../../.agents/notes/archived/feature/2026-08-22-fire-and-forget-webhook-sessions.md)记录了 runtime 为何不保留交付或完成状态。
 
 ## 共享值
 
@@ -32,7 +32,7 @@ follow-up 是普通持久 user-role 消息，使用 `source.kind: "webhook"`，�
 
 ## GitHub 适配器
 
-`@x1a0f3n9/dsh-webhook-github` 在注入的 WebServer 上注册精确路由，为每次请求解析凭据引用，在解析前验证未改动的 `application/json` body，并在内存分发后立即返回 `202`。它的规范化事件保证为已签名的无损 JSON 对象；规则负责验证自己消费的事件特定字段。
+`@deepseek-ai/dsh-webhook-github` 在注入的 WebServer 上注册精确路由，为每次请求解析凭据引用，在解析前验证未改动的 `application/json` body，并在内存分发后立即返回 `202`。它的规范化事件保证为已签名的无损 JSON 对象；规则负责验证自己消费的事件特定字段。
 
 [GitHub 评审指南](../user/guide/github-review.zh.md)把该路由挂载在隔离的第二个 WebServer 上，因此暴露 webhook 入口不会暴露浏览器 API。
 
@@ -66,5 +66,5 @@ register<K extends string>(rule: WebhookRule<K>): () => Promise<void>
 dispatch<K extends string>(delivery: VerifiedWebhookDelivery<K>): void
 ```
 
-Source: [`packages/webhook/webhook/src/index.ts`](../../packages/webhook/webhook/src/index.ts)
+Source: [`packages/experimental/webhook/src/index.ts`](../../packages/experimental/webhook/src/index.ts)
 <!-- END GENERATED cordis-surface -->

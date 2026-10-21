@@ -2,7 +2,7 @@
 import type { PresentedOpenFailure } from './present-open.ts'
 import type { PresentedAction } from '../presented.ts'
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotMap {
     /** Open one file through its authorized Session event coordinates. */
     'deliverables.file.actions': {

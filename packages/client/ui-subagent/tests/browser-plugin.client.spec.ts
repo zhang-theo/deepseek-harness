@@ -1,16 +1,16 @@
 /** ui-subagent browser half: catalog actions and read-only composer routing. */
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 import { Context } from '@deepseek-ai/cordis'
-import { stubConfigForm } from '@x1a0f3n9/dsh-client-test-runtime'
+import { stubConfigForm } from '@deepseek-ai/dsh-client-test-runtime'
 import { describe, expect, it } from 'vitest'
 import type {
   SessionListState, SessionSnapshot, SessionSummary,
-} from '@x1a0f3n9/dsh-api-session-controller/client'
-import type { SubagentAddress } from '@x1a0f3n9/dsh-subagent/client'
-import { SlotRegistry } from '@x1a0f3n9/dsh-client-ui-renderer/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { ComposerChainProps } from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import { apply as applyLocale, inject as localeInject } from '@x1a0f3n9/dsh-client-locale/client'
+} from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SubagentAddress } from '@deepseek-ai/dsh-subagent/client'
+import { SlotRegistry } from '@deepseek-ai/dsh-client-ui-renderer/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { ComposerChainProps } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import { apply as applyLocale, inject as localeInject } from '@deepseek-ai/dsh-client-locale/client'
 import {
   SubagentHeaderLineage, type SubagentCatalogInjected,
 } from '../src/client/SubagentHeaderLineage.tsx'
@@ -134,10 +134,11 @@ describe('apply', () => {
     ])
 
     // The root-session catalog seat registers in the actions band with the
-    // same business face, leading the band directly after the title crumbs.
+    // same business face, between the preset label (-10) and background
+    // tasks (20).
     const actionEntry = ctx.slots.entries('conversation.session.header.actions')
       .find(entry => entry.options.id === 'subagent-catalog')!
-    expect(actionEntry.options.order).toBe(-30)
+    expect(actionEntry.options.order).toBe(10)
     expect(actionEntry.inject).toBe(catalogEntry.inject)
 
     const composerEntry = ctx.slots.entries('conversation.composer')

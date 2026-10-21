@@ -1,27 +1,17 @@
-import { imageOffloadProjection } from '@x1a0f3n9/dsh-compaction-image-offload/projection'
+import { imageOffloadProjection } from '@deepseek-ai/dsh-compaction-image-offload/projection'
 import { describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
-import { mountAgentLoopTestDependencies } from '@x1a0f3n9/dsh-agent-loop-testkit'
-import InvariantRegistry from '@x1a0f3n9/dsh-invariants'
-import { CommandId } from '@x1a0f3n9/dsh-commands/brand'
-import * as SessionInvariant from '@x1a0f3n9/dsh-session/invariant'
-import * as AgentInvariant from '@x1a0f3n9/dsh-agent/invariant'
-import * as AgentLoopInvariant from '@x1a0f3n9/dsh-agent-loop/invariant'
-import * as CompactionInvariant from '@x1a0f3n9/dsh-compaction/invariant'
-import { BasicCompactionEngine } from '@x1a0f3n9/dsh-compaction-basic'
-import {
-  CompactionId,
-  compactCheckpointSource,
-  isCompactCheckpointSource,
-  ManualCompactionError,
-} from '@x1a0f3n9/dsh-compaction'
-import type { CompactionResult } from '@x1a0f3n9/dsh-compaction'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
+import { mountAgentLoopTestDependencies } from '@deepseek-ai/dsh-agent-loop-testkit'
+import { CommandId } from '@deepseek-ai/dsh-commands/brand'
+import { BasicCompactionEngine } from '@deepseek-ai/dsh-compaction-basic'
+import { CompactionId, isCompactCheckpointSource, ManualCompactionError } from '@deepseek-ai/dsh-compaction'
+import type { CompactionResult } from '@deepseek-ai/dsh-compaction'
 import {
   createAssistantMessage,
   createUserMessage,
   LlmAdapter,
-} from '@x1a0f3n9/dsh-llm'
+} from '@deepseek-ai/dsh-llm'
 import type {
   ContentBlock,
   LlmResolvedModelInfo,
@@ -29,20 +19,20 @@ import type {
   RequestMessage,
   StreamChunk,
   TokenUsage,
-} from '@x1a0f3n9/dsh-llm'
-import SessionStore, { buildForkSeed, Session, SessionId, type SessionEvent } from '@x1a0f3n9/dsh-session'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import LlmRuntime from '@x1a0f3n9/dsh-llm'
-import type { ContextFormed } from '@x1a0f3n9/dsh-llm'
-import TokenMeter from '@x1a0f3n9/dsh-token-meter'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
+} from '@deepseek-ai/dsh-llm'
+import SessionStore, { buildForkSeed, Session, SessionId, type SessionEvent } from '@deepseek-ai/dsh-session'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import LlmRuntime from '@deepseek-ai/dsh-llm'
+import type { ContextFormed } from '@deepseek-ai/dsh-llm'
+import TokenMeter from '@deepseek-ai/dsh-token-meter'
+import type { Agent } from '@deepseek-ai/dsh-agent'
 import {
   CONTEXT_OVERFLOW_FALLBACK_SUMMARY,
   type SummarizationInput,
   type SummaryResult,
-} from '@x1a0f3n9/dsh-compaction-basic/src/summarizer.ts'
+} from '@deepseek-ai/dsh-compaction-basic/src/summarizer.ts'
 
-declare module '@x1a0f3n9/dsh-llm' {
+declare module '@deepseek-ai/dsh-llm' {
   interface MessageSourceMap {
     'listener': { kind: 'listener' } & ContextFormed
     'rival': { kind: 'rival' } & ContextFormed
@@ -112,16 +102,11 @@ interface LoopHarness {
   readonly log: string[]
 }
 
-/** Real loop, session store, and invariant companions around manual compaction. */
+/** Real loop and session store around manual compaction. */
 async function loopHarness(): Promise<LoopHarness> {
   const ctx = new Context()
   await mountAgentLoopTestDependencies(ctx)
   ctx.sessions.registerMessageProjection(imageOffloadProjection)
-  await ctx.plugin(InvariantRegistry)
-  await ctx.plugin(SessionInvariant)
-  await ctx.plugin(AgentInvariant)
-  await ctx.plugin(AgentLoopInvariant)
-  await ctx.plugin(CompactionInvariant)
   await ctx.plugin(AgentLoop, { agents: [] })
   await ctx.plugin(TokenMeter)
   const adapter = new TextAdapter()

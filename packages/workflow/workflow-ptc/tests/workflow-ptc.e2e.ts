@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { SessionId } from '@x1a0f3n9/dsh-session'
+import { SessionId } from '@deepseek-ai/dsh-session'
 
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
-import { mountAgentLoopTestDependencies } from '@x1a0f3n9/dsh-agent-loop-testkit'
-import * as LlmDeepSeek from '@x1a0f3n9/dsh-llm-deepseek-api-key'
-import SubagentRuntime from '@x1a0f3n9/dsh-subagent'
-import * as Spawn from '@x1a0f3n9/dsh-subagent-spawn-in-process'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
+import { mountAgentLoopTestDependencies } from '@deepseek-ai/dsh-agent-loop-testkit'
+import * as LlmDeepSeek from '@deepseek-ai/dsh-llm-deepseek-api-key'
+import SubagentRuntime from '@deepseek-ai/dsh-subagent'
+import * as Spawn from '@deepseek-ai/dsh-subagent-spawn-in-process'
 import PtcWorkflowEngine from '../src/index.ts'
 import { mountPtcRuntime } from './setup.ts'
 
@@ -19,7 +19,7 @@ afterEach(async () => {
 
 async function harness(): Promise<Context> {
   const built = new Context()
-  await mountAgentLoopTestDependencies(built)
+  await mountAgentLoopTestDependencies(built, { workingDirectory: true })
   await mountPtcRuntime(built)
   await built.plugin(AgentLoop, { agents: [] })
   await built.plugin(LlmDeepSeek)

@@ -6,8 +6,8 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import type { Context, Plugin } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/cordis-plugin-loader'
-import type { WebBootGraph } from '@x1a0f3n9/dsh-client-modules/client'
-import type {} from '@x1a0f3n9/dsh-client-modules'
+import type { WebBootGraph } from '@deepseek-ai/dsh-client-modules/client'
+import type {} from '@deepseek-ai/dsh-client-modules'
 
 /** Observed Loader entries, registered plugin instances, loaded modules, and delivered Client entries. */
 export interface RuntimeRoster {
@@ -74,22 +74,4 @@ export function runtimeRoster(ctx: Context): RuntimeRoster {
     modules: [...modules].sort(),
     client: ctx.clientModules.graph(),
   }
-}
-
-/**
- * Locate experimental package identities and experimental source/artifact paths in runtime evidence.
- * @param roster - independently collected Web runtime records.
- * @returns diagnostic evidence for every forbidden package reference.
- */
-export function experimentalRuntimeReferences(roster: RuntimeRoster): string[] {
-  const references = new Set([
-    ...roster.entries.map(entry => entry.name),
-    ...roster.plugins.flatMap(plugin => [plugin.owner ?? '', ...plugin.modules]),
-    ...roster.modules,
-    ...roster.client.entries.flatMap(entry => [entry.id, ...entry.inject ?? [], ...entry.external ?? []]),
-    ...roster.client.batches.flatMap(batch => batch.entries),
-  ])
-  return [...references].filter(reference => reference.includes('@x1a0f3n9/dsh-experimental-')
-    || (reference.startsWith('file:') && (fileURLToPath(reference).replaceAll('\\', '/').includes('/packages/experimental/')
-      || modulePackage(reference)?.startsWith('@x1a0f3n9/dsh-experimental-')))).sort()
 }

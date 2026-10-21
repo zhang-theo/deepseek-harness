@@ -2,7 +2,7 @@
 import { Buffer } from 'node:buffer'
 import { performance } from 'node:perf_hooks'
 import { Readable } from 'node:stream'
-import type { SubprocessOutcome, SubprocessTerminalHandle } from '@x1a0f3n9/dsh-subprocess'
+import type { SubprocessOutcome, SubprocessTerminalHandle } from '@deepseek-ai/dsh-subprocess'
 import { assertBuiltBenchmarkRuntime } from '../support/built-worker.ts'
 import { LocalPtySession } from './session-adapter.ts'
 
@@ -59,7 +59,7 @@ async function measure(capacityBytes: number, mode: string): Promise<TerminalIoR
     rows: 40, cols: 160, scrollbackLines: 10_000, scrollbackMaxBytes: capacityBytes,
     maxReadBytes: Math.min(256 * 1024, capacityBytes),
     pollIntervalMs: 1, exactProbeAfterMs: 150, idleSilenceMs: 1,
-    handoffGraceMs: 1, timeoutMs: 120_000, disposeGraceMs: 1,
+    handoffGraceMs: 1, promptTailGraceMs: 0, timeoutMs: 120_000, disposeGraceMs: 1,
   })
   try {
     if (prefillBytes > 0) {
@@ -97,7 +97,7 @@ async function measure(capacityBytes: number, mode: string): Promise<TerminalIoR
 }
 
 assertBuiltBenchmarkRuntime(import.meta.url, {
-  '@x1a0f3n9/dsh-terminal': import.meta.resolve('@x1a0f3n9/dsh-terminal'),
+  '@deepseek-ai/dsh-terminal': import.meta.resolve('@deepseek-ai/dsh-terminal'),
 })
 const capacityBytes = Number(process.argv[2])
 const mode = process.argv[3]

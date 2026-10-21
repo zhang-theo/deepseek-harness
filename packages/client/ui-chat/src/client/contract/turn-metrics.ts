@@ -2,7 +2,7 @@
 
 import type {
   AssistantMessageNode,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
 
 /** One assistant step's derivable latency facts; null marks an unrecorded part. */
 export interface StepReading {

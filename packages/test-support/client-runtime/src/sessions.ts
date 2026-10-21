@@ -1,27 +1,27 @@
 /** Test-owned Session Controller faces over declarative fixtures. */
 import type { Context } from '@deepseek-ai/cordis'
-import type { AttachmentIdType } from '@x1a0f3n9/dsh-attachment'
+import type { AttachmentIdType } from '@deepseek-ai/dsh-attachment'
 import {
   createScope, MutableSessionEventSource, scopeOf, SESSION_SEARCH_RESULT_LIMIT,
-} from '@x1a0f3n9/dsh-api-session-controller/client'
+} from '@deepseek-ai/dsh-api-session-controller/client'
 import type {
   AgentContext, ISessions, ProjectionsFace, SessionBinding, SessionFace, SessionListState,
   SessionEventLikeEntry, SessionLiveEventEntry, SessionSearchResultItem,
   SessionReference, SessionReferenceSource, SessionRetainInfo, SessionRetainOptions,
   SessionSnapshot, SessionSummary, SessionTarget, SubmissionHandle,
-} from '@x1a0f3n9/dsh-api-session-controller/client'
-import { scopeIdentityOf } from '@x1a0f3n9/dsh-api-session-controller/src/client/scope.ts'
-import type { SessionRequestId } from '@x1a0f3n9/dsh-api-session-controller/types'
-import type { SubagentAddress } from '@x1a0f3n9/dsh-subagent/client'
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
-import type { ObservableSnapshot, SnapshotStore } from '@x1a0f3n9/dsh-client-store'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+} from '@deepseek-ai/dsh-api-session-controller/client'
+import { scopeIdentityOf } from '@deepseek-ai/dsh-api-session-controller/src/client/scope.ts'
+import type { SessionRequestId } from '@deepseek-ai/dsh-api-session-controller/types'
+import type { SubagentAddress } from '@deepseek-ai/dsh-subagent/client'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { ObservableSnapshot, SnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import { sessionSnapshot } from './fixtures.ts'
 import type {
   SessionFixture, SessionFixtureSnapshot, Stabilizer,
 } from './fixtures.ts'
 
-declare module '@x1a0f3n9/dsh-api-session-controller/client' {
+declare module '@deepseek-ai/dsh-api-session-controller/client' {
   interface SessionReferenceSourceMap {
     testFixture: unknown
     testView: unknown
@@ -647,7 +647,7 @@ export class TestSessions implements ISessions {
     if (retained !== undefined) return retained
     for (const [parentSessionId, projections] of Object.entries(this.list.getSnapshot().projectionsBySession)) {
       const child = projections.values.subagentCatalog?.find(entry => entry.id === id)
-      if (child !== undefined) {
+      if (child !== undefined && child.mode !== 'external') {
         return { parentSessionId: parentSessionId as SessionId, childSessionId: id, mode: child.mode }
       }
     }
@@ -693,7 +693,7 @@ export class TestSessions implements ISessions {
    * @param opts - source session id, optional cut anchor, and client title policy.
    * @returns the source id (no child record is created).
    */
-  fork(opts: { sessionId: SessionId; atSeq?: number; increaseTitle?: boolean }): Promise<SessionId> {
+  fork(opts: Parameters<ISessions['fork']>[0]): Promise<SessionId> {
     this.calls.push({ method: 'fork', args: [opts] })
     return Promise.resolve(opts.sessionId)
   }

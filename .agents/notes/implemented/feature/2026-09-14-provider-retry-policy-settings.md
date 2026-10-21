@@ -24,7 +24,7 @@ Each provider editor's 自定义设置 fold, and the custom-provider create card
 
 **Guess a policy from the model or provider id.** Rejected: Default is omission, Custom is explicit numbers.
 
-**Import `@x1a0f3n9/dsh-llm` into the client for the adapter defaults.** Rejected: the source-plane split forbids it; the card copies the numeric defaults.
+**Import `@deepseek-ai/dsh-llm` into the client for the adapter defaults.** Rejected: the source-plane split forbids it; the card copies the numeric defaults.
 
 ## Consequences
 

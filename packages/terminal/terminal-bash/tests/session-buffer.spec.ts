@@ -1,8 +1,8 @@
 import { Buffer } from 'node:buffer'
 import { PassThrough } from 'node:stream'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { SubprocessOutcome, SubprocessTerminalHandle } from '@x1a0f3n9/dsh-subprocess'
-import type { TerminalReadRequest } from '@x1a0f3n9/dsh-terminal'
+import type { SubprocessOutcome, SubprocessTerminalHandle } from '@deepseek-ai/dsh-subprocess'
+import type { TerminalReadRequest } from '@deepseek-ai/dsh-terminal'
 import type { ResolvedConfig } from '../src/config.ts'
 import { LocalPtySession } from '../src/session.ts'
 
@@ -44,7 +44,7 @@ function fixture(overrides: Partial<ResolvedConfig> = {}) {
     backendType: 'shell', shellDialect: 'bash', shellPath: '/bin/bash', shellArgs: [], rows: 24, cols: 80,
     scrollbackLines: 10_000, scrollbackMaxBytes: 4 * 1024 * 1024, maxReadBytes: 256 * 1024,
     pollIntervalMs: 60_000, exactProbeAfterMs: 60_000, idleSilenceMs: 60_000,
-    handoffGraceMs: 60_000, timeoutMs: 60_000, disposeGraceMs: 60_000,
+    handoffGraceMs: 60_000, promptTailGraceMs: 0, timeoutMs: 60_000, disposeGraceMs: 60_000,
     ...overrides,
   }
   const producer = new OutputProducer()

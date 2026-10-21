@@ -1,5 +1,5 @@
 /** Credit and setup confirmations with contained keyboard focus. */
-import { Button, IconCloseOutlineRegular, Modal } from '@x1a0f3n9/dsh-client-ui-primitives'
+import { Button, IconCloseOutlineRegular, Modal } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { DesktopOnboardingProps } from './onboarding-contract.ts'
 import css from './DesktopOnboarding.module.css'
 
@@ -7,12 +7,13 @@ import css from './DesktopOnboarding.module.css'
 export type OnboardingConfirmationKind = 'credit' | 'credit-skip' | 'skip'
 
 /** @param props - confirmation action, localized copy and navigation callbacks. @returns a focus-contained dialog. */
-export function OnboardingConfirmation({ kind, t, busy, canRecharge, onClose, onContinue, onRecharge, onSkip }:
+export function OnboardingConfirmation({ kind, t, busy, canRecharge, onClose, onContinueSetup, onContinue, onRecharge, onSkip }:
   Pick<DesktopOnboardingProps, 't'> & {
     kind: OnboardingConfirmationKind
     busy: boolean
     canRecharge: boolean
     onClose: () => void
+    onContinueSetup: () => void
     onContinue: () => void
     onRecharge: () => void
     onSkip: () => void
@@ -26,7 +27,7 @@ export function OnboardingConfirmation({ kind, t, busy, canRecharge, onClose, on
       </div>
       <p>{t(credit ? 'onboardingNoCreditDescription' : 'onboardingSkipDescription')}</p>
       <div className={css.confirmationActions}>
-        <Button className={css.dialogButton} variant="outline" disabled={busy} onClick={kind === 'credit-skip' ? onSkip : kind === 'credit' ? onContinue : onClose}>{t(credit ? 'onboardingUnderstood' : 'onboardingKeepSetting')}</Button>
+        <Button className={css.dialogButton} variant="outline" disabled={busy} onClick={kind === 'credit-skip' ? onSkip : kind === 'credit' ? onContinue : onContinueSetup}>{t(credit ? 'onboardingUnderstood' : 'onboardingKeepSetting')}</Button>
         <Button className={css.dialogButton} variant="primary" disabled={busy || (credit && !canRecharge)} onClick={credit ? onRecharge : onSkip}>{t(credit ? 'onboardingGoTopUp' : 'onboardingEnter')}</Button>
       </div>
     </div>

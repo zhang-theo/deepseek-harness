@@ -3,7 +3,7 @@ description: "SQLite storage backend for hosts and maintainers choosing, configu
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-storage-sqlite
+# @deepseek-ai/dsh-storage-sqlite
 
 English | [中文](README.zh.md)
 
@@ -36,11 +36,11 @@ Choose it when writes are frequent and point-sized — each key maps to exactly 
 Two fields: the database path and the journal mode. `:memory:` opens an in-process database whose contents disappear with the process.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-storage'
-- name: '@x1a0f3n9/dsh-storage-sqlite'
+- name: '@deepseek-ai/dsh-storage'
+- name: '@deepseek-ai/dsh-storage-sqlite'
   config:
     path: /var/lib/dsh/data.db
-- name: '@x1a0f3n9/dsh-storage-domain'
+- name: '@deepseek-ai/dsh-storage-domain'
   config:
     backend: sqlite
 ```
@@ -84,7 +84,6 @@ Opening the database creates the parent as `0o700`, exclusively creates a missin
 | [`src/index.ts`](src/index.ts) | Plugin entry: backend registration, `path`/`journalMode` config, unit table |
 | [`src/schema.ts`](src/schema.ts) | Open sequence, physical layout version, metadata tables, record table naming |
 | [`src/unit.ts`](src/unit.ts) | One opened unit: prepared statements, JSON value parse, close |
-| — | No runtime invariant companion is published; schema-version and unit-version consistency are open-time checks that reject before a unit exists, and durability needs the backend round-trip tests in the shared KV conformance suite; this package exposes no continuously observable in-process relation. |
 
 </details>
 

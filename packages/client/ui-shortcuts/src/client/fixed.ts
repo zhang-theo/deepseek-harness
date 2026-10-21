@@ -1,6 +1,6 @@
 /** Menu reservations contributed by the product's shortcut reference integration. */
-import type { ShortcutFixedCommand, ShortcutCommandId } from '@x1a0f3n9/dsh-client-shortcuts/client'
-import type { PropsLocale } from '@x1a0f3n9/dsh-client-ui-slots'
+import type { ShortcutFixedCommand, ShortcutCommandId } from '@deepseek-ai/dsh-client-shortcuts/client'
+import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
 
 /**
  * Describe shared menu actions for display and conflict checking.

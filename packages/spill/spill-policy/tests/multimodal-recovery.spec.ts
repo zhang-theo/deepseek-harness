@@ -3,31 +3,32 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Context } from '@deepseek-ai/cordis'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import type { ImageAttachmentRef } from '@x1a0f3n9/dsh-attachment'
-import LocalAttachments from '@x1a0f3n9/dsh-attachment-local'
-import FileSystem from '@x1a0f3n9/dsh-fs-local'
-import * as ToolFs from '@x1a0f3n9/dsh-tool-fs'
+import { provideWorkingDirectoryFixture } from '@deepseek-ai/dsh-agent-loop-testkit'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import type { ImageAttachmentRef } from '@deepseek-ai/dsh-attachment'
+import LocalAttachments from '@deepseek-ai/dsh-attachment-local'
+import FileSystem from '@deepseek-ai/dsh-fs-local'
+import * as ToolFs from '@deepseek-ai/dsh-tool-fs'
 import {
   createAssistantMessage, createToolResultMessage, createUserMessage, LlmAdapter, LlmRuntime,
   resolveImageAttachmentAccess, ToolCallId,
-} from '@x1a0f3n9/dsh-llm'
-import type { ContentBlock, GenerateOptions, ImageBlock, StreamChunk, UserMessage } from '@x1a0f3n9/dsh-llm'
-import { deepSeekImageRequestPricing, resolveAdapterOptions } from '@x1a0f3n9/dsh-llm-deepseek'
-import { prepareImages } from '@x1a0f3n9/dsh-llm-deepseek/src/images.ts'
-import { serialize } from '@x1a0f3n9/dsh-llm-deepseek/src/serialize.ts'
-import { createMcpToolDefinition } from '@x1a0f3n9/dsh-mcp-client'
-import NodeRuntime from '@x1a0f3n9/dsh-ptc-runtime-node'
-import Sandbox from '@x1a0f3n9/dsh-sandbox-local'
-import SandboxPolicy from '@x1a0f3n9/dsh-sandbox-policy'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import SessionProjections from '@x1a0f3n9/dsh-session-projection'
-import LocalSpillStore from '@x1a0f3n9/dsh-spill-local'
-import Subprocess from '@x1a0f3n9/dsh-subprocess-local'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import { estimateContent } from '@x1a0f3n9/dsh-token-meter/estimate'
-import ToolRuntime from '@x1a0f3n9/dsh-tools'
-import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
+} from '@deepseek-ai/dsh-llm'
+import type { ContentBlock, GenerateOptions, ImageBlock, StreamChunk, UserMessage } from '@deepseek-ai/dsh-llm'
+import { deepSeekImageRequestPricing, resolveAdapterOptions } from '@deepseek-ai/dsh-llm-deepseek'
+import { prepareImages } from '@deepseek-ai/dsh-llm-deepseek/src/images.ts'
+import { serialize } from '@deepseek-ai/dsh-llm-deepseek/src/serialize.ts'
+import { createMcpToolDefinition } from '@deepseek-ai/dsh-mcp-client'
+import NodeRuntime from '@deepseek-ai/dsh-ptc-runtime-node'
+import Sandbox from '@deepseek-ai/dsh-sandbox-local'
+import SandboxPolicy from '@deepseek-ai/dsh-sandbox-policy'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import SessionProjections from '@deepseek-ai/dsh-session-projection'
+import LocalSpillStore from '@deepseek-ai/dsh-spill-local'
+import Subprocess from '@deepseek-ai/dsh-subprocess-local'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import { estimateContent } from '@deepseek-ai/dsh-token-meter/estimate'
+import ToolRuntime from '@deepseek-ai/dsh-tools'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 import sharp from 'sharp'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import * as SpillPolicy from '../src/index.ts'
@@ -41,14 +42,15 @@ const text = (value: string): ContentBlock => ({ type: 'text', text: value })
 const textOf = (content: readonly ContentBlock[]): string => content.filter(block => block.type === 'text').map(block => block.text).join('')
 const imagesOf = (content: readonly ContentBlock[]): ImageBlock[] => content.filter((block): block is ImageBlock => block.type === 'image')
 
-async function setup() {
+async function setup(mode: 'native' | 'ptc' = 'native') {
   const root = await mkdtemp(join(tmpdir(), 'dsh-image-recovery-'))
   const ctx = new Context()
+  provideWorkingDirectoryFixture(ctx, root)
   onTestFinished(async () => {
     try { await ctx.fiber.dispose() } finally { await rm(root, { recursive: true, force: true }) }
   })
   await ctx.plugin(SystemPrompt)
-  await ctx.plugin(ToolRuntime, { mode: 'both' })
+  await ctx.plugin(ToolRuntime, { mode })
   await ctx.plugin(FileSystem, { cwd: root })
   await ctx.plugin(LocalAttachments, { dshHome: join(root, 'home') })
   await ctx.plugin(ToolFs)
@@ -175,7 +177,7 @@ describe('multimodal recovery through real providers', () => {
   })
 
   it.each(['sequential', 'parallel'] as const)('keeps budgets and image identities separate across %s Node PTC calls', async (mode) => {
-    const { ctx, session, execute, cost, requestImages, gates } = await setup()
+    const { ctx, session, execute, cost, requestImages, gates } = await setup('ptc')
     await ctx.plugin(Subprocess)
     await ctx.plugin(Sandbox, {})
     await ctx.plugin(SandboxPolicy, { mode: 'danger-full-access' })

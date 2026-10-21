@@ -1,14 +1,15 @@
 /** Recorded todo predecessors follow incremental history repair and nested invocations. */
 import { describe, expect, it } from 'vitest'
-import { ConversationNodeAssembler } from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { SessionEvent } from '@x1a0f3n9/dsh-session/types'
-import type { SessionLiveEventEntry } from '@x1a0f3n9/dsh-api-session-controller/client'
-import { makeTranslate } from '@x1a0f3n9/dsh-client-test-runtime'
-import { en } from '@x1a0f3n9/dsh-client-ui-conversation/src/client/locales.ts'
-import { en as commonEn } from '@x1a0f3n9/dsh-client-locale/src/locales/en.ts'
+import { ConversationNodeAssembler } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { SessionEvent } from '@deepseek-ai/dsh-session/types'
+import type { SessionLiveEventEntry } from '@deepseek-ai/dsh-api-session-controller/client'
+import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { en } from '@deepseek-ai/dsh-client-ui-conversation/src/client/locales.ts'
+import { en as commonEn } from '@deepseek-ai/dsh-client-locale/src/locales/en.ts'
 import { todoCallDefinition, todoHistoryView, todoWriteDefinition, type TodoHistory } from '../src/client/tool/models/todo-history.ts'
 import { todoDiffModel } from '../src/client/tool/models/todo-diff-model.ts'
-import type { ToolResultNode } from '@x1a0f3n9/dsh-client-ui-chat/client'
+import type { ToolResultNode } from '@deepseek-ai/dsh-client-ui-chat/client'
+import { PartialArguments } from '@deepseek-ai/dsh-util-values'
 
 const t = makeTranslate(en, commonEn)
 const first = [{ content: 'Build', status: 'in_progress' }, { content: 'Review', status: 'pending' }, { content: 'Old task', status: 'pending' }] as const
@@ -19,7 +20,7 @@ function entry(seq: number, type: string, data: unknown): SessionLiveEventEntry 
 }
 
 function call(todos: unknown): ToolResultNode {
-  return { kind: 'tool-result', seq: 20, time: 2000, callTime: 1000, callId: 'second', call: { name: 'todo_write', argsRaw: JSON.stringify({ todos }) }, content: [], isError: false, subCalls: [] }
+  return { kind: 'tool-result', seq: 20, time: 2000, callTime: 1000, callId: 'second', name: 'todo_write', args: PartialArguments.fromText(JSON.stringify({ todos })), call: { name: 'todo_write', argsRaw: JSON.stringify({ todos }) }, content: [], isError: false, subCalls: [] }
 }
 
 function runtime() {

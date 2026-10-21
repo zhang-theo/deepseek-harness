@@ -7,15 +7,15 @@
  */
 
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
-import type {} from '@x1a0f3n9/dsh-client-locale/client'
+import type {} from '@deepseek-ai/dsh-client-locale/client'
 // Type-only: the ctx.configForms Context merge. Cross-plugin collaboration
 // goes through the service, never a value import (client bundle purity gate).
-import type {} from '@x1a0f3n9/dsh-client-ui-settings/client'
+import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 // Type-only: the Plugins page's SlotMap merge (the 'plugins.item' entry).
-import type {} from '@x1a0f3n9/dsh-client-ui-plugin-manager/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-renderer/client'
+import type {} from '@deepseek-ai/dsh-client-ui-plugin-manager/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 // Type-only: the ctx.remote Context merge and the forwarded-event key face.
-import type {} from '@x1a0f3n9/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import { SubagentCard } from './SubagentCard.tsx'
 import { subagentCardFace } from './subagent-card-controller.ts'
@@ -33,7 +33,7 @@ export type {
 } from './subagent-model-selection-card-controller.ts'
 export type { SubagentSettingsLocaleKey } from './locales.ts'
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** Subagent settings page copy. */
     'settings.subagent': SubagentSettingsLocaleKey
@@ -85,7 +85,7 @@ export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.configForms.whileServed([SUBAGENT_NS, SUBAGENT_MODEL_SELECTION_NS], () => ctx.slots.inject('plugins.item', () => ctx.slots.register({
     name: 'plugins.item',
     id: 'subagent',
-    order: 30,
+    order: 10,
     label: () => t('subagentTitle'),
     locale: NS,
     inject: () => subagentCardFace(limitsFace, modelsFace),

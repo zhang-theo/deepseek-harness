@@ -24,33 +24,33 @@ afterEach(() => {
 describe('publish scope mapping', () => {
   it('rewrites only the family names onto the target scope', () => {
     const mapping = publishScopeMapping(
-      ['@x1a0f3n9/dsh', '@x1a0f3n9/dsh-session'],
+      ['@deepseek-ai/dsh', '@deepseek-ai/dsh-session'],
       '@x1a0f3n9',
       '@xfcodeai',
     )
-    expect(mapping.get('@x1a0f3n9/dsh')).toBe('@xfcodeai/dsh')
-    expect(mapping.get('@x1a0f3n9/dsh-session')).toBe('@xfcodeai/dsh-session')
+    expect(mapping.get('@deepseek-ai/dsh')).toBe('@deepseek-ai/dsh')
+    expect(mapping.get('@deepseek-ai/dsh-session')).toBe('@deepseek-ai/dsh-session')
   })
 
   it('rejects a name outside the source scope', () => {
     expect(() => {
-      publishScopeMapping(['@x1a0f3n9/dsh'], '@x1a0f3n9', '@xfcodeai')
-    }).toThrow(/not in @x1a0f3n9/)
+      publishScopeMapping(['@deepseek-ai/dsh'], '@x1a0f3n9', '@xfcodeai')
+    }).toThrow(/not in @deepseek-ai/)
   })
 })
 
 describe('scoped name rewrite', () => {
   it('does not rewrite a longer non-family name that shares a prefix', () => {
-    const mapping = publishScopeMapping(['@x1a0f3n9/dsh'], '@x1a0f3n9', '@xfcodeai')
+    const mapping = publishScopeMapping(['@deepseek-ai/dsh'], '@x1a0f3n9', '@xfcodeai')
     expect(rewriteScopedNames(
-      'require("@x1a0f3n9/dsh"); require("@x1a0f3n9/dsh-session-timeline")',
+      'require("@deepseek-ai/dsh"); require("@deepseek-ai/dsh-session-timeline")',
       mapping,
-    )).toBe('require("@xfcodeai/dsh"); require("@x1a0f3n9/dsh-session-timeline")')
+    )).toBe('require("@deepseek-ai/dsh"); require("@deepseek-ai/dsh-session-timeline")')
   })
 
   it('rewrites a family name at the end of the file', () => {
-    const mapping = publishScopeMapping(['@x1a0f3n9/dsh-session'], '@x1a0f3n9', '@xfcodeai')
-    expect(rewriteScopedNames('@x1a0f3n9/dsh-session', mapping)).toBe('@xfcodeai/dsh-session')
+    const mapping = publishScopeMapping(['@deepseek-ai/dsh-session'], '@x1a0f3n9', '@xfcodeai')
+    expect(rewriteScopedNames('@deepseek-ai/dsh-session', mapping)).toBe('@deepseek-ai/dsh-session')
   })
 
   it('leaves a NUL file unrewritable', () => {
@@ -66,41 +66,41 @@ describe('packed tarball rewrite', () => {
     const extracted = join(root, 'package')
     mkdirSync(extracted)
     writeFileSync(join(extracted, 'package.json'), `${JSON.stringify({
-      name: '@x1a0f3n9/dsh',
+      name: '@deepseek-ai/dsh',
       version: '0.1.5-rc.5',
       dependencies: {
-        '@x1a0f3n9/dsh-session': '0.1.5-rc.5',
-        '@x1a0f3n9/dsh-session-timeline': '0.1.5-xfdsh.2',
+        '@deepseek-ai/dsh-session': '0.1.5-rc.5',
+        '@deepseek-ai/dsh-session-timeline': '0.1.5-xfdsh.2',
       },
     }, null, 2)}\n`)
     writeFileSync(
       join(extracted, 'index.js'),
-      'import "@x1a0f3n9/dsh-session"; import "@x1a0f3n9/dsh-session-timeline";\n',
+      'import "@deepseek-ai/dsh-session"; import "@deepseek-ai/dsh-session-timeline";\n',
     )
     const source = join(root, 'x1a0f3n9-dsh-0.1.5-rc.5.tgz')
     capture('tar', ['-czf', source, '-C', root, 'package'])
     writeFileSync(join(root, PUBLISH_ORDER_FILE), 'x1a0f3n9-dsh-0.1.5-rc.5.tgz\n')
 
     const mapping = publishScopeMapping(
-      ['@x1a0f3n9/dsh', '@x1a0f3n9/dsh-session'],
+      ['@deepseek-ai/dsh', '@deepseek-ai/dsh-session'],
       '@x1a0f3n9',
       '@xfcodeai',
     )
     const filename = rewritePackedTarball(source, root, mapping)
     expect(filename).toBe('xfcodeai-dsh-0.1.5-rc.5.tgz')
     expect(packedIdentity(join(root, filename))).toEqual({
-      name: '@xfcodeai/dsh',
+      name: '@deepseek-ai/dsh',
       version: '0.1.5-rc.5',
     })
     const js = capture('tar', ['-xOzf', join(root, filename), 'package/index.js'])
-    expect(js).toContain('import "@xfcodeai/dsh-session"')
-    expect(js).toContain('import "@x1a0f3n9/dsh-session-timeline"')
+    expect(js).toContain('import "@deepseek-ai/dsh-session"')
+    expect(js).toContain('import "@deepseek-ai/dsh-session-timeline"')
     const manifest = JSON.parse(capture('tar', ['-xOzf', join(root, filename), 'package/package.json'])) as {
       dependencies: Record<string, string>
     }
     expect(manifest.dependencies).toEqual({
-      '@xfcodeai/dsh-session': '0.1.5-rc.5',
-      '@x1a0f3n9/dsh-session-timeline': '0.1.5-xfdsh.2',
+      '@deepseek-ai/dsh-session': '0.1.5-rc.5',
+      '@deepseek-ai/dsh-session-timeline': '0.1.5-xfdsh.2',
     })
     expect(readFileSync(join(root, PUBLISH_ORDER_FILE), 'utf8')).toBe('x1a0f3n9-dsh-0.1.5-rc.5.tgz\n')
   })
@@ -113,7 +113,7 @@ describe('packed family directory rewrite', () => {
     const extracted = join(root, 'package')
     mkdirSync(extracted)
     writeFileSync(join(extracted, 'package.json'), `${JSON.stringify({
-      name: '@x1a0f3n9/dsh',
+      name: '@deepseek-ai/dsh',
       version: '0.1.5-rc.5',
     }, null, 2)}\n`)
     const fromDir = join(root, 'from')
@@ -132,7 +132,7 @@ describe('packed family directory rewrite', () => {
     expect(rewritten).toEqual(['xfcodeai-dsh-0.1.5-rc.5.tgz'])
     expect(readFileSync(join(outDir, PUBLISH_ORDER_FILE), 'utf8')).toBe('xfcodeai-dsh-0.1.5-rc.5.tgz\n')
     expect(packedIdentity(join(outDir, 'xfcodeai-dsh-0.1.5-rc.5.tgz'))).toEqual({
-      name: '@xfcodeai/dsh',
+      name: '@deepseek-ai/dsh',
       version: '0.1.5-rc.5',
     })
   })

@@ -3,7 +3,7 @@ description: "Browser-use provider registration for deployments that enable one 
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-browser-use
+# @deepseek-ai/dsh-browser-use
 
 English | [中文](README.zh.md)
 
@@ -28,10 +28,10 @@ A deployment can enable one browser-use provider at a time. Loading another prov
 Mount the service once beside the chosen provider in a Cordis composition:
 
 ```yaml
-- name: '@x1a0f3n9/dsh-browser-use'
+- name: '@deepseek-ai/dsh-browser-use'
 ```
 
-The service has no configuration. Provider plugins inject `browserUse` and call `ctx.browserUse.register(BrowserUseProviderName(name))`; the brand is exported from `@x1a0f3n9/dsh-browser-use/brand`. The returned effect disposer releases that registration.
+The service has no configuration. Provider plugins inject `browserUse` and call `ctx.browserUse.register(BrowserUseProviderName(name))`; the brand is exported from `@deepseek-ai/dsh-browser-use/brand`. The returned effect disposer releases that registration.
 
 Providers stop admitting tool calls, close their resources, and await owned work before releasing the registration. `ctx.browserUse.providerName` reports the registered name until release.
 
@@ -44,8 +44,6 @@ Providers stop admitting tool calls, close their resources, and await owned work
 <summary>Implementation internals — click to expand</summary>
 
 One private name owns the slot. Cordis effects remove contributions when their plugin unloads; a repeated disposer cannot remove a later registration. The [source](src/index.ts) contains no browser object, operation interface, resource lifecycle, or provider selector.
-
-No runtime invariant companion is published: the registry has one authoritative field and exposes no independently maintained observation that can diverge. Duplicate rejection and plugin disposal are covered by the owning tests.
 
 </details>
 

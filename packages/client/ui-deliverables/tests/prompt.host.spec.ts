@@ -3,7 +3,7 @@
 import { readFile } from 'node:fs/promises'
 import { Context } from '@deepseek-ai/cordis'
 import { afterEach, describe, expect, it } from 'vitest'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import { apply, inject } from '../src/index.ts'
 
 let ctx: Context | undefined

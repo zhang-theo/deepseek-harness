@@ -3,7 +3,7 @@ description: "完整的 V2 到 V3 会话转换：系统头节点、经过审计�
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-session-format-v2-to-v3
+# @deepseek-ai/dsh-session-format-v2-to-v3
 
 [English](README.md) | 中文
 
@@ -69,7 +69,7 @@ const targetHeader = sessionFormatV2ToV3.migrateHeader(sourceHeader)
 
 在每条 `request/header` 处，缺失的 `data.header.system` 表示空提示词；否则，其字符串与当前提示词进行精确比较。发生变化时，在该请求头之前立即插入系统消息，恰好替换当前受保护的头节点，并在 `sourceEventSeqs` 中引用它。提示词不变时不插入消息。空字符串和缺失字段会清空先前的提示词；仅含空白的字符串仍为非空文本。每个请求头都会移除 `data.header.system`，无论是否需要替换。
 
-合成消息携带开放步骤的 `turn` 和 `step`、锚点事件的 `time`、角色 `system`，以及来源 `{ kind: 'plugin', plugin: '@x1a0f3n9/dsh-system-prompt' }`。空提示词使用 `content: []`；其他提示词使用包含精确字符串的单个文本块。首次追加没有源事件引用；每次替换的两个端点及唯一源引用都使用前一头节点的目标序号。空头节点保持受保护，但不产生模型消息。
+合成消息携带开放步骤的 `turn` 和 `step`、锚点事件的 `time`、角色 `system`，以及来源 `{ kind: 'plugin', plugin: '@deepseek-ai/dsh-system-prompt' }`。空提示词使用 `content: []`；其他提示词使用包含精确字符串的单个文本块。首次追加没有源事件引用；每次替换的两个端点及唯一源引用都使用前一头节点的目标序号。空头节点保持受保护，但不产生模型消息。
 
 每个合成标识由 `v2-to-v3-system-` 加上 `JSON.stringify(['session-format-v2-to-v3', sourceHeader.id, anchor.seq, anchor.type])` 的十六进制 SHA-256 构成。首次创建的锚点是源 `step/start`，替换的锚点是提示词变化的 `request/header`。与已生成或源消息标识的冲突均被拒绝，不受遇到顺序影响；检查范围包括收件箱插入消息与标题请求消息中的标识。现有消息标识绝不改变。特别是，`TOOL_NOT_STARTED` 修复标识保留规范的历史 `interrupted-tool-result-<callId>-<integer>` 后缀；该后缀不是目标序列坐标。
 
@@ -155,7 +155,7 @@ V2 `session-log-deepseek/delivery-accepted` 若携带 `data.sessionFormatVersion
 <details>
 <summary>实现细节 — 点击展开</summary>
 
-[阶段](src/migration.ts)拥有每份产物独立的同步序列映射、消息身份集合和提示词/生命周期状态。紧凑事件段增量展开。[编解码器](src/codec.ts)复用冻结的 V2 分帧；[恢复器](src/validation.ts)先校验 V3 结构，再向冻结的普通关系校验提供私有 system/PTC/修复标识与端点视图。该视图为投递检查保留实际目标代次，且绝不对外返回：恢复返回原始 V3 产物与身份。冻结的 V0 到 V1 和 V1 到 V2 语义保持不变。本库不拥有可独立观察的注册或状态副本，因此不发布运行时不变量伴随入口。
+[阶段](src/migration.ts)拥有每份产物独立的同步序列映射、消息身份集合和提示词/生命周期状态。紧凑事件段增量展开。[编解码器](src/codec.ts)复用冻结的 V2 分帧；[恢复器](src/validation.ts)先校验 V3 结构，再向冻结的普通关系校验提供私有 system/PTC/修复标识与端点视图。该视图为投递检查保留实际目标代次，且绝不对外返回：恢复返回原始 V3 产物与身份。冻结的 V0 到 V1 和 V1 到 V2 语义保持不变。
 
 [组合目录测试](tests/combined-migration.spec.ts)验证转换组合与原生重新打开；[迁移测试](tests/migration.spec.ts)和[规范测试](tests/canonical-envelopes.spec.ts)固定保留与拒绝规则。[持久化集成](../session-persistence-jsonl/tests/v2-ptc-migration.spec.ts)负责发布证据。[已发布格式决策](../../../.agents/notes/implemented/architecture/2026-08-31-released-session-format-migrations.zh.md)负责将相邻组合测试与原生准入测试分开的依据。
 

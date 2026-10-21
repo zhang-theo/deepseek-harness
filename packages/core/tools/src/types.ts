@@ -1,11 +1,12 @@
 /**
  * Durable Tool event vocabulary shared with type-only consumers.
  *
- * @module @x1a0f3n9/dsh-tools/types
+ * @module @deepseek-ai/dsh-tools/types
  */
 
-import type { ToolCallId } from '@x1a0f3n9/dsh-llm/brand'
-import type { ContentBlock } from '@x1a0f3n9/dsh-llm/types'
+import type { ToolCallId } from '@deepseek-ai/dsh-llm/brand'
+import type { ContentBlock } from '@deepseek-ai/dsh-llm/types'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 
 /** Payload recorded when one nested PTC mode Tool dispatch starts. */
 export interface PtcDispatchStartEventData {
@@ -20,11 +21,13 @@ export interface PtcDispatchStartEventData {
 export interface PtcDispatchEventData extends PtcDispatchStartEventData {
   isError: boolean
   content: ContentBlock[]
+  /** Replayable tool-owned presentation metadata, separate from model content. */
+  meta?: JsonValue
   /** Optional failure identity and raw user-facing detail, outside model-facing content. */
   error?: { name: string; code: string; reason?: string }
 }
 
-declare module '@x1a0f3n9/dsh-session/types' {
+declare module '@deepseek-ai/dsh-session/types' {
   interface SessionEventMap {
     /**
      * One sub-dispatch STARTING inside a `run_code` program: the parent
@@ -45,8 +48,8 @@ declare module '@x1a0f3n9/dsh-session/types' {
      * `tool/ptc-dispatch-start` with the same `subCallId`), the tool `name`
      * with the same JSON-normalized `arguments`, and the sub-call's complete
      * durable outcome in `tool/result`'s own vocabulary (`content` + `isError`
-     * + optional structured `error`), so UIs and SDKs render a sub-call through
-     * the exact path used for a native call. Every started sub-call settles
+     * + optional presentation `meta` and structured `error`), so UIs and SDKs
+     * render a sub-call through the exact path used for a native call. Every started sub-call settles
      * with exactly one of these (abort included: the aborted pipeline result
      * is an `isError` outcome).
      * Log-only: `deriveMessages()` ignores it, so sub-calls never re-enter

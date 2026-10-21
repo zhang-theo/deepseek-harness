@@ -19,7 +19,7 @@ import {
 describe('verify-cordis-config metadata expressions', () => {
   it('accepts a disabled !!js expression', () => {
     const problems = metadataExpressionErrors(
-      { id: 'tool-bash', name: '@x1a0f3n9/dsh-tool-bash', disabled: { __jsExpr: "process.platform === 'win32'" } },
+      { id: 'tool-bash', name: '@deepseek-ai/dsh-tool-bash', disabled: { __jsExpr: "process.platform === 'win32'" } },
       '[0]',
     )
     expect(problems).toEqual([])
@@ -56,11 +56,11 @@ describe('workspace Bundle discovery and product dependency closures', () => {
       mkdirSync(bundleDir, { recursive: true })
       mkdirSync(plainDir, { recursive: true })
       writeFileSync(join(bundleDir, 'package.json'), JSON.stringify({
-        name: '@x1a0f3n9/dsh-subagent-example',
+        name: '@deepseek-ai/dsh-subagent-example',
         dsh: { bundle: { patch: './cordis.patch.yml' } },
       }))
       writeFileSync(join(plainDir, 'package.json'), JSON.stringify({
-        name: '@x1a0f3n9/dsh-plain',
+        name: '@deepseek-ai/dsh-plain',
       }))
 
       expect(bundleManifestPaths(fixture)).toEqual([
@@ -75,16 +75,16 @@ describe('workspace Bundle discovery and product dependency closures', () => {
     const manifestPath = 'packages/subagent/example/package.json'
     const file = 'packages/subagent/example/cordis.patch.yml'
     const manifest = {
-      name: '@x1a0f3n9/dsh-subagent-example',
+      name: '@deepseek-ai/dsh-subagent-example',
       dependencies: {},
     }
-    const self = { file, name: '@x1a0f3n9/dsh-subagent-example' }
+    const self = { file, name: '@deepseek-ai/dsh-subagent-example' }
     expect(bundlePluginDependencyErrors(manifestPath, manifest, [self])).toEqual([])
     expect(bundlePluginDependencyErrors(manifestPath, manifest, [
       self,
-      { file, name: '@x1a0f3n9/dsh-missing-plugin' },
+      { file, name: '@deepseek-ai/dsh-missing-plugin' },
     ])).toEqual([
-      `${file}: @x1a0f3n9/dsh-missing-plugin must be declared in ${manifestPath} dependencies`,
+      `${file}: @deepseek-ai/dsh-missing-plugin must be declared in ${manifestPath} dependencies`,
     ])
   })
 })
@@ -94,18 +94,18 @@ describe('package-owned Loader test dependency closures', () => {
     const manifestPath = 'packages/example/owner/package.json'
     const file = 'packages/example/owner/tests/fixtures/cordis.yml'
     const manifest = {
-      name: '@x1a0f3n9/dsh-owner',
+      name: '@deepseek-ai/dsh-owner',
       dependencies: {},
       devDependencies: {
-        '@x1a0f3n9/dsh-declared': 'workspace:^',
+        '@deepseek-ai/dsh-declared': 'workspace:^',
       },
     }
     expect(packageTestPluginDependencyErrors(manifestPath, manifest, [
-      { file, name: '@x1a0f3n9/dsh-owner' },
-      { file, name: '@x1a0f3n9/dsh-declared' },
-      { file, name: '@x1a0f3n9/dsh-missing' },
+      { file, name: '@deepseek-ai/dsh-owner' },
+      { file, name: '@deepseek-ai/dsh-declared' },
+      { file, name: '@deepseek-ai/dsh-missing' },
     ])).toEqual([
-      `${file}: @x1a0f3n9/dsh-missing must be declared in ${manifestPath} dependencies or devDependencies`,
+      `${file}: @deepseek-ai/dsh-missing must be declared in ${manifestPath} dependencies or devDependencies`,
     ])
   })
 
@@ -116,25 +116,25 @@ describe('package-owned Loader test dependency closures', () => {
       const driverDir = join(packageDir, 'tests/fixtures/loader')
       mkdirSync(driverDir, { recursive: true })
       writeFileSync(join(packageDir, 'package.json'), JSON.stringify({
-        name: '@x1a0f3n9/dsh-owner',
+        name: '@deepseek-ai/dsh-owner',
         devDependencies: {
-          '@x1a0f3n9/dsh-declared': 'workspace:^',
+          '@deepseek-ai/dsh-declared': 'workspace:^',
         },
       }))
       writeFileSync(join(driverDir, 'driver.ts'), [
-        "import '@x1a0f3n9/dsh-owner'",
-        "import '@x1a0f3n9/dsh-declared'",
-        "import '@x1a0f3n9/dsh-missing'",
+        "import '@deepseek-ai/dsh-owner'",
+        "import '@deepseek-ai/dsh-declared'",
+        "import '@deepseek-ai/dsh-missing'",
       ].join('\n'))
       writeFileSync(join(driverDir, 'cordis.yml'), '[]\n')
-      writeFileSync(join(driverDir, 'fixture.mjs'), "import '@x1a0f3n9/dsh-declared'\n")
+      writeFileSync(join(driverDir, 'fixture.mjs'), "import '@deepseek-ai/dsh-declared'\n")
       const unrelatedDir = join(packageDir, 'tests/fixtures/unrelated')
       mkdirSync(unrelatedDir, { recursive: true })
-      writeFileSync(join(unrelatedDir, 'driver.ts'), "import '@x1a0f3n9/dsh-unrelated'\n")
+      writeFileSync(join(unrelatedDir, 'driver.ts'), "import '@deepseek-ai/dsh-unrelated'\n")
 
       expect(packageTestFixtureDependencyErrors(fixture)).toEqual([
         'packages/example/owner/tests/fixtures/loader/driver.ts: '
-        + '@x1a0f3n9/dsh-missing must be declared in '
+        + '@deepseek-ai/dsh-missing must be declared in '
         + 'packages/example/owner/package.json dependencies or devDependencies',
       ])
     } finally {

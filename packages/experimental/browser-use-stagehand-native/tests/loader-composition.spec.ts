@@ -8,16 +8,16 @@ import { afterEach, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
 import Include from '@deepseek-ai/cordis-plugin-include'
-import AgentRegistry from '@x1a0f3n9/dsh-agent'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
-import BrowserUseRegistry from '@x1a0f3n9/dsh-browser-use'
-import LocalAttachmentStore from '@x1a0f3n9/dsh-attachment-local'
-import LlmRuntime, { LlmAdapter, ToolCallId, createUserMessage } from '@x1a0f3n9/dsh-llm'
-import type { GenerateOptions, LlmResolvedModelInfo, StreamChunk } from '@x1a0f3n9/dsh-llm'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import ToolRuntime from '@x1a0f3n9/dsh-tools'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
+import BrowserUseRegistry from '@deepseek-ai/dsh-browser-use'
+import LocalAttachmentStore from '@deepseek-ai/dsh-attachment-local'
+import LlmRuntime, { LlmAdapter, ToolCallId, createUserMessage } from '@deepseek-ai/dsh-llm'
+import type { GenerateOptions, LlmResolvedModelInfo, StreamChunk } from '@deepseek-ai/dsh-llm'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import ToolRuntime from '@deepseek-ai/dsh-tools'
 import * as Provider from '../src/index.ts'
 import { resetFixture, screenshotBase64 } from './fixtures/stagehand.ts'
 
@@ -75,22 +75,22 @@ it('loads browser tools from cordis.yml, logs browser results, and admits the sc
   resetFixture()
   root = await mkdtemp(join(tmpdir(), 'dsh-stagehand-composition-'))
   const modules = new Map<string, unknown>([
-    ['@x1a0f3n9/dsh-llm', LlmRuntime],
-    ['@x1a0f3n9/dsh-session', SessionStore],
-    ['@x1a0f3n9/dsh-session-projection', SessionProjectionRegistry],
-    ['@x1a0f3n9/dsh-system-prompt', SystemPrompt],
-    ['@x1a0f3n9/dsh-tools', ToolRuntime],
-    ['@x1a0f3n9/dsh-agent', AgentRegistry],
-    ['@x1a0f3n9/dsh-agent-loop', AgentLoop],
-    ['@x1a0f3n9/dsh-attachment-local', LocalAttachmentStore],
-    ['@x1a0f3n9/dsh-browser-use', BrowserUseRegistry],
-    ['@x1a0f3n9/dsh-experimental-browser-use-stagehand-native', Provider],
+    ['@deepseek-ai/dsh-llm', LlmRuntime],
+    ['@deepseek-ai/dsh-session', SessionStore],
+    ['@deepseek-ai/dsh-session-projection', SessionProjectionRegistry],
+    ['@deepseek-ai/dsh-system-prompt', SystemPrompt],
+    ['@deepseek-ai/dsh-tools', ToolRuntime],
+    ['@deepseek-ai/dsh-agent', AgentRegistry],
+    ['@deepseek-ai/dsh-agent-loop', AgentLoop],
+    ['@deepseek-ai/dsh-attachment-local', LocalAttachmentStore],
+    ['@deepseek-ai/dsh-browser-use', BrowserUseRegistry],
+    ['@deepseek-ai/dsh-experimental-browser-use-stagehand-native', Provider],
   ])
   const configPath = join(root, 'cordis.yml')
   await writeFile(configPath, [...modules.keys()].flatMap(name => [
     `- name: '${name}'`,
-    ...name === '@x1a0f3n9/dsh-attachment-local' ? ['  config:', `    dshHome: ${JSON.stringify(root)}`] : [],
-    ...name === '@x1a0f3n9/dsh-experimental-browser-use-stagehand-native' ? ['  config:', '    mode: launch', '    model:', '      modelName: openai/gpt-5.4-mini', '      apiKey: fixture-model-key'] : [],
+    ...name === '@deepseek-ai/dsh-attachment-local' ? ['  config:', `    dshHome: ${JSON.stringify(root)}`] : [],
+    ...name === '@deepseek-ai/dsh-experimental-browser-use-stagehand-native' ? ['  config:', '    mode: launch', '    model:', '      modelName: openai/gpt-5.4-mini', '      apiKey: fixture-model-key'] : [],
   ]).join('\n') + '\n')
   const context = ctx = new Context()
   context.baseUrl = pathToFileURL(root).href + '/'

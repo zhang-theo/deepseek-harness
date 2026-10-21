@@ -22,13 +22,13 @@ import { fileURLToPath } from 'node:url'
 import type { Browser, Page } from 'playwright'
 import { chromium } from 'playwright'
 import { afterAll, beforeAll, describe, expect, it, onTestFailed } from 'vitest'
-import { createMessage, createUserMessage } from '@x1a0f3n9/dsh-llm'
+import { createMessage, createUserMessage } from '@deepseek-ai/dsh-llm'
 import {
   SESSION_FORMAT_VERSION,
   Session,
   SessionId,
-} from '@x1a0f3n9/dsh-session'
-import type {} from '@x1a0f3n9/dsh-session-title'
+} from '@deepseek-ai/dsh-session'
+import type {} from '@deepseek-ai/dsh-session-title'
 import {
   assertFixtureInventory,
   compareOrRefreshGolden,
@@ -111,7 +111,7 @@ function tablesMarkdown(): string {
   ].join('\n')
 }
 
-/** Build one closed, invariant-checked session fixture carrying the tables. */
+/** Build one closed session fixture carrying the tables. */
 function wideTableFixture(): string {
   const session = Session.create(SessionId('markdown-wide-table-source'))
   const eventTimeOrigin = new Date().setHours(12, 0, 0, 0)

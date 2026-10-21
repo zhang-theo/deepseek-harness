@@ -38,7 +38,7 @@ importer 指发起 `import` 或 `require` 的那个模块文件。Node 从 impor
 
 拦截层是 importer 所属 profile 目录（`$DSH_HOME/profiles/<name>`）之上的第一个祖先 `node_modules`。树内所有 profile 的这一层都是 `$DSH_HOME/profiles/node_modules`。
 
-runtime resolution 中的每个包名，在这一层上占据 `<拦截层>/<包名>` 这个包目录的位置。对 `@x1a0f3n9/dsh-tools` 这样的本体包名，③ 上的包目录就是运行中安装的那一份；磁盘上同名的旧链接或旧目录不再是链上的成员。对 runtime resolution 没有的包名，③ 上的包目录就是磁盘上的物理内容。
+runtime resolution 中的每个包名，在这一层上占据 `<拦截层>/<包名>` 这个包目录的位置。对 `@deepseek-ai/dsh-tools` 这样的本体包名，③ 上的包目录就是运行中安装的那一份；磁盘上同名的旧链接或旧目录不再是链上的成员。对 runtime resolution 没有的包名，③ 上的包目录就是磁盘上的物理内容。
 
 一次裸包名请求的顺序：主线先走完 profile 目录内部的各层（①②），有候选就交给 Node 在候选内解析并返回。走到 ③ 时，runtime resolution 有该包名的条目，Node 就在条目记录的包目录内解析；找到就返回，包内缺文件则按 Node 自身对"已找到包"的处理继续，CommonJS 从 ④ 继续逐层找子路径，ESM 直接报错。runtime resolution 没有条目，Node 就看 ③ 的物理目录，再到 ④。
 
@@ -83,7 +83,7 @@ ESM 与 CommonJS 两个适配器调用同一个路由函数，主线程与 Harne
 
 #### 表 1：ESM 与 CommonJS 在各类请求下的主线与拦截
 
-下表以本体包 `@x1a0f3n9/dsh-tools`（runtime resolution 有条目）和第三方库 `left-pad`（runtime resolution 无条目）为例；`pkg` 泛指两者。
+下表以本体包 `@deepseek-ai/dsh-tools`（runtime resolution 有条目）和第三方库 `left-pad`（runtime resolution 无条目）为例；`pkg` 泛指两者。
 
 | 请求形态 | ESM | CommonJS | ③ 上该包名的位置 | 包内缺文件时 |
 |---|---|---|---|---|
@@ -108,13 +108,13 @@ ESM 与 CommonJS 两个适配器调用同一个路由函数，主线程与 Harne
 
 #### 表 3：插件被 link 到树外时的主线
 
-插件 `my-plugin` 被 `<profile>/node_modules/my-plugin` 链接到真实目录 R；R 的 manifest 把 `@x1a0f3n9/dsh-tools` 声明为 peer 并装成 devDependency，把 `zod` 声明为 dependency。
+插件 `my-plugin` 被 `<profile>/node_modules/my-plugin` 链接到真实目录 R；R 的 manifest 把 `@deepseek-ai/dsh-tools` 声明为 peer 并装成 devDependency，把 `zod` 声明为 dependency。
 
 | import 来源 → 目标 | hook 是否参与 | 结果 |
 |---|---|---|
 | profile → 链接的插件 | 参与到 ② 为止 | ② 的软链接被 Node 跟随，插件以真实路径加载 |
 | 链接插件 → `zod` | 参与，`R/node_modules` 上 `zod` 未被占据 | `R/node_modules/zod`，开发者自己安装的版本 |
-| 链接插件 → `@x1a0f3n9/dsh-tools`（peer） | 参与，`R/node_modules` 上该名被占据 | 运行中的 dsh 的那一份；`R/node_modules` 里的 devDependency 副本不被读到 |
+| 链接插件 → `@deepseek-ai/dsh-tools`（peer） | 参与，`R/node_modules` 上该名被占据 | 运行中的 dsh 的那一份；`R/node_modules` 里的 devDependency 副本不被读到 |
 | 链接插件 → 只声明为 dependency 的有状态 dsh 包 | 参与，未被占据 | `R/node_modules` 里自己的副本，产生第二个实例；与树内把 dsh 包装进 ② 的错误相同，改为 peer 即可 |
 | 链接插件 → 未声明的包名 | 参与，R 不占据该包名 | `R/node_modules` 的物理内容，再沿真实祖先链逐位置应用同一规则 |
 | R 内传递依赖 → 任何包名 | 参与 | 每个位置使用自己的 manifest 的 peer；更近的物理候选先于后续 peer 声明 |
@@ -135,9 +135,9 @@ ESM 与 CommonJS 两个适配器调用同一个路由函数，主线程与 Harne
 
 `npm link`，或 `dsh plugin add ../my-plugin` 这类裸目录路径（pnpm 按 `link:` 处理），会让 profile 里的条目成为指向插件仓库的软链接，仓库目录成为 linked root。插件以真实路径加载。查找到其 manifest 的 peer 位置时，匹配的运行时条目由当前运行的安装提供，无论 dsh 来自 npm 全局安装、Desktop 内置还是源码仓启动。该位置的 devDependency 副本服务编译器，普通请求不会加载它。link 指向无 manifest 的 `src` 目录时，也可以通过同一条祖先查询使用父目录的 peer。
 
-manifest 的写法与 harness 自身的包相同：需要与宿主共享实例的 dsh 包同时声明在 `peerDependencies` 与 `devDependencies`，peer 让 `R/node_modules` 上的位置被占据，dev 副本给编译器和独立测试使用；第三方依赖以及 `@x1a0f3n9/dsh-brand`、`@x1a0f3n9/dsh-util-values` 这类无状态 dsh 工具包放在 `dependencies`。修改 `peerDependencies` 后，重新加载插件时的新解析会使用新声明；已加载模块的生命周期仍由 Node 和 Cordis 管理。
+manifest 的写法与 harness 自身的包相同：需要与宿主共享实例的 dsh 包同时声明在 `peerDependencies` 与 `devDependencies`，peer 让 `R/node_modules` 上的位置被占据，dev 副本给编译器和独立测试使用；第三方依赖以及 `@deepseek-ai/dsh-brand`、`@deepseek-ai/dsh-util-values` 这类无状态 dsh 工具包放在 `dependencies`。修改 `peerDependencies` 后，重新加载插件时的新解析会使用新声明；已加载模块的生命周期仍由 Node 和 Cordis 管理。版本相同也不会让不同目录中的副本共享模块局部状态。仅把 scope 标记改成 `Symbol.for` 同样无法共享 scope 父关系、carrier key 或注册表；承载身份的运行时必须解析到 Host 实例。
 
-另两种可用布局：插件仓库自装 `@x1a0f3n9/dsh` 并从仓库里启动 `pnpm exec dsh --profile <name>`；或把 dsh 包 link 到本机源码仓并从源码仓启动。两者让运行中的 dsh 与仓库里的副本本来就是同一份，但 linked 插件不要求使用这两种布局。
+另两种可用布局：插件仓库自装 `@deepseek-ai/dsh` 并从仓库里启动 `pnpm exec dsh --profile <name>`；或把 dsh 包 link 到本机源码仓并从源码仓启动。两者让运行中的 dsh 与仓库里的副本本来就是同一份，但 linked 插件不要求使用这两种布局。
 
 ## Alternatives considered
 

@@ -7,16 +7,17 @@
  * imports no provider.
  *
  * Namespace plugin (named exports, no default export).
- * @module @x1a0f3n9/dsh-tool-lsp
+ * @module @deepseek-ai/dsh-tool-lsp
  */
 
+import type {} from '@deepseek-ai/dsh-working-directory'
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { defineTool } from '@x1a0f3n9/dsh-tools'
-import { LspError } from '@x1a0f3n9/dsh-lsp'
-import type {} from '@x1a0f3n9/dsh-lsp'
-import { MAX_TIMER_DELAY_MS } from '@x1a0f3n9/dsh-timeout'
-import { assertNever } from '@x1a0f3n9/dsh-util-values'
+import { defineTool } from '@deepseek-ai/dsh-tools'
+import { LspError } from '@deepseek-ai/dsh-lsp'
+import type {} from '@deepseek-ai/dsh-lsp'
+import { MAX_TIMER_DELAY_MS } from '@deepseek-ai/dsh-timeout'
+import { assertNever } from '@deepseek-ai/dsh-util-values'
 import {
   DEFAULT_MAX_LOCATIONS,
   DEFAULT_MAX_RESULT_CHARS,
@@ -26,7 +27,6 @@ import {
   parseLspArgs,
   presentLspCall,
 } from './render.ts'
-import { sessionCwd } from './session-cwd.ts'
 
 export {
   DEFAULT_MAX_LOCATIONS,
@@ -38,13 +38,12 @@ export {
   presentLspCall,
   renderUri,
 } from './render.ts'
-export { sessionCwd } from './session-cwd.ts'
 
 /** Cordis plugin name for loader diagnostics. */
 export const name = 'tool-lsp'
 
 /** Services required by this plugin. */
-export const inject = ['tools', 'lsp', 'systemPrompt']
+export const inject = ['tools', 'lsp', 'systemPrompt', 'workingDirectory']
 
 /** Default tool-call timeout budget (ms), covering the queued open/query/close lifecycle. */
 export const DEFAULT_LSP_TOOL_TIMEOUT_MS = 60_000
@@ -182,7 +181,7 @@ export function apply(ctx: Context, config: Config): void {
     timeoutMs: resolved.timeoutMs,
     async execute(args, exec) {
       const input = parseLspArgs(args)
-      const workspaceRoot = sessionCwd(exec)
+      const workspaceRoot = exec.agent === undefined ? undefined : await ctx.workingDirectory.ensure(exec.agent, exec.signal)
       if (workspaceRoot === undefined) {
         throw new LspError('the lsp tool requires a session workspace cwd', 'LSP_WORKSPACE_REQUIRED')
       }

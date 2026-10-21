@@ -11,9 +11,9 @@
  */
 
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
-import type { HostObservable, SnapshotSelectorHook } from '@x1a0f3n9/dsh-client-ui-slots'
-import type { ScheduleCatalogEntry } from '@x1a0f3n9/dsh-schedule/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+import type { HostObservable, SnapshotSelectorHook } from '@deepseek-ai/dsh-client-ui-slots'
+import type { ScheduleCatalogEntry } from '@deepseek-ai/dsh-schedule/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import { createCatalogSource, type CatalogInjected, type CatalogSnapshot } from './catalog-source.ts'
 
 /** Per-Session source factory handed to the Session-header catalog occupant. */

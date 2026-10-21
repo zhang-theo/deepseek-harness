@@ -2,11 +2,11 @@
 
 import { Context } from '@deepseek-ai/cordis'
 import { describe, expect, it, vi } from 'vitest'
-import { resolveSlotLabel } from '@x1a0f3n9/dsh-client-ui-slots'
-import { SlotRegistry } from '@x1a0f3n9/dsh-client-ui-renderer/client'
-import { RemoteError, TestRemote } from '@x1a0f3n9/dsh-client-test-runtime'
-import { LocaleRuntime } from '@x1a0f3n9/dsh-client-locale/client'
-import { apply as settingsApply, inject as settingsInject } from '@x1a0f3n9/dsh-client-ui-settings/client'
+import { resolveSlotLabel } from '@deepseek-ai/dsh-client-ui-slots'
+import { SlotRegistry } from '@deepseek-ai/dsh-client-ui-renderer/client'
+import { RemoteError, TestRemote } from '@deepseek-ai/dsh-client-test-runtime'
+import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
+import { apply as settingsApply, inject as settingsInject } from '@deepseek-ai/dsh-client-ui-settings/client'
 import { apply, inject, NS } from '../src/client/index.ts'
 import type { SubagentCardFace } from '../src/client/index.ts'
 import { SubagentModelSelectionCardController } from '../src/client/subagent-model-selection-card-controller.ts'
@@ -61,7 +61,7 @@ describe('ui-settings-subagent apply', () => {
 
     await vi.waitFor(() => { expect(slots.entries('plugins.item')).toHaveLength(1) })
     const entry = slots.entries('plugins.item')[0]!
-    expect(entry.options).toMatchObject({ id: 'subagent', order: 30 })
+    expect(entry.options).toMatchObject({ id: 'subagent', order: 10 })
     expect(resolveSlotLabel(entry.options.label)).toBe('子智能体')
     expect(entry.locale).toBe(NS)
     const face = (entry.inject as () => Pick<SubagentCardFace, 'hooks'>)()

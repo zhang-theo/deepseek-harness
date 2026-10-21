@@ -8,8 +8,8 @@
 import { readFileSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
-import { ok, RemoteMock } from '@x1a0f3n9/dsh-remote-mock'
-import { remoteDefaultResponses } from '@x1a0f3n9/dsh-client-test-runtime/src/assembly/remote-default-responses.ts'
+import { ok, RemoteMock } from '@deepseek-ai/dsh-remote-mock'
+import { remoteDefaultResponses } from '@deepseek-ai/dsh-client-test-runtime/src/assembly/remote-default-responses.ts'
 
 interface SessionSummary {
   readonly sessionId: string
@@ -223,8 +223,8 @@ export function createAssembledRemote(options: AssembledRemoteOptions = {}): Ass
     return ok(undefined)
   })
   mock.unary('session/list', () => ok({ items: structuredClone(sessions) }))
-  // The shipped Web composition mounts the Schedule client, whose catalog and
-  // per-Session list read empty here: these scenarios drive no reminder.
+  // The shipped composition mounts the `ui-schedule` row, so the Schedule
+  // client reads the catalog and the per-Session list over this mock.
   mock.unary('schedule/catalog', () => ok([]))
   mock.unary('schedule/list', () => ok([]))
   mock.unary('session/projections', (request: unknown) => {

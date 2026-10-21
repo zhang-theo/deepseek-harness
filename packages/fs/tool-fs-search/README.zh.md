@@ -3,7 +3,7 @@ description: "面向模型的 glob 与 grep 发现工具：供组合或排查 ag
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-tool-fs-search
+# @deepseek-ai/dsh-tool-fs-search
 
 [English](README.md) | 中文
 
@@ -25,6 +25,8 @@ kind: "package-reference"
 <a id="use-this-package"></a>
 ## 使用本包
 
+搜索使用 Session 的当前工作目录，包括通过 `working_directory` 切换后的目录。
+
 在 `ctx.subprocess` 后端之后挂载工具；无需宿主 `rg` 安装，也无需文件系统提供方。模型随后获得按修改时间排序的文件发现与按行组织的内容搜索，两者都有界并受超时防护。
 
 ### 最小组合
@@ -32,11 +34,11 @@ kind: "package-reference"
 一个子进程后端，然后是工具；spill 后端为可选，使达到上限的结果可完整恢复。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-subprocess-local'
-- name: '@x1a0f3n9/dsh-tool-fs-search'
+- name: '@deepseek-ai/dsh-subprocess-local'
+- name: '@deepseek-ai/dsh-tool-fs-search'
   config:
     sampleOverCapGlobResults: false
-- name: '@x1a0f3n9/dsh-spill-local'
+- name: '@deepseek-ai/dsh-spill-local'
 ```
 
 `sampleOverCapGlobResults` 是必填项且没有回退值：部署必须显式选择超过上限时的排序约定。格式化 spill 成功时，两种模式都会在 spill 产物中保留完整排序列表。
@@ -219,5 +221,3 @@ glob 描述声明了配置的超过上限排序方式。生成的 [`glob` 和 `g
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。这个面向模型的适配器没有独立生命周期流；执行关系由它调用的能力 seam 负责。

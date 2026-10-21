@@ -1,7 +1,7 @@
 /**
  * Process facts the startup provider reads, kept out of the `./startup` entry
  * so substituting them in tests adds no public package API.
- * @module @x1a0f3n9/dsh-headless/startup-internals
+ * @module @deepseek-ai/dsh-headless/startup-internals
  */
 
 /** Process facts the provider reads; tests substitute them. */

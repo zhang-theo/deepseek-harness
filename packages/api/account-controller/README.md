@@ -3,7 +3,7 @@ description: "Account screens use authenticated Remote commands and a snapshot s
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-api-account-controller
+# @deepseek-ai/dsh-api-account-controller
 
 English | [中文](README.zh.md)
 
@@ -31,7 +31,7 @@ Every operation that reaches Platform takes the calling UI's `AccountClientMetad
 <a id="understand-the-implementation"></a>
 ## Understand the implementation
 
-The controller forwards operations to the account service and maintains no independent account state; no invariant companion is published.
+The controller forwards operations to the account service and maintains no independent account state.
 
 <a id="further-exploration"></a>
 ## Further Exploration

@@ -1,6 +1,6 @@
 /**
  * Vendor adapters the pool dispatches. Credentialed adapters reject redirects.
- * @module @x1a0f3n9/dsh-web-search-pool/backends
+ * @module @deepseek-ai/dsh-web-search-pool/backends
  */
 
 import {
@@ -8,21 +8,21 @@ import {
   EXA_DEFAULT_HIGHLIGHTS_PER_RESULT,
   EXA_DEFAULT_SEARCH_TYPE,
   ExaSearchProvider,
-} from '@x1a0f3n9/dsh-web-search-exa'
+} from '@deepseek-ai/dsh-web-search-exa'
 import {
   PERPLEXITY_DEFAULT_BASE_URL,
   PERPLEXITY_DEFAULT_MAX_TOKENS,
   PERPLEXITY_DEFAULT_MODEL,
   PerplexitySearchProvider,
-} from '@x1a0f3n9/dsh-web-search-perplexity'
+} from '@deepseek-ai/dsh-web-search-perplexity'
 import {
   FREE_DEFAULT_BING_BASE_URL,
   FREE_DEFAULT_DDG_BASE_URL,
   FREE_DEFAULT_USER_AGENT,
   FreeSearchProvider,
-} from '@x1a0f3n9/dsh-web-search-free'
-import { WebError } from '@x1a0f3n9/dsh-web'
-import type { WebSearchRequest, WebSearchResult, WebSearchSource } from '@x1a0f3n9/dsh-web'
+} from '@deepseek-ai/dsh-web-search-free'
+import { WebError } from '@deepseek-ai/dsh-web'
+import type { WebSearchRequest, WebSearchResult, WebSearchSource } from '@deepseek-ai/dsh-web'
 import { poolFetchJson, poolFetchText, SEARCH_POOL_USER_AGENT, SearchPoolHttpError } from './http.ts'
 import type { SearchPoolBackendKind } from './types.ts'
 

@@ -38,7 +38,7 @@ The chain below defines the numbering that every table in this Note references. 
 
 The interception layer is the first ancestor `node_modules` above the importer's profile directory (`$DSH_HOME/profiles/<name>`). For every profile inside the tree this layer is `$DSH_HOME/profiles/node_modules`.
 
-Every package name in the runtime resolution occupies the package directory position `<interception layer>/<package>` at this layer. For an installation package name such as `@x1a0f3n9/dsh-tools`, the package directory at ③ is the copy of the running installation; an old link or old directory of the same name on disk is no longer a member of the chain. For a package name absent from the runtime resolution, the package directory at ③ is the physical content on disk.
+Every package name in the runtime resolution occupies the package directory position `<interception layer>/<package>` at this layer. For an installation package name such as `@deepseek-ai/dsh-tools`, the package directory at ③ is the copy of the running installation; an old link or old directory of the same name on disk is no longer a member of the chain. For a package name absent from the runtime resolution, the package directory at ③ is the physical content on disk.
 
 The order for one bare package name request: the ancestor chain first walks the layers inside the profile directory (① and ②), and when a candidate exists Node resolves inside that candidate and returns. On reaching ③, if the runtime resolution has an entry for that package name, Node resolves inside the package directory the entry records; a hit returns, and a missing file inside the package continues per Node's own handling of a "found package": CommonJS keeps looking for the subpath layer by layer from ④, ESM fails immediately. If the runtime resolution has no entry, Node looks at the physical directory at ③ and then moves on to ④.
 
@@ -83,7 +83,7 @@ The ESM and CommonJS adapters call the same routing function, and the main threa
 
 #### Table 1: Ancestor chain and interception for ESM and CommonJS across request forms
 
-The table uses the installation package `@x1a0f3n9/dsh-tools` (has a runtime resolution entry) and the third-party library `left-pad` (no runtime resolution entry) as examples; `pkg` stands for either.
+The table uses the installation package `@deepseek-ai/dsh-tools` (has a runtime resolution entry) and the third-party library `left-pad` (no runtime resolution entry) as examples; `pkg` stands for either.
 
 | Request form | ESM | CommonJS | Position of the package name at ③ | When a file is missing inside the package |
 |---|---|---|---|---|
@@ -108,13 +108,13 @@ After a runtime resolution hit, the `ERR_MODULE_NOT_FOUND` and `ERR_PACKAGE_PATH
 
 #### Table 3: Ancestor chain when a plugin is linked outside the tree
 
-The profile links `<profile>/node_modules/my-plugin` to the plugin's real directory R. R's manifest declares `@x1a0f3n9/dsh-tools` as a peer and installs it as a devDependency, and declares `zod` as a dependency.
+The profile links `<profile>/node_modules/my-plugin` to the plugin's real directory R. R's manifest declares `@deepseek-ai/dsh-tools` as a peer and installs it as a devDependency, and declares `zod` as a dependency.
 
 | Import source → target | Hook participates | Result |
 |---|---|---|
 | profile → linked plugin | Participates up to ② | Node follows the symlink at ②; the plugin loads by its real path |
 | Linked plugin → `zod` | Participates; `zod` is not occupied at `R/node_modules` | `R/node_modules/zod`, the developer's installed version |
-| Linked plugin → `@x1a0f3n9/dsh-tools` (peer) | Participates; the name is occupied at `R/node_modules` | The running dsh's copy; the devDependency copy in `R/node_modules` is not read |
+| Linked plugin → `@deepseek-ai/dsh-tools` (peer) | Participates; the name is occupied at `R/node_modules` | The running dsh's copy; the devDependency copy in `R/node_modules` is not read |
 | Linked plugin → a stateful dsh package declared only as a dependency | Participates; the name is not occupied | Its own copy in `R/node_modules`, creating a second instance; the same mistake as installing the dsh package at ② inside the tree. Declare it as a peer instead |
 | Linked plugin → undeclared package name | Participates; R does not occupy the name | Physical contents of `R/node_modules`, then the same per-position rule along the real ancestor chain |
 | Transitive dependency inside R → any package name | Participates | Each position uses its own manifest's peers; nearer physical candidates precede later peer declarations |
@@ -135,9 +135,9 @@ The plugin's own third-party dependencies are hoisted to `$DSH_HOME/profiles/<na
 
 `npm link`, or a bare directory path such as `dsh plugin add ../my-plugin` (which pnpm treats as `link:`), makes the profile entry a symlink to the plugin repository, which becomes a linked root. The plugin loads by its real path. When lookup reaches its manifest's peer position, the running installation supplies matching runtime entries, whether dsh was installed globally from npm, bundled with Desktop, or started from the source repository. The devDependency copy at that position serves the compiler and is not loaded by an ordinary request. A link to a `src` directory without a manifest can use a parent directory's peers through the same ancestor lookup.
 
-Use the same manifest declarations as the harness packages: declare dsh packages whose instances must be shared with the host under both `peerDependencies` and `devDependencies`. The peer declaration occupies their positions at `R/node_modules`; the dev copies serve the compiler and standalone tests. Keep third-party dependencies and stateless dsh utilities such as `@x1a0f3n9/dsh-brand` and `@x1a0f3n9/dsh-util-values` under `dependencies`. After changing `peerDependencies`, new resolutions during a plugin reload use the new declaration; Node and Cordis still own the lifetime of already loaded modules.
+Use the same manifest declarations as the harness packages: declare dsh packages whose instances must be shared with the host under both `peerDependencies` and `devDependencies`. The peer declaration occupies their positions at `R/node_modules`; the dev copies serve the compiler and standalone tests. Keep third-party dependencies and stateless dsh utilities such as `@deepseek-ai/dsh-brand` and `@deepseek-ai/dsh-util-values` under `dependencies`. After changing `peerDependencies`, new resolutions during a plugin reload use the new declaration; Node and Cordis still own the lifetime of already loaded modules. Equal package versions do not make copies from different directories share module-local state. Replacing only a scope tag with `Symbol.for` likewise cannot share scope parents, carrier keys, or registration tables; identity-bearing runtimes must resolve to the Host instance.
 
-Two other layouts remain available: install `@x1a0f3n9/dsh` in the plugin repository and run `pnpm exec dsh --profile <name>` there, or link dsh packages to a local source repository and start dsh from that repository. Both make the running dsh and the repository's copies identical, but linked plugins do not require either layout.
+Two other layouts remain available: install `@deepseek-ai/dsh` in the plugin repository and run `pnpm exec dsh --profile <name>` there, or link dsh packages to a local source repository and start dsh from that repository. Both make the running dsh and the repository's copies identical, but linked plugins do not require either layout.
 
 ## Alternatives considered
 

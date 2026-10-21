@@ -6,15 +6,15 @@
  * (`{ value, seq }`) comes from the connected Host — a follow opening
  * baseline, a Session Controller `projection` frame, a list block the Host
  * computed for an attached Session — and merges under **higher seq wins**
- * against other sequenced rows. A `cached` row (`{ value }`) comes from the
- * session list's view of the persisted checkpoint, carries no comparable
+ * against other sequenced rows. A `cached` row (`{ value }`) comes from
+ * a Host view of the persisted checkpoint, carries no comparable
  * seq, and yields to every sequenced write. No client-side domain folding
  * exists: a domain ships projection support with zero client code. Per-key
  * bare observable faces feed `useProjection` (ui-renderer binds them).
  */
-import type { SessionProjectionMap } from '@x1a0f3n9/dsh-session-projection/types'
-import type { SessionSeqCursor } from '@x1a0f3n9/dsh-session/types'
-import type { ObservableSnapshot } from '@x1a0f3n9/dsh-client-store'
+import type { SessionProjectionMap } from '@deepseek-ai/dsh-session-projection/types'
+import type { SessionSeqCursor } from '@deepseek-ai/dsh-session/types'
+import type { ObservableSnapshot } from '@deepseek-ai/dsh-client-store'
 import { Notifier } from './notifier.ts'
 
 // The single projection type table, typed end to end (host unit, wire block,
@@ -24,7 +24,7 @@ import { Notifier } from './notifier.ts'
 // client program (one program must not hold both sides). No second
 // client-side "views" table (rejected in the Alternatives of
 // .agents/notes/proposed/architecture/2026-07-27-session-projection-and-command-log.md).
-export type { SessionProjectionMap } from '@x1a0f3n9/dsh-session-projection/types'
+export type { SessionProjectionMap } from '@deepseek-ai/dsh-session-projection/types'
 
 /**
  * The fifth framework hook seat (see the session-projection subsystem page,
@@ -166,7 +166,7 @@ export class ProjectionValueStore {
   }
 
   /**
-   * Fill keys from a session-list block the Host labeled `cached`: a zero-I/O
+   * Fill keys from a Host block labeled `cached`: a zero-I/O
    * view of the persisted checkpoint. A cached value lands only where no
    * sequenced row exists: a connected Session has already answered for such
    * a key, and the list's view of the persisted checkpoint cannot be newer

@@ -1,5 +1,5 @@
-import type { ContentBlock, ToolSchema } from '@x1a0f3n9/dsh-llm/types'
-import type { SessionEvent } from '@x1a0f3n9/dsh-session/types'
+import type { ContentBlock, ToolSchema } from '@deepseek-ai/dsh-llm/types'
+import type { SessionEvent } from '@deepseek-ai/dsh-session/types'
 import type {
   AssistantProviderMetadataView, AssistantRequestConfig,
 } from './records.ts'
@@ -130,8 +130,9 @@ interface RequestViewBase {
   startedAt: number
   completedAt: number | null
   status: 'running' | 'complete' | 'error'
+  /** Failure detail; with assistant retry metadata, the last failed attempt even while running or after recovery. */
   error?: string
-  /** Stable provider code for localized presentation of known failures. */
+  /** Stable provider code for `error`, including retained attempt failures, for localized presentation. */
   errorCode?: string
   providerMetadata?: AssistantProviderMetadataView
   requestConfig?: AssistantRequestConfig

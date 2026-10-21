@@ -1,6 +1,6 @@
 /** Host configuration for browser document previews. */
 import type { Context } from '@deepseek-ai/cordis'
-import type {} from '@x1a0f3n9/dsh-host-webserver'
+import type {} from '@deepseek-ai/dsh-host-webserver'
 import type { Config } from './config.ts'
 
 export { Config } from './config.ts'

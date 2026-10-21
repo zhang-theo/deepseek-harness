@@ -1,21 +1,22 @@
 // @vitest-environment jsdom
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 /**
  * Browser-half lifecycle over the real SlotRegistry: the dictionary,
  * header-slot, and document-preview path registrations with fiber teardown
  * proving removal (HMR safety) and the injected controller faces.
  */
 
-import type { ShortcutCommand } from '@x1a0f3n9/dsh-client-shortcuts/client'
-import type { SessionListState } from '@x1a0f3n9/dsh-api-session-controller/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+import type { PropsRuntime, SlotComponent } from '@deepseek-ai/dsh-client-ui-slots'
+import type { ShortcutCommand } from '@deepseek-ai/dsh-client-shortcuts/client'
+import type { SessionListState } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import { Context } from '@deepseek-ai/cordis'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { SlotRegistry } from '@x1a0f3n9/dsh-client-ui-renderer/client'
-import { LocaleRuntime } from '@x1a0f3n9/dsh-client-locale/client'
-import { LayoutController, type MainPanelId } from '@x1a0f3n9/dsh-client-ui-layout/client'
-import { createLayoutStore } from '@x1a0f3n9/dsh-client-ui-layout/src/client/stores.ts'
-import type {} from '@x1a0f3n9/dsh-client-ui-conversation/client'
+import { SlotRegistry } from '@deepseek-ai/dsh-client-ui-renderer/client'
+import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
+import { LayoutController, type MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client'
+import { createLayoutStore } from '@deepseek-ai/dsh-client-ui-layout/src/client/stores.ts'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { apply, inject, type OpenInAppActionInjected, type OpenPathInjected } from '../src/client/index.ts'
 import { apply as nodeApply } from '../src/index.ts'
 import { OpenInAppAction } from '../src/client/OpenInAppAction.tsx'
@@ -45,6 +46,7 @@ async function bench() {
     name: 'root',
     children: {
       'conversation.session.header.utilities': { kind: 'list', scope: 'session' },
+      'sidebar.right.tab.files.actions': { kind: 'list', scope: 'session' },
       'sidebar.right.tab.document.actions': { kind: 'list', scope: 'session' },
       'sidebar.right.tab.document.unpreviewable': { kind: 'list', scope: 'session' },
       'deliverables.file.actions': { kind: 'list', scope: 'session' },
@@ -193,14 +195,31 @@ describe('open-in-app browser half', () => {
     expect(ctx.slots.entries('deliverables.file.actions')).toHaveLength(0)
   })
 
-  it('registers the header split button, and fiber teardown removes it (HMR safety)', async () => {
+  it('adapts the Session directory, shares the controller with the file tree, and removes both on teardown', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ apps: [] }), { status: 200 })))
-    const { ctx, fiber } = await bench()
-    const entry = ctx.slots.entries('conversation.session.header.utilities')[0]
-    expect(entry?.component).toBe(OpenInAppAction)
-    expect(entry?.options).toMatchObject({ id: 'open-in-app' })
-    await fiber.dispose()
+    const { ctx, fiber, list } = await bench()
+    try {
+      const entry = ctx.slots.entries('conversation.session.header.utilities')[0]
+      const files = ctx.slots.entries('sidebar.right.tab.files.actions')[0]
+      expect(files?.component).toBe(OpenInAppAction)
+      expect(files?.inject).toBe(entry?.inject)
+      expect(entry?.options).toMatchObject({ id: 'open-in-app' })
+      const header = entry?.component as SlotComponent<Pick<
+        PropsRuntime<'conversation.session.header.utilities'>, 'sessionId' | 'useSessions'
+      >>
+      const id = 'main' as SessionId
+      const props = { sessionId: id, useSessions: <T>(select: (state: SessionListState) => T) => select(list.getSnapshot()) }
+      expect(header(props)).toBeNull()
+      for (const cwd of ['', '/first', '/second']) {
+        list.set({ ...list.getSnapshot(), ids: [id], byId: {
+          [id]: { id, displayTitle: 'Main', cwd, running: false, blank: false, updatedAt: 0, retainedBy: {} },
+        } })
+        if (cwd === '') expect(header(props)).toBeNull()
+        else expect(header(props)).toMatchObject({ type: OpenInAppAction, props: { absolutePath: cwd } })
+      }
+    } finally { await fiber.dispose() }
     expect(headerEntryIds(ctx)).not.toContain('open-in-app')
+    expect(ctx.slots.entries('sidebar.right.tab.files.actions')).toHaveLength(0)
   })
 
   it('injects the controller face: availability sources, launch carrier, choice, and icon URLs', async () => {

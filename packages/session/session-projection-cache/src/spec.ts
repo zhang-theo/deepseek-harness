@@ -7,15 +7,15 @@
  * backend stores the domain `per-record`: one document per session under
  * `<root>/session_projcache/sessions/`, so a checkpoint write rewrites one
  * session's document instead of the whole unit).
- * @module @x1a0f3n9/dsh-session-projection-cache/src/spec
+ * @module @deepseek-ai/dsh-session-projection-cache/src/spec
  */
 
 import { z } from 'zod'
-import { isJsonValue } from '@x1a0f3n9/dsh-util-values'
-import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
-import { SessionLogOffset, SessionSeq } from '@x1a0f3n9/dsh-session'
-import type { SessionId, SessionSeqCursor } from '@x1a0f3n9/dsh-session'
-import { defineDomain, domainTable } from '@x1a0f3n9/dsh-storage-domain'
+import { isJsonValue } from '@deepseek-ai/dsh-util-values'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
+import { SessionLogOffset, SessionSeq } from '@deepseek-ai/dsh-session'
+import type { SessionId, SessionSeqCursor } from '@deepseek-ai/dsh-session'
+import { defineDomain, domainTable } from '@deepseek-ai/dsh-storage-domain'
 
 /**
  * One persisted checkpoint row (the RFC's `(sessionId, key, ver, seq, val)`
@@ -83,8 +83,7 @@ export type CheckpointRecord = z.infer<typeof checkpointRecord>
  * keep structurally valid predecessor records available for a later current
  * checkpoint rewrite. Records without `formatVersion` remain unusable as fold
  * shortcuts because they cannot prove which Session event semantics produced
- * their rows; the per-record version map and disposition live in the read-compat Agent Note
- * (.agents/notes/implemented/architecture/2026-09-02-projcache-cross-version-read-compat.md).
+ * their rows; the per-record version map and disposition live in this package's README.
  * The per-row `ver` guard and the identity match still discard anything the
  * current fold semantics cannot vouch for.
  *

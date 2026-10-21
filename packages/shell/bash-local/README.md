@@ -3,7 +3,7 @@ description: "The default POSIX Bash executor for deployments and maintainers ch
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-bash-local
+# @deepseek-ai/dsh-bash-local
 
 English | [中文](README.zh.md)
 
@@ -33,7 +33,7 @@ Load the executor with the budgets you want; every field has a default, so the s
 
 ```yaml
 - id: bash
-  name: '@x1a0f3n9/dsh-bash-local'
+  name: '@deepseek-ai/dsh-bash-local'
   config:
     cwd: /path/to/workspace
     timeoutMs: 120000
@@ -88,7 +88,6 @@ The executor is a Service Provider for the `ctx.shell` seam built on the subproc
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry: `LocalBashExecutor`, `Config`, settings-section wiring |
-| — | No runtime invariant companion is published; this package exposes no independent event sequence or mutable data relation beyond contracts enforced at its owning seam. |
 | `tests/executor.spec.ts` | Exercised behavior: budgets, classification, background handles, ownership |
 | `tests/settings.spec.ts` | Settings layering over the composition entry |
 

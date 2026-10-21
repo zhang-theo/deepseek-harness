@@ -1,7 +1,7 @@
 /**
  * Rewrite one packed dsh family from the checkout scope onto a publish scope.
  *
- * Git keeps `@x1a0f3n9/dsh-*`. `master` publishes `@xfcodeai/dsh-*` by rewriting
+ * Git keeps `@deepseek-ai/dsh-*`. `master` publishes `@deepseek-ai/dsh-*` by rewriting
  * packed tarballs after pack, so the two npm lines share one tree
  * ([rationale](../../.agents/notes/implemented/process/2026-09-20-master-xfcodeai-publish.md)).
  */
@@ -41,8 +41,8 @@ export function publishScopeMapping(
 }
 
 /**
- * Replace complete family package names. A shorter name such as `@x1a0f3n9/dsh`
- * does not rewrite `@x1a0f3n9/dsh-session-timeline`.
+ * Replace complete family package names. A shorter name such as `@deepseek-ai/dsh`
+ * does not rewrite `@deepseek-ai/dsh-session-timeline`.
  * @param text - file contents.
  * @param mapping - old name to new name.
  * @returns The rewritten text.

@@ -59,11 +59,11 @@ describe('dsh-base bundle', () => {
     })
     expect(rows.find(row => row.id === 'web-search-pool')).toBeUndefined()
     expect(rows.find(row => row.id === 'web-fetch-http')).toBeDefined()
-    expect(manifest.dependencies).not.toHaveProperty('@x1a0f3n9/dsh-web-search-pool')
+    expect(manifest.dependencies).not.toHaveProperty('@deepseek-ai/dsh-web-search-pool')
     expect(rows.find(row => row.id === 'tool-web')?.config).toMatchObject({ fetch: true })
-    expect(manifest.dependencies).not.toHaveProperty('@x1a0f3n9/dsh-subagent-codex')
-    expect(manifest.dependencies).not.toHaveProperty('@x1a0f3n9/dsh-subagent-claude-code')
-    expect(manifest.dependencies).toHaveProperty('@x1a0f3n9/dsh-web-fetch-http')
+    expect(manifest.dependencies).not.toHaveProperty('@deepseek-ai/dsh-subagent-codex')
+    expect(manifest.dependencies).not.toHaveProperty('@deepseek-ai/dsh-subagent-claude-code')
+    expect(manifest.dependencies).toHaveProperty('@deepseek-ai/dsh-web-fetch-http')
   })
 
   it('gates each shell stack by platform with a symmetric disabled expression', () => {

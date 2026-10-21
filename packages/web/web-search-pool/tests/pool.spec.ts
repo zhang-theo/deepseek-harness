@@ -6,7 +6,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import WebRuntime from '@x1a0f3n9/dsh-web'
+import WebRuntime from '@deepseek-ai/dsh-web'
 import {
   defaultApiKeyEnvNames,
   resolveBackendKeys,
@@ -14,8 +14,8 @@ import {
   SEARCH_POOL_DEFAULT_CIRCUIT,
   SEARCH_POOL_PROVIDER_ID,
   SearchPoolProvider,
-} from '@x1a0f3n9/dsh-web-search-pool'
-import * as poolPlugin from '@x1a0f3n9/dsh-web-search-pool'
+} from '@deepseek-ai/dsh-web-search-pool'
+import * as poolPlugin from '@deepseek-ai/dsh-web-search-pool'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' }, ...init })
@@ -288,10 +288,10 @@ describe('web-search-pool Loader composition', () => {
     try {
       const configPath = join(root, 'cordis.yml')
       await writeFile(configPath, [
-        "- name: '@x1a0f3n9/dsh-web'",
+        "- name: '@deepseek-ai/dsh-web'",
         '  config:',
         '    searchProvider: search-pool',
-        "- name: '@x1a0f3n9/dsh-web-search-pool'",
+        "- name: '@deepseek-ai/dsh-web-search-pool'",
         '  config:',
         '    backends:',
         '      - id: tavily',
@@ -305,8 +305,8 @@ describe('web-search-pool Loader composition', () => {
       await ctx.plugin(Loader)
       ctx.loader.builtins.include = Include
       const modules = new Map<string, unknown>([
-        ['@x1a0f3n9/dsh-web', WebRuntime],
-        ['@x1a0f3n9/dsh-web-search-pool', poolPlugin],
+        ['@deepseek-ai/dsh-web', WebRuntime],
+        ['@deepseek-ai/dsh-web-search-pool', poolPlugin],
       ])
       ctx.loader.internal = {
         version: 'v2',

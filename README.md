@@ -16,7 +16,7 @@ Read the [safety notice](SAFETY.md) before running.
 ### npm
 
 ```sh
-npm install --global @xfcodeai/dsh
+npm install --global @deepseek-ai/dsh
 xfdsh web
 ```
 
@@ -25,10 +25,10 @@ The command starts the Web UI at `http://127.0.0.1:7777` by default and opens it
 One-off without a global install:
 
 ```sh
-npx --package @xfcodeai/dsh xfdsh web
+npx --package @deepseek-ai/dsh xfdsh web
 ```
 
-A bare `xfdsh` on PATH comes from the global npm install. The development line from `dev-x1a0f3n9` uses `@x1a0f3n9/dsh` in the same commands.
+A bare `xfdsh` on PATH comes from the global npm install. The development line from `dev-x1a0f3n9` uses `@deepseek-ai/dsh` in the same commands.
 
 ### Source
 
@@ -59,7 +59,7 @@ It is built on an **everything-is-a-plugin** architecture and powered by [Cordis
 
 The rows below summarize user-visible and release-impacting fork changes. Merge commits that only integrate upstream are not listed.
 
-Development packages use `@x1a0f3n9/dsh-*`. `master` publishes `@xfcodeai/dsh-*` from the same tree. Vendor and native packages keep `@deepseek-ai/*`.
+Development packages use `@deepseek-ai/dsh-*`. `master` publishes `@deepseek-ai/dsh-*` from the same tree. Vendor and native packages keep `@deepseek-ai/*`.
 
 ### Preset plugins
 
@@ -67,15 +67,15 @@ Prebundled extras live on **Settings → xfdsh preset plugins**. Cards show the 
 
 | Plugin | Package | What it does |
 | --- | --- | --- |
-| Session timeline | `@x1a0f3n9/dsh-session-timeline@0.1.5-xfdsh.2` | Rewind, delete, regenerate, and a composer compact button. |
-| Plugin market | `@x1a0f3n9/dshmarket@1.45.2` | Browse community plugins. Official `@deepseek-ai/dsh-*` plugins remap into this runtime. |
-| Reasoning effort | `@x1a0f3n9/dsh-reasoning-effort@0.7.3` | Settings → Models lets each custom model choose Default (none) or Custom `reasoningEfforts`. The composer can then pick thinking strength. |
-| Context dashboard | `@x1a0f3n9/dsh-context@0.49.7` | A Context tab and `/context` show composition, compaction, and token use. Version detection reads this fork. |
-| Better sidebar | `@x1a0f3n9/dsh-better-sidebar@0.19.3` | Files, terminal, Git, and subagents in the sidebar workbench. |
-| Hindsight memory | `@x1a0f3n9/hindsight-coding-agents@0.5.2-xfdsh.4` | On by default. Uses a local daemon, not Cloud. Cloud or a self-hosted URL remains optional in `~/.hindsight/coding-agent.json`. |
-| Failover queue | `@x1a0f3n9/dsh-failover-queue@0.1.12` | Composer chip plus Settings → Failover for P1/P2/P3. A 503 / timeout / transport error skips `llm-retry` and jumps to the next P. Recovered P1 is probed and selected again. |
-| Skills manager | `@x1a0f3n9/dsh-skills-manager@0.1.53-xfdsh.1` | Load, toggle, create, and import local Agent skills. Settings → Skills appears when the card is on. |
-| Web search pool | `@x1a0f3n9/dsh-web-search-pool` | Default order is the search pool, then Perplexity, Exa, and keyless Bing/DuckDuckGo. DeepSeek search remains selectable. Every chat model can `web_search` without a DeepSeek search key. |
+| Session timeline | `@deepseek-ai/dsh-session-timeline@0.1.5-xfdsh.2` | Rewind, delete, regenerate, and a composer compact button. |
+| Plugin market | `@deepseek-ai/dshmarket@1.45.2` | Browse community plugins. Official `@deepseek-ai/dsh-*` plugins remap into this runtime. |
+| Reasoning effort | `@deepseek-ai/dsh-reasoning-effort@0.7.3` | Settings → Models lets each custom model choose Default (none) or Custom `reasoningEfforts`. The composer can then pick thinking strength. |
+| Context dashboard | `@deepseek-ai/dsh-context@0.49.7` | A Context tab and `/context` show composition, compaction, and token use. Version detection reads this fork. |
+| Better sidebar | `@deepseek-ai/dsh-better-sidebar@0.19.3` | Files, terminal, Git, and subagents in the sidebar workbench. |
+| Hindsight memory | `@deepseek-ai/hindsight-coding-agents@0.5.2-xfdsh.4` | On by default. Uses a local daemon, not Cloud. Cloud or a self-hosted URL remains optional in `~/.hindsight/coding-agent.json`. |
+| Failover queue | `@deepseek-ai/dsh-failover-queue@0.1.12` | Composer chip plus Settings → Failover for P1/P2/P3. A 503 / timeout / transport error skips `llm-retry` and jumps to the next P. Recovered P1 is probed and selected again. |
+| Skills manager | `@deepseek-ai/dsh-skills-manager@0.1.53-xfdsh.1` | Load, toggle, create, and import local Agent skills. Settings → Skills appears when the card is on. |
+| Web search pool | `@deepseek-ai/dsh-web-search-pool` | Default order is the search pool, then Perplexity, Exa, and keyless Bing/DuckDuckGo. DeepSeek search remains selectable. Every chat model can `web_search` without a DeepSeek search key. |
 
 ### Other changes
 
@@ -93,8 +93,8 @@ GitHub's default branch is `dev-x1a0f3n9`. Clone without `-b` already lands on t
 
 | Branch | Role | npm |
 | --- | --- | --- |
-| `master` | Stable fork line. Merge upstream here, then into `dev-x1a0f3n9`. | Push publishes `@xfcodeai/*`. |
-| `dev-x1a0f3n9` | Fork integration. Test here, then push. | Push publishes `@x1a0f3n9/*`. |
+| `master` | Stable fork line. Merge upstream here, then into `dev-x1a0f3n9`. | Push publishes `@deepseek-ai/*`. |
+| `dev-x1a0f3n9` | Fork integration. Test here, then push. | Push publishes `@deepseek-ai/*`. |
 | `feat/<topic>` or `fix/<topic>` | One small change, cut from `dev-x1a0f3n9`. | None. Merge `--no-ff` into `dev-x1a0f3n9`. |
 
 1. Merge upstream `deepseek-ai/deepseek-harness` into `master`.
@@ -102,8 +102,8 @@ GitHub's default branch is `dev-x1a0f3n9`. Clone without `-b` already lands on t
 3. Cut `feat/<topic>` or `fix/<topic>` from `dev-x1a0f3n9`.
 4. Merge `--no-ff` back into `dev-x1a0f3n9`. Do not merge those short-lived branches into `master`.
 5. Test `dev-x1a0f3n9` locally with `pnpm xfdsh web`.
-6. Push `dev-x1a0f3n9`. CI builds and publishes `@x1a0f3n9/*`.
-7. Merge `dev-x1a0f3n9` into `master` and push. CI publishes `@xfcodeai/*`.
+6. Push `dev-x1a0f3n9`. CI builds and publishes `@deepseek-ai/*`.
+7. Merge `dev-x1a0f3n9` into `master` and push. CI publishes `@deepseek-ai/*`.
 
 An npm new-name quota pause stops a publish run without failing it; the next push continues remaining names.
 
@@ -115,7 +115,7 @@ DeepSeek Harness is in _developer preview_ and iterating rapidly. **THERE WILL B
 
 - Submit feedback or bug reports through [GitHub Discussions](https://github.com/LunFengChen/deepseek-harness/discussions).
 - Add the [`dsh-plugin`](https://github.com/topics/dsh-plugin) topic to your plugin repository for discoverability.
-- Join <a href="https://discord.gg/Ycq5dCaS4">DeepSeek Harness Discord community</a>.
+- Join <a href="https://discord.gg/4MrtZUhpxg">DeepSeek Harness Discord community</a>.
 
 ## Contributing
 

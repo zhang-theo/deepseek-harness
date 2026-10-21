@@ -1,6 +1,6 @@
 /** Browser entry for the optional speech Remote contribution and composer control. */
 import type { Context } from '@deepseek-ai/cordis'
-import speechRemote from '@x1a0f3n9/dsh-experimental-api-speech-to-text/remote'
+import speechRemote from '@deepseek-ai/dsh-experimental-api-speech-to-text/remote'
 import { mountVoiceInput } from './mount.ts'
 
 export { inject } from './mount.ts'

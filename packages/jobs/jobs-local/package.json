@@ -1,7 +1,7 @@
 {
-  "name": "@x1a0f3n9/dsh-jobs-local",
+  "name": "@deepseek-ai/dsh-jobs-local",
   "description": "Process-local implementation of the DeepSeek Harness background job registry seam",
-  "version": "0.1.7-rc.4",
+  "version": "0.2.1-rc.2",
   "publishConfig": {
     "access": "public"
   },
@@ -19,18 +19,20 @@
       "default": "./lib/index.js"
     },
     "./src/*": "./src/*",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
   },
   "files": [
+    "locale/*.json",
     "lib/index.js",
     "lib/types/**/*.d.ts"
   ],
   "license": "MIT",
   "peerDependencies": {
-    "@x1a0f3n9/dsh-agent": "workspace:*",
-    "@x1a0f3n9/dsh-scope": "workspace:*",
-    "@x1a0f3n9/dsh-jobs": "workspace:*",
-    "@x1a0f3n9/dsh-timeout": "workspace:*",
+    "@deepseek-ai/dsh-agent": "workspace:*",
+    "@deepseek-ai/dsh-scope": "workspace:*",
+    "@deepseek-ai/dsh-jobs": "workspace:*",
+    "@deepseek-ai/dsh-timeout": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~"
   },
   "dependencies": {
@@ -39,13 +41,13 @@
   "devDependencies": {
     "@deepseek-ai/cordis-plugin-include": "workspace:~",
     "@deepseek-ai/cordis-plugin-loader": "workspace:~",
-    "@x1a0f3n9/dsh-agent": "workspace:*",
-    "@x1a0f3n9/dsh-agent-loop-testkit": "workspace:*",
-    "@x1a0f3n9/dsh-brand": "workspace:*",
-    "@x1a0f3n9/dsh-scope": "workspace:*",
-    "@x1a0f3n9/dsh-session": "workspace:*",
-    "@x1a0f3n9/dsh-jobs": "workspace:*",
-    "@x1a0f3n9/dsh-timeout": "workspace:*",
+    "@deepseek-ai/dsh-agent": "workspace:*",
+    "@deepseek-ai/dsh-agent-loop-testkit": "workspace:*",
+    "@deepseek-ai/dsh-brand": "workspace:*",
+    "@deepseek-ai/dsh-scope": "workspace:*",
+    "@deepseek-ai/dsh-session": "workspace:*",
+    "@deepseek-ai/dsh-jobs": "workspace:*",
+    "@deepseek-ai/dsh-timeout": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~"
   }
 }

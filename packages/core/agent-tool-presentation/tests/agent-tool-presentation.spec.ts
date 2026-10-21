@@ -8,18 +8,18 @@
 
 import { describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { createScope } from '@x1a0f3n9/dsh-scope'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import { PtcRuntime } from '@x1a0f3n9/dsh-ptc-runtime'
-import type { PtcRunRequest, PtcRunResult } from '@x1a0f3n9/dsh-ptc-runtime'
-import ToolRuntime, { RUN_CODE_NAME, defineTool } from '@x1a0f3n9/dsh-tools'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import { SessionId } from '@x1a0f3n9/dsh-session'
-import { apply, Config, inject, name } from '@x1a0f3n9/dsh-agent-tool-presentation'
+import { createScope } from '@deepseek-ai/dsh-scope'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import { PtcRuntime } from '@deepseek-ai/dsh-ptc-runtime'
+import type { PtcRunRequest, PtcRunResult } from '@deepseek-ai/dsh-ptc-runtime'
+import ToolRuntime, { RUN_CODE_NAME, defineTool } from '@deepseek-ai/dsh-tools'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import { SessionId } from '@deepseek-ai/dsh-session'
+import { apply, Config, inject, name } from '@deepseek-ai/dsh-agent-tool-presentation'
 
 /** A runtime that never runs anything: presentation never dispatches. */
 class StubRuntime extends PtcRuntime {
-  resolve(request: import('@x1a0f3n9/dsh-ptc-runtime').PtcRunRequest): import('@x1a0f3n9/dsh-ptc-runtime').PtcRunSpec { return { ...request, cwd: request.cwd ?? process.cwd(), timeoutMs: request.timeoutMs ?? 120_000 } }
+  resolve(request: import('@deepseek-ai/dsh-ptc-runtime').PtcRunRequest): import('@deepseek-ai/dsh-ptc-runtime').PtcRunSpec { return { ...request, cwd: request.cwd ?? process.cwd(), timeoutMs: request.timeoutMs ?? 120_000 } }
 
   readonly language = 'typescript'
   readonly isolation = 'stub'
@@ -59,6 +59,10 @@ async function mount(ctx: Context, config: Config, id = 'agent') {
 }
 
 describe('the tool-presentation row', () => {
+  it('rejects an unsupported presentation mode in configuration', () => {
+    expect(() => Config({ mode: 'both' } as never)).toThrow()
+  })
+
   it('declares the services it uses without holding a PTC runtime hostage', () => {
     // A `native` row must mount where no runtime is composed, so the wait is
     // conditional inside apply rather than static metadata.
@@ -76,15 +80,6 @@ describe('the tool-presentation row', () => {
     expect(codedAssembly.tools.map(tool => tool.name)).toEqual([RUN_CODE_NAME])
     expect(codedAssembly.sections.find(section => section.name === 'tools:sdk')?.text).toContain('echo')
     expect(plainAssembly.tools.map(tool => tool.name)).toEqual(['echo'])
-  })
-
-  it('presents both forms when asked for both', async () => {
-    const ctx = await host()
-    const { agent } = await mount(ctx, { mode: 'both' })
-
-    const assembly = await ctx.systemPrompt.assemble({ scope: agent })
-
-    expect(assembly.tools.map(tool => tool.name)).toEqual(['echo', RUN_CODE_NAME])
   })
 
   it('restores the deployment default when the agent unloads', async () => {

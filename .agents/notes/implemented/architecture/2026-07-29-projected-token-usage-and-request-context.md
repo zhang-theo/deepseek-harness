@@ -12,7 +12,7 @@ Context occupancy needs a numerator and a denominator that no existing surface c
 
 ## Decision
 
-Both values are ordinary durable session-projection state. `@x1a0f3n9/dsh-token-meter` registers two units when `ctx.sessionProjections` is present.
+Both values are ordinary durable session-projection state. `@deepseek-ai/dsh-token-meter` registers two units when `ctx.sessionProjections` is present.
 
 `tokenUsage` folds the complete durable log into uncached input, output, cache-read, and cache-write buckets. It expands each `assistant/message` or `assistant/attempt` stream and takes the last usage sample; a message's top-level usage takes precedence over its embedded sample instead of double-counting it. `assistant/attempt` therefore preserves usage from failed requests. A matching `llm/retry-started` boundary opens a new attempt, so a retry with the same `(turn, step)` contributes separately. Reasoning stays an output subdivision. Compaction and surface replacement do not erase earlier billing.
 
@@ -26,7 +26,7 @@ Capacity deliberately stays out of `EpochHeader`. That type is the reconstructio
 
 Both units ride the standard projection lifecycle: history tail baselines, `session/projection` live frames, higher-seq-wins client storage, JSON checkpoints, cache recovery, and unit unload. There is no token-specific history field, mux frame, projector, revision counter, or client fence.
 
-The Web [`StatsPills`](../feature/2026-09-07-composer-session-stats-pills.md) reads both through the standard `useProjection` seat. Window nodes still supply turn and step counts plus LLM and tool wall times as the no-projection fallback — those answer "what is on screen" and are correctly window-scoped. The durable usage pill remains when compaction leaves no visible assistant step. Cache writes count in billed input and in the cache-hit denominator. A deployment without token-meter drops the usage pill; context occupancy lives on the composer's ContextMeter ring. Exact token figures show in the usage pill's click-open dialog rather than a hover tooltip.
+The Web [`StatsPills`](../../../../packages/client/ui-chat/src/client/chat/StatsPills.tsx) reads `tokenUsage` through the standard `useProjection` seat. Window nodes still supply turn and step counts plus LLM and tool wall times as the no-projection fallback — those answer "what is on screen" and are correctly window-scoped. The durable usage pill remains when compaction leaves no visible assistant step. Cache writes count in billed input and in the cache-hit denominator. A deployment without token-meter drops the usage pill; context occupancy lives on the composer's ContextMeter ring. Exact token figures show in the usage pill's click-open dialog rather than a hover tooltip.
 
 ## Context occupancy is approximate, and that is the decision
 

@@ -1,20 +1,21 @@
 // @vitest-environment jsdom
 
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent } from '@testing-library/react'
-import type { ISession } from '@x1a0f3n9/dsh-api-session-controller/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { WorkspaceId } from '@x1a0f3n9/dsh-workspace/types'
+import type { ISession } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { WorkspaceId } from '@deepseek-ai/dsh-workspace/types'
 import {
   apply as applyChat, inject as injectChat, type ToolResultNode,
-} from '@x1a0f3n9/dsh-client-ui-chat/client'
-import type { PropsRenderSlots } from '@x1a0f3n9/dsh-client-ui-slots'
-import { SlotTestRuntime, stubConfigForm } from '@x1a0f3n9/dsh-client-test-runtime'
-import { LocaleRuntime } from '@x1a0f3n9/dsh-client-locale/client'
-import { apply as applyConversation, inject as injectConversation } from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import { apply as applyTool, inject as injectTool } from '@x1a0f3n9/dsh-client-ui-tool/client'
-import type { ToolCallViewProps } from '@x1a0f3n9/dsh-client-ui-tool/client'
+} from '@deepseek-ai/dsh-client-ui-chat/client'
+import type { PropsRenderSlots } from '@deepseek-ai/dsh-client-ui-slots'
+import { SlotTestRuntime, stubConfigForm } from '@deepseek-ai/dsh-client-test-runtime'
+import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
+import { apply as applyConversation, inject as injectConversation } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import { apply as applyTool, inject as injectTool } from '@deepseek-ai/dsh-client-ui-tool/client'
+import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
+import { PartialArguments } from '@deepseek-ai/dsh-util-values'
 import { toolSessionEvents } from './tool-fixtures.client.ts'
 
 const SID = 's1' as SessionId
@@ -47,12 +48,16 @@ const toolResult = (
   name: string,
   args = '{"command":"make build","description":"Build"}',
   over: Partial<ToolResultNode> = {},
-): ToolResultNode => ({
-  kind: 'tool-result', seq, time: seq * 1_000, callId,
-  call: { name, argsRaw: args },
-  callTime: seq * 1_000 - 500,
-  content: [], isError: false, subCalls: [], ...over,
-})
+): ToolResultNode => {
+  const call = over.call === undefined ? { name, argsRaw: args } : over.call
+  return {
+    kind: 'tool-result', seq, time: seq * 1_000, callId,
+    name: call?.name ?? '', args: call === null ? PartialArguments.EMPTY : PartialArguments.fromText(call.argsRaw),
+    call,
+    callTime: seq * 1_000 - 500,
+    content: [], isError: false, subCalls: [], ...over,
+  }
+}
 
 /** Test-owned AppFrame role: declares and renders the resident conversation area. */
 type AppRootProps = PropsRenderSlots<'main'>

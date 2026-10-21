@@ -4,22 +4,22 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Context } from '@deepseek-ai/cordis'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
-import JsonlSessionPersistence from '@x1a0f3n9/dsh-session-persistence-jsonl'
-import { mountAgentLoopTestDependencies } from '@x1a0f3n9/dsh-agent-loop-testkit'
-import { SessionId } from '@x1a0f3n9/dsh-session'
-import { defineContentToolFixture } from '@x1a0f3n9/dsh-tools'
-import { bindScopeParent, createScope, scopeOf } from '@x1a0f3n9/dsh-scope'
-import LocalFileReference from '@x1a0f3n9/dsh-file-reference-local'
-import SubagentRuntime from '@x1a0f3n9/dsh-subagent'
-import * as SubagentSpawn from '@x1a0f3n9/dsh-subagent-spawn-in-process'
-import * as SubagentTool from '@x1a0f3n9/dsh-tool-subagent'
-import Selection from '@x1a0f3n9/dsh-tool-subagent/model-selection-settings'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import { createUserMessage } from '@x1a0f3n9/dsh-llm'
-import type { ContextFormed } from '@x1a0f3n9/dsh-llm'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
+import * as JsonlSessionPersistence from '@deepseek-ai/dsh-session-persistence-jsonl'
+import { mountAgentLoopTestDependencies } from '@deepseek-ai/dsh-agent-loop-testkit'
+import { SessionId } from '@deepseek-ai/dsh-session'
+import { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
+import { bindScopeParent, createScope, scopeOf } from '@deepseek-ai/dsh-scope'
+import LocalFileReference from '@deepseek-ai/dsh-file-reference-local'
+import SubagentRuntime from '@deepseek-ai/dsh-subagent'
+import * as SubagentSpawn from '@deepseek-ai/dsh-subagent-spawn-in-process'
+import * as SubagentTool from '@deepseek-ai/dsh-tool-subagent'
+import Selection from '@deepseek-ai/dsh-tool-subagent/model-selection-settings'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import { createUserMessage } from '@deepseek-ai/dsh-llm'
+import type { ContextFormed } from '@deepseek-ai/dsh-llm'
 
-declare module '@x1a0f3n9/dsh-llm' {
+declare module '@deepseek-ai/dsh-llm' {
   interface MessageSourceMap {
     'due-work': { kind: 'due-work'; plugin: string } & ContextFormed
   }
@@ -35,7 +35,7 @@ afterEach(async () => {
 async function core(persistenceRoot?: string) {
   const ctx = new Context()
   contexts.push(ctx)
-  await mountAgentLoopTestDependencies(ctx)
+  await mountAgentLoopTestDependencies(ctx, { workingDirectory: true })
   if (persistenceRoot !== undefined) await ctx.plugin(JsonlSessionPersistence, { root: persistenceRoot, compression: 'none' })
   await ctx.plugin(AgentLoop, { agents: [] })
   return ctx
@@ -107,7 +107,7 @@ describe('serial creation listener integrations', () => {
     await ctx.plugin(SubagentRuntime)
     await ctx.plugin(SubagentSpawn, { providerName: 'spawn' })
     const preset = createScope(ctx, { preset: 'review' })
-    await preset.ctx.plugin(SubagentTool, { provider: 'spawn', modelSelectionSettings: true, backgroundMode: 'continuable' })
+    await preset.ctx.plugin(SubagentTool, { provider: 'spawn', modelSelectionSettings: true })
     try {
       await expect(ctx.agents.create({
         sessionId: SessionId('review-tool'),

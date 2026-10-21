@@ -3,7 +3,7 @@ description: "本地文件系统 spill 后端：spill 文本如何保存到私�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-spill-local
+# @deepseek-ai/dsh-spill-local
 
 [English](README.md) | 中文
 
@@ -32,7 +32,7 @@ kind: "package-reference"
 不带配置加载插件是安全的：文件会落在操作系统临时目录下延迟创建的私有（0700）每进程目录中。当文件必须位于已知位置时，设置 `root`。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-spill-local'
+- name: '@deepseek-ai/dsh-spill-local'
   config:
     root: /absolute/path/to/spill
     cleanupPeriodDays: 30
@@ -85,7 +85,6 @@ kind: "package-reference"
 | [`src/index.ts`](src/index.ts) | 插件入口：`Config`、`LocalSpillStore` 服务、清理生命周期、定位信息与取回提示的组装 |
 | [`src/cleanup.ts`](src/cleanup.ts) | 一次性按年龄扫描、文件系统身份检查、符号链接和所有权保护 |
 | [`src/store.ts`](src/store.ts) | 与 Cordis 无关的存储机制：私有根目录、会话目录、安全名称编码、排他写入 |
-| — | 不发布运行时不变式伴生入口；除由所属 seam 强制执行的约定外，本包不暴露独立事件序列或可变数据关系。 |
 
 ### 文件命名与写入
 

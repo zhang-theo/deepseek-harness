@@ -1,6 +1,6 @@
 /** Wire audio validation rejects malformed headers and inconsistent duration. */
 import { expect, it } from 'vitest'
-import { validateWave } from '@x1a0f3n9/dsh-experimental-speech-to-text/wave'
+import { validateWave } from '@deepseek-ai/dsh-experimental-speech-to-text/wave'
 
 function wave(): Buffer {
   const bytes = Buffer.alloc(44 + 32000)

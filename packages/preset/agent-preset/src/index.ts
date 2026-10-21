@@ -2,8 +2,8 @@
 import { Context, Service } from '@deepseek-ai/cordis'
 import { EntryGroup } from '@deepseek-ai/cordis-plugin-loader'
 import z from '@deepseek-ai/schemastery'
-import type { PresetDefinition } from '@x1a0f3n9/dsh-agent-preset-registry'
-import type {} from '@x1a0f3n9/dsh-agent-preset-registry'
+import type { PresetDefinition } from '@deepseek-ai/dsh-agent-preset-registry'
+import type {} from '@deepseek-ai/dsh-agent-preset-registry'
 
 /** Definition submitted to the preset registry. */
 export type Config = PresetDefinition

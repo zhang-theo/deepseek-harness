@@ -16,7 +16,7 @@
 import type { ReactNode } from 'react'
 import type {
   BoundActions, HandleOf, PropsStore, SnapshotSelectorHook, StoreDecl,
-} from '@x1a0f3n9/dsh-client-store'
+} from '@deepseek-ai/dsh-client-store'
 import type { HostObservable, KeyedStandardSource } from './renderer.ts'
 
 export * from './store.ts'
@@ -116,6 +116,8 @@ export interface SlotScopeTargetMap {}
 export interface SlotEntryDef {
   kind: SlotKind
   scope: SlotScope
+  /** Use span anchors and error placeholders for inline content; omitted uses div. */
+  inline?: true
   owner?: object
   /**
    * Optional keyed-entry prop table. A keyed registration contributes one
@@ -163,6 +165,8 @@ export interface SlotFactoryDef {
 export type SlotSpec<E extends SlotEntryDef> = {
   kind: E['kind']
   scope: E['scope']
+  /** Use span anchors and error placeholders for inline content; omitted uses div. */
+  inline?: true
 } & ('inject' extends keyof E
   ? E extends { inject: infer Injected extends object }
     ? { inject: Injected }

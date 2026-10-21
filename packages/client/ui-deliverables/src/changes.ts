@@ -1,6 +1,6 @@
 /** Validate workspace-change records that cross the Host routes and address their summary, comparison, and native-open actions. */
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { WorkspaceChangedFile, WorkspaceChangesSummary, WorkspaceDiffHunk, WorkspaceFileDiff } from '@x1a0f3n9/dsh-workspace-changes/types'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { WorkspaceChangedFile, WorkspaceChangesSummary, WorkspaceDiffHunk, WorkspaceFileDiff } from '@deepseek-ai/dsh-workspace-changes/types'
 
 /** Authenticated GET route serving one announced change summary while its Session lives. */
 export const CHANGED_FILES_PATH = '/api/changes.summary'

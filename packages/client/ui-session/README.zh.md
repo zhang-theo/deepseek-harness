@@ -2,7 +2,7 @@
 description: "面向 Session Controller 列表、交互状态与逐会话上下文的 React 与 Slot 适配器。"
 kind: "package-reference"
 ---
-# @x1a0f3n9/dsh-client-ui-session
+# @deepseek-ai/dsh-client-ui-session
 
 [English](README.md) | 中文
 
@@ -14,11 +14,17 @@ kind: "package-reference"
 
 ## 目录
 
+- [访问 Hook](#access-hooks)
 - [模型体验](#model-experience)
 - [已知限制与暂缓事项](#known-limitations-and-deferred-work)
 - [开发备注](#dev-note)
 
 -----
+
+<a id="access-hooks"></a>
+## 访问 Hook
+
+本包注入 Client `remoteAccess` 服务，并在其 `source()` 之上发布会话访问 Hook：根作用域的 `useSessionAccess(sessionId, action)` 回答某一个 Session 资源上的访问，Session 作用域的 `useAccess(action)` 回答所绑定 Session 资源上的访问；`global` 资源上的答案是另一个 Hook `useRemoteAccess(action)`，两者互不遮蔽。SessionMaybe 作用域的 `useAccess(action)` 在未绑定 Session 时返回 `undefined`，调用方将其视为不允许；需要 `global` 资源上的判断时读 `useRemoteAccess`。快照语义归 [`dsh-api-remote-access`](../../api/remote-access/README.zh.md#client-face)。
 
 <a id="model-experience"></a>
 ## 模型体验
@@ -45,5 +51,3 @@ kind: "package-reference"
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。适配器 materialization 路径已经强制 Session 绑定一致。

@@ -3,7 +3,7 @@ description: "The authorization flow registry for users and maintainers who obta
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-authorization
+# @deepseek-ai/dsh-authorization
 
 English | [中文](README.zh.md)
 
@@ -37,8 +37,8 @@ Your plugin declares one flow per credential it holds, keyed by the `<scope>/<id
 
 ```ts
 import type { Context } from '@deepseek-ai/cordis'
-import type { AuthorizationSession } from '@x1a0f3n9/dsh-authorization'
-import { credentialKey } from '@x1a0f3n9/dsh-credentials'
+import type { AuthorizationSession } from '@deepseek-ai/dsh-authorization'
+import { credentialKey } from '@deepseek-ai/dsh-credentials'
 
 declare const ctx: Context
 declare const exchangeCode: (code: string, signal: AbortSignal) => Promise<{ token: string }>
@@ -99,7 +99,6 @@ This section explains the design decisions behind the seam and points at the cod
 |---|---|
 | [`src/index.ts`](src/index.ts) | Service Definition: flow registry, one-attempt-per-key lifecycle, interaction routing, commit confirmation |
 | [`src/types.ts`](src/types.ts) | Wire-safe vocabulary: methods, notices, prompts, outcomes, entries |
-| [`src/invariant.ts`](src/invariant.ts) | Invariant companion: `authorization/settled` always names a released key |
 
 ### Lifecycle
 
@@ -158,7 +157,7 @@ These limits define when this package is a poor fit or needs special care. They 
 
 This Dev Note is working context for maintainers: open questions and undecided directions. It is explicitly non-authoritative — shipped behavior, limits, and accepted rationale live in the sections above, the package code, and the linked Agent Note.
 
-The limitations above name the open directions — resumable attempts, server-side revocation, orphaned-record discovery — each needing its own design and store before landing. The invariant companion is the one load-bearing runtime check: settlement must always find the key released, because a wedged key is indistinguishable from a busy one and only a restart frees it.
+The limitations above name the open directions — resumable attempts, server-side revocation, orphaned-record discovery — each needing its own design and store before landing.
 
 </details>
 

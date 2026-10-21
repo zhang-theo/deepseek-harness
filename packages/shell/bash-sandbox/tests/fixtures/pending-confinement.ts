@@ -2,9 +2,9 @@
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
-import { SandboxProvider } from '@x1a0f3n9/dsh-sandbox'
-import type { ConfinedArgv, SandboxPolicy } from '@x1a0f3n9/dsh-sandbox'
-import LocalSubprocessRuntime from '@x1a0f3n9/dsh-subprocess-local'
+import { SandboxProvider } from '@deepseek-ai/dsh-sandbox'
+import type { ConfinedArgv, SandboxPolicy } from '@deepseek-ai/dsh-sandbox'
+import LocalSubprocessRuntime from '@deepseek-ai/dsh-subprocess-local'
 
 export const name = 'snapshot-pending-confinement'
 

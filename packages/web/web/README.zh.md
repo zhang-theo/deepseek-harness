@@ -3,7 +3,7 @@ description: "web 访问服务（ctx.web）：部署方与插件作者如何通�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-web
+# @deepseek-ai/dsh-web
 
 [English](README.md) | 中文
 
@@ -36,9 +36,9 @@ kind: "package-reference"
 加载服务并让唯一挂载的后端自动选择，或用 `searchProvider`／`fetchProvider` 固定提供方 id。环境变量 `$DSH_WEB_SEARCH_PROVIDER` 与 `$DSH_WEB_FETCH_PROVIDER` 提供相同字段，不是另一条优先级链。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-web'
-- name: '@x1a0f3n9/dsh-web-search-exa'
-- name: '@x1a0f3n9/dsh-web-fetch-http'
+- name: '@deepseek-ai/dsh-web'
+- name: '@deepseek-ai/dsh-web-search-exa'
+- name: '@deepseek-ai/dsh-web-fetch-http'
 ```
 
 | 字段 | 默认值 | 含义 |
@@ -108,7 +108,6 @@ const page = await ctx.web.fetch({ url: 'https://example.com' })
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：`WebRuntime` 服务、两个提供方注册表与执行时选择 |
 | [`src/types.ts`](src/types.ts) | 词汇：请求／结果类型、封闭的 `WebFetchBody` 联合与 `WebError` 分类体系 |
-| — | 不发布运行时不变式配套项；提供方映射是私有数据，服务会在每次调用时执行提供方选择并强制执行结果上限；该 seam 不发布独立注册表，也不发布请求／结果观测流。 |
 
 ### 数据模型
 

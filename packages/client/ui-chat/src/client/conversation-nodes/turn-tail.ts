@@ -1,10 +1,10 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type {
   ConversationMatch, ConversationNodeContext, ConversationNodeDefinition, TurnLocation,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type {} from '@x1a0f3n9/dsh-llm-retry/types'
-import type { SessionEvent } from '@x1a0f3n9/dsh-session/types'
-import { deriveTurnTokenUsage } from '@x1a0f3n9/dsh-token-meter/client'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type {} from '@deepseek-ai/dsh-llm-retry/types'
+import type { SessionEvent } from '@deepseek-ai/dsh-session/types'
+import { deriveTurnTokenUsage } from '@deepseek-ai/dsh-token-meter/client'
 import type {
   AssistantChatData, FinalAssistantChatData, TurnTailChatData,
 } from '../contract/chat-nodes.ts'
@@ -17,7 +17,7 @@ declare module '../contract/chat-nodes.ts' {
   }
 }
 
-declare module '@x1a0f3n9/dsh-client-ui-conversation/client' {
+declare module '@deepseek-ai/dsh-client-ui-conversation/client' {
   interface ConversationTurnDataMap {
     /** Closing Assistant and footer facts derived for this completed Turn. */
     'turn-tail': TurnTailChatData
@@ -135,7 +135,7 @@ export const turnTailDefinition: ConversationNodeDefinition<TurnTailState> = {
   buildViewNode: (context) => {
     const turn = turnLocation(context)
     const data = turn?.data.get('turn-tail')
-    return data === undefined ? null : chatNode(context, 'turn-tail', data.seq + CHAT_SYNTHETIC_SEQ_OFFSETS.finalizedFollowup, data)
+    return data === undefined ? null : chatNode(context, 'turn-tail', data.seq + CHAT_SYNTHETIC_SEQ_OFFSETS.finalizedFollowup, data, { groupTree: 'turn' })
   },
 }
 
@@ -144,5 +144,21 @@ export const turnTailDefinition: ConversationNodeDefinition<TurnTailState> = {
  * @param ctx - owning UI Conversation context.
  */
 export function registerTurnTailConversationNode(ctx: Context): void {
-  ctx.uiConversation.events.register(turnTailDefinition)
+  const match = turnTailDefinition.match.bind(turnTailDefinition)
+  ctx.uiConversation.events.register({
+    ...turnTailDefinition,
+    match: {
+      'turn/start': match,
+      'turn/end': match,
+      'tool/call': match,
+      'tool/result': match,
+      'assistant/message': match,
+      'assistant/attempt': match,
+      'assistant/live-chunk': match,
+      'step/start': match,
+      'step/end': match,
+      'llm/retry': match,
+      'llm/retry-started': match,
+    },
+  })
 }

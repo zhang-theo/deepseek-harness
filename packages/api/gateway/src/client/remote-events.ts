@@ -5,14 +5,14 @@ import type {
   ConnectionGenerationSource,
   ConnectionHostInfo,
   ConnectionHandle,
-} from '@x1a0f3n9/dsh-client-connection/client'
+} from '@deepseek-ai/dsh-client-connection/client'
 import type {
   TypertClientEventListener,
   TypertOwnedValue,
   TypertRemoteEvent,
-} from '@x1a0f3n9/dsh-typert-protocol'
-import { isRemoteJsonValue, isTypertOwnedValue } from '@x1a0f3n9/dsh-typert-protocol'
-import { randomUUID } from '@x1a0f3n9/dsh-util-crypto'
+} from '@deepseek-ai/dsh-typert-protocol'
+import { isRemoteJsonValue, isTypertOwnedValue } from '@deepseek-ai/dsh-typert-protocol'
+import { randomUUID } from '@deepseek-ai/dsh-util-crypto'
 import {
   REMOTE_EVENT_RESULT_ENDPOINT,
   REMOTE_EVENT_STREAM_ENDPOINT,

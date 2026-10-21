@@ -1,8 +1,8 @@
 /** Shared trajectory record data and formatting contracts. */
 
 import type { HTMLAttributes } from 'react'
-import type { FileAttachmentRef, ImageAttachmentRef } from '@x1a0f3n9/dsh-attachment'
-import type { ConversationPromptSnapshot } from '@x1a0f3n9/dsh-client-ui-conversation/client'
+import type { FileAttachmentRef, ImageAttachmentRef } from '@deepseek-ai/dsh-attachment'
+import type { ConversationPromptSnapshot } from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type { TrajectoryTranslate } from './locales.ts'
 
 /** Closed set of trajectory record kinds. */
@@ -84,7 +84,7 @@ export interface TrajectoryCellProps extends HTMLAttributes<HTMLDivElement> {
   callId?: string
   /** Recorded tool name; independent of the display summary. */
   toolName?: string
-  /** Tool-only result failure state. */
+  /** Failed operation or interrupted assistant output. */
   isError?: boolean
   /** Own duration in seconds, or `null` when no duration is known. */
   timeSeconds: number | null

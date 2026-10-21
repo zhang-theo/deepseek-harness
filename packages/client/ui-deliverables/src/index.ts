@@ -6,8 +6,8 @@
  */
 
 import type { Context } from '@deepseek-ai/cordis'
-import type {} from '@x1a0f3n9/dsh-system-prompt'
-import type {} from '@x1a0f3n9/dsh-workspace-changes/types'
+import type {} from '@deepseek-ai/dsh-system-prompt'
+import type {} from '@deepseek-ai/dsh-workspace-changes/types'
 import { registerPresentOpen } from './present-open.ts'
 
 /** Services required for file-reference guidance, change summaries, and authenticated native opens. */

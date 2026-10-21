@@ -7,10 +7,10 @@ import {
   IconTrashOutlineRegular,
   useAnchoredPosition,
   useDismissOnOutsidePointer,
-} from '@x1a0f3n9/dsh-client-ui-primitives'
-import type { InjectFace, PropsLocale, PropsRuntime } from '@x1a0f3n9/dsh-client-ui-slots'
-import type {} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { ScheduleId } from '@x1a0f3n9/dsh-schedule/client'
+} from '@deepseek-ai/dsh-client-ui-primitives'
+import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { ScheduleId } from '@deepseek-ai/dsh-schedule/client'
 import type { CatalogInjected } from './catalog-source.ts'
 import { NS } from './locales.ts'
 import {

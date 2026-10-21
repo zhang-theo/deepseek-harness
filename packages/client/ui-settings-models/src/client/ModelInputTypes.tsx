@@ -1,7 +1,7 @@
 /** Input-type declarations shared by the DeepSeek and pi-ai catalog editors. */
 
 import type { ReactNode } from 'react'
-import { Checkbox } from '@x1a0f3n9/dsh-client-ui-primitives'
+import { Checkbox } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { DeepSeekModelDraft } from './DeepSeekModelsEditor.tsx'
 import type { ModelsKey } from './locales.ts'
 import styles from './ModelsSection.module.css'

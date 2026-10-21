@@ -2,7 +2,7 @@
 description: "客户端资源模型：按协议注册的提供方把 URL 地址解析为实时值，任何 slot 组件都通过 useResource 标准钩子读取。"
 kind: "package-reference"
 ---
-# @x1a0f3n9/dsh-client-resources
+# @deepseek-ai/dsh-client-resources
 
 [English](README.md) | 中文
 
@@ -41,7 +41,7 @@ kind: "package-reference"
 协议所属的客户端包在 `ResourceProtocolMap` 声明其值类型，并以自有 effect 注册一个提供方。`open` 产出 `RemoteResult` 帧：先是当前内容，之后每次变化一帧，失败以 `ok: false` 帧而非抛错表达；必须在 `signal` 中止时停止：
 
 ```ts ignore-check
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface ResourceProtocolMap { note: NoteView }
 }
 
@@ -103,5 +103,3 @@ export function apply(ctx) {
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。提供方归属与持有者计数只有注册表这一个拥有者，没有可供比对的独立运行时来源；注册的 dispose 与打开/关闭生命周期由行为测试断言。

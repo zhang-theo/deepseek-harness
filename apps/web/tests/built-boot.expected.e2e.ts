@@ -97,6 +97,8 @@ it('boots the built plugin graph and renders a fixture session end to end', asyn
   fireEvent.click(waitingTitle)
   await waitFor(() => {
     expect(document.querySelector('[data-sample="bash"]')).not.toBeNull()
+    expect(document.querySelector('[data-chat-running]')?.parentElement?.getAttribute('data-slot'))
+      .toBe('conversation.chat.flow')
   }, { timeout: 10_000 })
   // The generated bundle roster mounts the question UI before the approval UI.
   // Skip the resident fixture's three questions, then resolve its approval so
@@ -129,7 +131,8 @@ it('boots the built plugin graph and renders a fixture session end to end', asyn
   const writeRow = mutationRows.find(row => row.getAttribute('data-variant') === 'write'
     && row.textContent?.includes('new-demo.txt'))
   if (writeRow === undefined) throw new Error('fixture write row missing')
-  expect(within(writeRow).getAllByText('+1 -0', { exact: true })).toHaveLength(1)
+  expect(within(writeRow).getAllByText('+1', { exact: true })).toHaveLength(1)
+  expect(within(writeRow).getAllByText('-0', { exact: true })).toHaveLength(1)
   expect(writeRow.querySelector('[data-diff]')).toBeNull()
   for (const row of mutationRows) {
     const toggle = row.querySelector('[data-expandable]')
@@ -140,7 +143,8 @@ it('boots the built plugin graph and renders a fixture session end to end', asyn
   const writeDiff = writeRow.querySelector<HTMLElement>('[data-diff]')
   if (writeDiff === null) throw new Error('expanded fixture write diff missing')
   within(writeDiff).getByText('hello fixture', { exact: true })
-  expect(within(writeRow).getAllByText('+1 -0', { exact: true })).toHaveLength(1)
+  expect(within(writeRow).getAllByText('+1', { exact: true })).toHaveLength(1)
+  expect(within(writeRow).getAllByText('-0', { exact: true })).toHaveLength(1)
   expect(writeDiff.textContent).not.toContain('+1 -0')
 
   // The web render intent reaches the assembled boot graph: the fixture's
@@ -165,17 +169,17 @@ it('boots the built plugin graph and renders a fixture session end to end', asyn
   // Every bundle injected its plugin-owned style tag (the loader's CSS path).
   const styleOwners = [...document.head.querySelectorAll('style[data-plugin]')]
     .map(style => style.getAttribute('data-plugin'))
-  for (const plugin of ['@x1a0f3n9/dsh-client-ui-layout', '@x1a0f3n9/dsh-client-ui-sidebar', '@x1a0f3n9/dsh-client-ui-conversation', '@x1a0f3n9/dsh-client-ui-tool']) {
+  for (const plugin of ['@deepseek-ai/dsh-client-ui-layout', '@deepseek-ai/dsh-client-ui-sidebar', '@deepseek-ai/dsh-client-ui-conversation', '@deepseek-ai/dsh-client-ui-tool']) {
     expect(styleOwners).toContain(plugin)
   }
 })
 
 it('boots without ui-chat and does not select another conversation view implicitly', async () => {
-  mountAssembledApp({ exclude: ['@x1a0f3n9/dsh-client-ui-chat'] })
+  mountAssembledApp({ exclude: ['@deepseek-ai/dsh-client-ui-chat'] })
 
   const tree = await screen.findByRole('tree', { name: 'Sessions' }, { timeout: 10_000 })
   const boot = Reflect.get(window, '__DSH_BOOT__') as { entries: Array<{ id: string }> } | undefined
-  expect(boot?.entries.some(entry => entry.id === '@x1a0f3n9/dsh-client-ui-chat')).toBe(false)
+  expect(boot?.entries.some(entry => entry.id === '@deepseek-ai/dsh-client-ui-chat')).toBe(false)
   const sessionTitle = await within(tree).findByText('Fixture 历史会话')
   fireEvent.click(sessionTitle)
   await waitFor(() => {

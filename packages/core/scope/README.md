@@ -3,7 +3,7 @@ description: "The scoped-registration library for plugin authors and maintainers
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-scope
+# @deepseek-ai/dsh-scope
 
 English | [中文](README.zh.md)
 
@@ -65,8 +65,6 @@ The registration context determines both visibility and ownership: a registratio
 |---|---|
 | [`src/index.ts`](src/index.ts) | `createScope`, `scopeOf`, `scopeTarget`, `bindScopeParent`/`scopeParentOf`/`scopeChainOf`, carrier marks |
 | [`src/store.ts`](src/store.ts) | `ScopedLayers`, `NamedEntries`, `AnonymousEntries`, `ScopeLayer` |
-| [`src/invariant.ts`](src/invariant.ts) | Invariant companion over the generated scoped-event map |
-| [`src/scoped-events.generated.ts`](src/scoped-events.generated.ts) | Generated resolver map of declared scoped events |
 
 ### The parent chain
 
@@ -86,8 +84,7 @@ One relation powers both directions: registration views inherit DOWN the chain (
 The package-level contract is enough for most consumers; read these when you need the surrounding domain and the design rationale.
 
 - [Scoped registration subsystem](../../../docs/subsystems/scope.md) — the identity, carrier, and layer types.
-- [Agent-scope contexts Agent Note](../../../.agents/notes/implemented/architecture/2026-07-08-agent-scope-contexts.md) — the security non-goals and context design.
-- [Agent-scope runtime design Agent Note](../../../.agents/notes/implemented/architecture/2026-07-12-agent-scope-runtime-design.md) — how the loop builds per-agent scopes.
+- [Agent-scope runtime design reference](../agent-loop/README.md) — how the loop builds per-agent scopes.
 - [Core group map](../README.md) — how the core packages compose.
 
 -----

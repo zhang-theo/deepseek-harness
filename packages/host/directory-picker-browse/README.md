@@ -3,7 +3,7 @@ description: "In-app browsing backend of the directory-picker seam: one-level di
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-host-directory-picker-browse
+# @deepseek-ai/dsh-host-directory-picker-browse
 
 English | [中文](README.zh.md)
 
@@ -72,7 +72,6 @@ Every filesystem await races the caller's signal (`raceAbort`), so a stalled net
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | `BrowseDirectoryPicker` service: listing, creation, bounded window, error mapping |
-| — | No runtime invariant companion is published; each list/create is one stateless filesystem round trip; the filesystem itself is the authoritative state. |
 
 </details>
 

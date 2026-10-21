@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { jsonSchemaToPy, renderToolsSdkPy } from '@x1a0f3n9/dsh-tools/src/py-types.ts'
-import { parameterSchemaSpecToJsonSchema } from '@x1a0f3n9/dsh-tools'
-import type { ToolSdkSchema } from '@x1a0f3n9/dsh-tools/src/ts-types.ts'
+import { jsonSchemaToPy, renderToolsSdkPy } from '@deepseek-ai/dsh-tools/src/py-types.ts'
+import { parameterSchemaSpecToJsonSchema } from '@deepseek-ai/dsh-tools'
+import type { ToolSdkSchema } from '@deepseek-ai/dsh-tools/src/ts-types.ts'
 
 describe('jsonSchemaToPy', () => {
   it('maps the defineTool DSL subset', () => {
@@ -151,7 +151,7 @@ describe('renderToolsSdkPy', () => {
     expect(text).toContain('# tools["my-mcp.tool"](args: dict[str, Any]) -> str')
     expect(text).toContain('# tools["class"](args: dict[str, Any]) -> str')
     // Fixed instruction lines the model relies on.
-    expect(text).toContain('top-level `await`')
+    expect(text).toContain('and `description`, a short summary of what the program does')
     // The binding boundary: `tools`/`ToolCallError` are bound, the TypedDicts
     // are not. Both halves are pinned — dropping either one turns a correct
     // contract into a wrong one (a model that reads only "STATIC STUB" would
@@ -166,13 +166,11 @@ describe('renderToolsSdkPy', () => {
     expect(text).toContain('tools: Tools')
   })
 
-  it('names both required call arguments, not just the program', () => {
-    // The schema requires `code` AND `description`; instructions that mention
-    // only the program let a model emit `{code}` alone and fail INVALID_ARGS.
+  it('lists the program before its description', () => {
     const text = renderToolsSdkPy([bash])
     expect(text).toContain('`code`')
     expect(text).toContain('`description`')
-    expect(text).toContain('two required arguments')
+    expect(text).toContain('two required arguments: `code`')
   })
 
   it('renders required as plain fields and optional as NotRequired, with per-field description comments', () => {

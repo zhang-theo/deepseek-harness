@@ -6,7 +6,7 @@ English | [中文](2026-09-10-npm-layout-official-dsh-alias.zh.md)
 
 ## Problem
 
-`verify-npm-install-layout` serves only `@x1a0f3n9/dsh*` in its local registry. Preinstalled community plugins still declare `@deepseek-ai/dsh*` dependencies, so npm 404s and the Release publish job never starts.
+`verify-npm-install-layout` serves only `@deepseek-ai/dsh*` in its local registry. Preinstalled community plugins still declare `@deepseek-ai/dsh*` dependencies, so npm 404s and the Release publish job never starts.
 
 ## Decision
 

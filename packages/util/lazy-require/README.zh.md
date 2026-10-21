@@ -3,7 +3,7 @@ description: "按调用方解析并惰性加载 CommonJS 兼容的 Host 依赖�
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-lazy-require
+# @deepseek-ai/dsh-lazy-require
 
 [English](README.md) | 中文
 
@@ -28,7 +28,7 @@ kind: "package-library"
 传入依赖的字面量 specifier 与调用方的 `import.meta.url`：
 
 ```ts
-import { createLazyRequire } from '@x1a0f3n9/dsh-lazy-require'
+import { createLazyRequire } from '@deepseek-ai/dsh-lazy-require'
 
 interface NativeModule { open(): void }
 const requireNative = createLazyRequire<NativeModule>('native-package', import.meta.url)
@@ -79,8 +79,6 @@ const requireNative = createLazyRequire<NativeModule>('native-package', import.m
 
 - **仅限兼容 CommonJS 的依赖**——仅 ESM package 需要由调用方拥有异步 factory。
 - **WebWorker 打包需要显式请求**——静态 packer 无法发现仅在 `createLazyRequire()` 调用中命名的依赖。Preview image 使用的 package 必须通过受支持的字面量请求保持该依赖可达，直到 packer 能够识别此 helper。
-
-本包不发布运行时 invariant companion，因为 loader 不持有可独立观测的可变关系。
 
 <a id="dev-note"></a>
 ### 开发备注

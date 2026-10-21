@@ -1,16 +1,16 @@
 /**
- * Named wire types for the DeepSeek Harness SDK runtime protocol: the three
- * request/result pairs and the four server-to-client notification payloads
+ * Named wire types for the DeepSeek Harness SDK runtime protocol: its
+ * request/result pairs and server-to-client notification payloads
  * exchanged over the newline-delimited JSON-RPC stdio transport. The server
- * plugin (`@x1a0f3n9/dsh-sdk-jsonrpc-server`) and SDK clients share these shapes;
+ * plugin (`@deepseek-ai/dsh-sdk-jsonrpc-server`) and SDK clients share these shapes;
  * `serverInfo.name` stays the wire-stable `deepseek-harness-sdk-runtime`.
  *
- * @module @x1a0f3n9/dsh-sdk-protocol/types
+ * @module @deepseek-ai/dsh-sdk-protocol/types
  */
 
-import type { ContentBlock, ReasoningEffortId } from '@x1a0f3n9/dsh-llm'
-import type { SessionEvent } from '@x1a0f3n9/dsh-session'
-import type { SubagentStopReason } from '@x1a0f3n9/dsh-subagent'
+import type { ContentBlock, ReasoningEffortId } from '@deepseek-ai/dsh-llm'
+import type { SessionEvent } from '@deepseek-ai/dsh-session'
+import type { SubagentStopReason } from '@deepseek-ai/dsh-subagent'
 
 /** Parameters for the process-wide SDK handshake. */
 export interface InitializeParams {
@@ -56,6 +56,36 @@ export type SdkPromptContentBlock = ContentBlock | SdkEncodedImageBlock
 export interface SessionPromptResult {
   /** Identity of the queued user message. */
   messageId: string
+}
+
+/** Restore a persisted session without enqueueing a prompt. */
+export interface SessionResumeParams {
+  /** Persisted session identity; missing or already owned sessions are rejected. */
+  sessionId: string
+}
+
+/** Wait for an existing SDK session and its managed descendants to finish. */
+export interface SessionWaitParams {
+  /** An SDK-owned session id; waiting never creates a session. */
+  sessionId: string
+}
+
+/** Session whose effective working directory is requested; an unknown id creates the Session. */
+export interface SessionWorkingDirectoryParams {
+  /** SDK-side Session identity. */
+  sessionId: string
+}
+
+/** Change one Session's effective directory without changing its origin or permissions. */
+export interface SessionWorkingDirectorySetParams extends SessionWorkingDirectoryParams {
+  /** Directory to enter; relative paths resolve against the Session's current directory. */
+  path: string
+}
+
+/** Validated effective directory after a read, change, or missing-directory recovery. */
+export interface SessionWorkingDirectoryResult {
+  /** Absolute directory used by future independent operations and new processes. */
+  cwd: string
 }
 
 /** Deployment-mapped SDK outcome: `ok` for an accepted result, `error` otherwise. */
@@ -115,5 +145,9 @@ export interface HarnessSdkNotificationMap {
 export interface HarnessSdkRequestMap {
   'initialize': { params: InitializeParams; result: InitializeResult }
   'session/prompt': { params: SessionPromptParams; result: SessionPromptResult }
+  'session/resume': { params: SessionResumeParams; result: Record<string, never> }
+  'session/wait': { params: SessionWaitParams; result: Record<string, never> }
+  'session/working-directory/get': { params: SessionWorkingDirectoryParams; result: SessionWorkingDirectoryResult }
+  'session/working-directory/set': { params: SessionWorkingDirectorySetParams; result: SessionWorkingDirectoryResult }
   'shutdown': { params: undefined; result: Record<string, never> }
 }

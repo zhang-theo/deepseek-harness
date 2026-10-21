@@ -3,7 +3,7 @@ description: "面向部署场景的自动会话压缩（compaction）：用于�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-compaction-basic
+# @deepseek-ai/dsh-compaction-basic
 
 [English](README.md) | 中文
 
@@ -36,17 +36,17 @@ kind: "package-reference"
 挂载会话存储、token 测量、可选修剪器、本后端，以及可选的按需命令：
 
 ```yaml
-- name: '@x1a0f3n9/dsh-session'
-- name: '@x1a0f3n9/dsh-token-meter'
-- name: '@x1a0f3n9/dsh-compaction-tool-result-pruner'
-- name: '@x1a0f3n9/dsh-compaction-basic'
-- name: '@x1a0f3n9/dsh-command-compact'
+- name: '@deepseek-ai/dsh-session'
+- name: '@deepseek-ai/dsh-token-meter'
+- name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+- name: '@deepseek-ai/dsh-compaction-basic'
+- name: '@deepseek-ai/dsh-command-compact'
 ```
 
 你可以通过观察会话越过本来会溢出的位置继续工作、以及运行 `/compact` 立即压缩一次来确认成功。如果组合缺少 LLM、会话存储或 token 测量，插件会加载失败。同一个后端可以服务上下文大小不同的模型；用按模型覆盖为每条路由设置各自的阈值与保留：
 
 ```yaml
-- name: '@x1a0f3n9/dsh-compaction-basic'
+- name: '@deepseek-ai/dsh-compaction-basic'
   config:
     thresholdRatio: 0.8
     retainRatio: 0.16
@@ -137,7 +137,6 @@ kind: "package-reference"
 | [`src/summarizer.ts`](src/summarizer.ts) | 默认 `ctx.llm.stream()` 摘要、检查点框定、安全摘要投影 |
 | [`src/config.ts`](src/config.ts) | 加载时验证与路由模型策略解析 |
 | [`src/types.ts`](src/types.ts) | `BasicCompactionConfig` 与已解析策略词汇 |
-| — | 不发布运行时不变式配套条目；除所属 seam 强制执行的约定外，本包不公开独立事件序列或可变数据关系。持久标记对仍可在会话日志中观察。 |
 
 </details>
 

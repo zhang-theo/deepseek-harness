@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import LlmRuntime, { createToolResultMessage, createUserMessage, ToolCallId, ReasoningEffortId } from '@x1a0f3n9/dsh-llm'
-import type { Message, ToolSchema } from '@x1a0f3n9/dsh-llm'
-import * as LlmPiAi from '@x1a0f3n9/dsh-llm-pi-ai'
-import type { PiAiProviderProfile } from '@x1a0f3n9/dsh-llm-pi-ai'
-import * as LlmDeepSeek from '@x1a0f3n9/dsh-llm-deepseek-api-key'
+import LlmRuntime, { createToolResultMessage, createUserMessage, ToolCallId, ReasoningEffortId } from '@deepseek-ai/dsh-llm'
+import type { Message, ToolSchema } from '@deepseek-ai/dsh-llm'
+import * as LlmPiAi from '@deepseek-ai/dsh-llm-pi-ai'
+import type { PiAiProviderProfile } from '@deepseek-ai/dsh-llm-pi-ai'
+import * as LlmDeepSeek from '@deepseek-ai/dsh-llm-deepseek-api-key'
 import { assemble, type AssembledResult } from './assemble.ts'
 
 /**
@@ -13,7 +13,7 @@ import { assemble, type AssembledResult } from './assemble.ts'
  * and exercises a replayed tool follow-up. Key-gated.
  */
 
-const FLASH = 'deepseek-v4-flash'
+const FLASH = 'deepseek-flash'
 const contexts: Context[] = []
 
 async function harness(_model: string, config: Partial<PiAiProviderProfile> = {}) {

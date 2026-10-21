@@ -3,7 +3,7 @@ description: "Web 会话日志 ZIP 导出：Host 流式传输、认证下载路�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-session-log-export
+# @deepseek-ai/dsh-session-log-export
 
 [English](README.md) | 中文
 
@@ -37,7 +37,7 @@ kind: "package-reference"
 
 ```yaml
 - id: session-log-download
-  name: '@x1a0f3n9/dsh-session-log-export'
+  name: '@deepseek-ai/dsh-session-log-export'
 ```
 
 Web bundle 将本包与 Connection、`dsh-commands`、`dsh-client-ui-commands` 和 `dsh-client-ui-conversation` 一起挂载。
@@ -143,5 +143,3 @@ Host 路由是由该功能拥有的精确 Fetch 路由贡献。Connection 应用
 下载刻意限定在浏览器范围；Host 路径或原生文件夹导出需要新的端点约定，并决定 ZIP 的落盘位置。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。Connection 与命令注册表持有两个注册，每次导出均读取权威的 Session 服务。

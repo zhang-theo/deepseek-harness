@@ -3,7 +3,7 @@ description: "通过已安装的 Cua Driver MCP 可执行程序和独占提供�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-experimental-computer-use-cua-driver-mcp
+# @deepseek-ai/dsh-experimental-computer-use-cua-driver-mcp
 
 [English](README.md) | 中文
 
@@ -32,8 +32,8 @@ kind: "package-reference"
 将以下条目加入已提供 tools 和 system-prompt 服务的组合。截图还需要附件存储，以及声明支持图像输入的模型路由。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-computer-use'
-- name: '@x1a0f3n9/dsh-experimental-computer-use-cua-driver-mcp'
+- name: '@deepseek-ai/dsh-computer-use'
+- name: '@deepseek-ai/dsh-experimental-computer-use-cua-driver-mcp'
   config:
     command: cua-driver
     args: [mcp]
@@ -63,8 +63,6 @@ kind: "package-reference"
 <summary>实现细节 — 点击展开</summary>
 
 [`src/index.ts`](src/index.ts) 将计算机使用注册和所属 MCP 子插件归入同一个有序副作用。子插件完成清理后才运行注册释放函数，激活失败时也遵循这一顺序。MCP 客户端负责凭据过滤、子进程终止、工具同步、取消和持久化图像投影。
-
-本包不发布运行时不变量伴随插件：提供者没有独立的驱动状态可与注册比较，连接和工具代次由子插件持有。
 
 ### 验证已安装的驱动
 

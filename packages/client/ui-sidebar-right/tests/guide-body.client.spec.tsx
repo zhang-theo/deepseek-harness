@@ -9,17 +9,17 @@
  */
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render } from '@testing-library/react'
-import type { GlobalStandardProps, RenderOpts, SessionStandardProps } from '@x1a0f3n9/dsh-client-ui-slots'
-import type { ShortcutCatalogEntry } from '@x1a0f3n9/dsh-client-shortcuts/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { PaneId, TabId } from '@x1a0f3n9/dsh-client-ui-dockkit'
+import type { GlobalStandardProps, RenderOpts, SessionStandardProps } from '@deepseek-ai/dsh-client-ui-slots'
+import type { ShortcutCatalogEntry } from '@deepseek-ai/dsh-client-shortcuts/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { PaneId, TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { ReactNode } from 'react'
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
-import type { IconProps } from '@x1a0f3n9/dsh-client-ui-primitives'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { IconProps } from '@deepseek-ai/dsh-client-ui-primitives'
 import { GuideBody } from '../src/client/tabs/guide/GuideBody.tsx'
 import type { GuideBodyProps } from '../src/client/tabs/guide/GuideBody.tsx'
 import type { SidebarRightGuideBox } from '../src/client/tab-registry.ts'
-import { bindSnapshotSelector } from '@x1a0f3n9/dsh-client-test-runtime'
+import { allowAllAccess, bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
 import css from '../src/client/tabs/guide/GuideBody.module.css'
 
 afterEach(cleanup)
@@ -31,7 +31,8 @@ const standard: GlobalStandardProps & SessionStandardProps = {
   useInput: unused, useChat: unused, useTrajectory: unused,
   usePanelInfo: unused, useSessions: unused, useSessionStatus: unused,
   useSessionRetainInfo: unused, useResource: unused, useWorkspaces: unused,
-  inputActions: { captureInsertion: unused, insertText: unused, setDraft: unused,
+  ...allowAllAccess,
+  inputActions: { captureInsertion: unused, insertText: unused, setDraft: unused, persistDraft: unused,
     addAttachments: unused, removeAttachment: unused, pruneAttachments: unused, submit: unused },
 }
 

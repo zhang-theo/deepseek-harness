@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { createUserMessage } from '@x1a0f3n9/dsh-llm'
+import { createUserMessage } from '@deepseek-ai/dsh-llm'
 import SessionStore, {
   SESSION_FORMAT_VERSION,
   SESSION_LIVE_WINDOW_EVENTS,
@@ -9,7 +9,7 @@ import SessionStore, {
   SessionId,
   SessionLogOffset,
   SessionSeq,
-} from '@x1a0f3n9/dsh-session'
+} from '@deepseek-ai/dsh-session'
 
 function appendClosedTurn(session: Session, turn: number): void {
   session.append('turn/start', { turn })

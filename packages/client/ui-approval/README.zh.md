@@ -2,7 +2,7 @@
 description: "通过作用域交互路径响应 Host 权限请求的浏览器批准界面。"
 kind: "package-reference"
 ---
-# @x1a0f3n9/dsh-client-ui-approval
+# @deepseek-ai/dsh-client-ui-approval
 
 [English](README.md) | 中文
 
@@ -45,5 +45,3 @@ kind: "package-reference"
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。Remote listener 与临时 Slot entry 由各自注册表持有并观察。

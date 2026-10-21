@@ -16,18 +16,18 @@
  * artifact is the formatted result saved through `ctx.spillStore.saveText()`
  * ({@link trySaveFormattedResult}).
  *
- * @module @x1a0f3n9/dsh-tool-fs-search/search-core
+ * @module @deepseek-ai/dsh-tool-fs-search/search-core
  */
 
 import { existsSync } from 'node:fs'
 import { isAbsolute, join, parse, relative, sep } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
-import { HarnessError } from '@x1a0f3n9/dsh-llm'
-import { ItemRetainer, TextRetainer } from '@x1a0f3n9/dsh-output-retention'
-import type { RetainedItems } from '@x1a0f3n9/dsh-output-retention'
-import type { SubprocessHandle, SubprocessOutcome, SubprocessOutputRead, SubprocessSpawnSpec } from '@x1a0f3n9/dsh-subprocess'
-import type { SaveTextSpill, SpillRef } from '@x1a0f3n9/dsh-spill'
-import type { ToolExecution } from '@x1a0f3n9/dsh-tools'
+import { HarnessError } from '@deepseek-ai/dsh-llm'
+import { ItemRetainer, TextRetainer } from '@deepseek-ai/dsh-output-retention'
+import type { RetainedItems } from '@deepseek-ai/dsh-output-retention'
+import type { SubprocessHandle, SubprocessOutcome, SubprocessOutputRead, SubprocessSpawnSpec } from '@deepseek-ai/dsh-subprocess'
+import type { SaveTextSpill, SpillRef } from '@deepseek-ai/dsh-spill'
+import type { ToolExecution } from '@deepseek-ai/dsh-tools'
 
 /**
  * Default cap on the complete raw `rg` stdout the tools will parse (the
@@ -38,7 +38,7 @@ export const RAW_OUTPUT_MAX_BYTES = 20_000_000
 /**
  * Default cooperative tool-call timeout budget in milliseconds (the `timeoutMs`
  * config), attached to both tool definitions for
- * `@x1a0f3n9/dsh-tool-call-timeout-policy` to enforce through `exec.signal`.
+ * `@deepseek-ai/dsh-tool-call-timeout-policy` to enforce through `exec.signal`.
  */
 export const SEARCH_TIMEOUT_MS = 30_000
 
@@ -186,9 +186,9 @@ export function resolveRgPath(): Promise<string> {
 /**
  * Run the packaged ripgrep binary with a plain argv vector and return its
  * complete raw stdout. The working directory is the calling agent's session
- * cwd (`exec.agent.session.header.cwd`) when available, else
+ * current directory when available, else
  * `process.cwd()`. `exec.signal` is forwarded so the cooperative tool timeout
- * (`@x1a0f3n9/dsh-tool-call-timeout-policy`) and caller cancellation terminate the
+ * (`@deepseek-ai/dsh-tool-call-timeout-policy`) and caller cancellation terminate the
  * process tree.
  *
  * The spawn is unconfined (a plain `ctx.subprocess` call), so `--no-config`
@@ -211,7 +211,7 @@ export function resolveRgPath(): Promise<string> {
  * creation time becomes `SEARCH_ABORTED` instead.
  *
  * @param ctx - the plugin context; execution uses its `subprocess` service.
- * @param exec - the tool-execution context; supplies the session cwd and the abort signal.
+ * @param exec - the tool-execution context; supplies the owning Agent and the abort signal.
  * @param toolName - `glob` or `grep`, used in error messages.
  * @param argv - the ripgrep arguments (every model value an unquoted argv element; no shell layer exists).
  * @param rawOutputMaxBytes - cap on the complete raw stdout the tool will parse.
@@ -231,8 +231,9 @@ export async function runRipgrep(
   if (exec.signal.aborted) {
     throw new SearchError(`${toolName} was aborted before completion (tool timeout or caller cancellation)`, 'SEARCH_ABORTED')
   }
-  const cwd = exec.agent?.session.header.cwd
-  const workdir = cwd ?? process.cwd()
+  const workdir = exec.agent === undefined
+    ? process.cwd()
+    : await ctx.workingDirectory.ensure(exec.agent, exec.signal)
   let handle: SubprocessHandle
   try {
     handle = ctx.subprocess.spawn({
@@ -331,9 +332,9 @@ export function previewLine(line: string, maxBytes: number): string {
 /**
  * Apply the shared inline cap to a canonical `grep` match list: preview each
  * retained line to `maxLineBytes` and keep the first `maxMatches`. The single
- * retention pass both the model-facing render ({@link module:@x1a0f3n9/dsh-tool-fs-search/grep}
+ * retention pass both the model-facing render ({@link module:@deepseek-ai/dsh-tool-fs-search/grep}
  * `formatGrepOutput`) and the search-card projection
- * ({@link module:@x1a0f3n9/dsh-tool-fs-search/presentation} `grepSearchMeta`)
+ * ({@link module:@deepseek-ai/dsh-tool-fs-search/presentation} `grepSearchMeta`)
  * consume, so text and card never disagree about which matches survived.
  *
  * @param matches - every match the search parsed (the canonical value's matches).

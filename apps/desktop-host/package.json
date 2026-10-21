@@ -1,28 +1,35 @@
 {
-  "name": "@x1a0f3n9/dsh-desktop-host",
+  "name": "@deepseek-ai/dsh-desktop-host",
   "description": "Private Node-mode host process for the Electron desktop application",
-  "version": "0.1.7-rc.4",
+  "version": "0.2.1-rc.2",
   "private": true,
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
   "files": [
-    "lib/index.js"
+    "lib/index.js",
+    "lib/cli.js"
   ],
   "dependencies": {
-    "@deepseek-ai/libreoffice-kit": "^0.1.1",
+    "koffi": "3.1.1",
+    "@deepseek-ai/libreoffice-kit": "^0.1.5",
     "@deepseek-ai/cordis": "workspace:~",
-    "@x1a0f3n9/dsh": "workspace:*",
-    "@x1a0f3n9/dsh-agent": "workspace:*",
-    "@x1a0f3n9/dsh-app-boot": "workspace:*",
-    "@x1a0f3n9/dsh-client-connection": "workspace:*",
-    "@x1a0f3n9/dsh-host-webserver": "workspace:*",
-    "@x1a0f3n9/dsh-home-paths": "workspace:*",
-    "@x1a0f3n9/dsh-jobs": "workspace:*",
-    "@x1a0f3n9/dsh-schedule": "workspace:*",
-    "@x1a0f3n9/dsh-tool-workspace-dependencies": "workspace:*",
-    "@x1a0f3n9/dsh-skill-office": "workspace:*",
-    "@x1a0f3n9/dsh-deepseek-account": "workspace:*",
-    "@x1a0f3n9/dsh-workspace": "workspace:*"
+    "@deepseek-ai/dsh": "workspace:*",
+    "@deepseek-ai/dsh-agent": "workspace:*",
+    "@deepseek-ai/dsh-app-boot": "workspace:*",
+    "@deepseek-ai/dsh-client-connection": "workspace:*",
+    "@deepseek-ai/dsh-host-webserver": "workspace:*",
+    "@deepseek-ai/dsh-home-paths": "workspace:*",
+    "@deepseek-ai/dsh-jobs": "workspace:*",
+    "@deepseek-ai/dsh-schedule": "workspace:*",
+    "@deepseek-ai/dsh-tool-workspace-dependencies": "workspace:*",
+    "@deepseek-ai/dsh-skill-office": "workspace:*",
+    "@deepseek-ai/dsh-deepseek-account": "workspace:*",
+    "@deepseek-ai/dsh-workspace": "workspace:*"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis-plugin-loader": "workspace:~",
+    "@deepseek-ai/cordis-plugin-include": "workspace:~",
+    "@deepseek-ai/dsh-skill": "workspace:*"
   }
 }

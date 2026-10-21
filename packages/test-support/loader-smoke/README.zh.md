@@ -3,7 +3,7 @@ description: "面向无密钥示例冒烟测试的共享子进程与直接 agent
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-loader-smoke
+# @deepseek-ai/dsh-loader-smoke
 
 [English](README.md) | 中文
 
@@ -81,7 +81,6 @@ harness 建立在一个分离之上：冒烟测试在隔离世界中的子进程
 |---|---|
 | [`src/index.ts`](src/index.ts) | 模式解析器、`runLoaderSmoke` 子进程 harness、选项与结果类型 |
 | [`src/agent-turn.ts`](src/agent-turn.ts) | `runFixtureTurn` 直接 agent driver 与结果信封 |
-| — | 不发布运行时不变量伴生入口；该测试支持包不负责维护生产事件流或可变数据；消费它的测试套件会检验该 harness。 |
 | [`tests/fixtures/production-profile.ts`](tests/fixtures/production-profile.ts) | 仅限仓库内部、供集成 fixture 使用的交付 profile 组装 helper |
 
 </details>

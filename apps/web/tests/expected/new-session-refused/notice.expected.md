@@ -1,1 +1,1 @@
-- alert: "新建会话失败：agent-preset/invalid: ghost (@x1a0f3n9/dsh-no-such-plugin): never started"
+- alert: "新建会话失败：agent-preset/invalid: ghost (@deepseek-ai/dsh-no-such-plugin): never started"

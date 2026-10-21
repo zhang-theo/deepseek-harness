@@ -3,7 +3,7 @@ description: "Semantic session durability checkpoints for users and maintainers 
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-session-checkpoint-policy
+# @deepseek-ai/dsh-session-checkpoint-policy
 
 English | [中文](README.zh.md)
 
@@ -37,10 +37,10 @@ No configuration fields exist; the plugin is a single load beside one persistenc
 
 ```yaml
 - id: session-persistence
-  name: '@x1a0f3n9/dsh-session-persistence-jsonl'
+  name: '@deepseek-ai/dsh-session-persistence-jsonl'
 
 - id: session-checkpoints
-  name: '@x1a0f3n9/dsh-session-checkpoint-policy'
+  name: '@deepseek-ai/dsh-session-checkpoint-policy'
 ```
 
 ### What becomes durable
@@ -70,7 +70,6 @@ The plugin is a listener-only composition over three seams, with no state of its
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry: `apply` installs the three checkpoint listeners |
-| — | No runtime invariant companion is published; checkpoint ordering is enforced at the intercepted waterfall and persistence seams; this stateless policy owns no independent mutable relation. |
 
 </details>
 

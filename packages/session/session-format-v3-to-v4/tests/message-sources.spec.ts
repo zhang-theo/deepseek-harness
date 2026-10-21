@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { SessionFormatEventCollector } from '@x1a0f3n9/dsh-session-format'
-import type { SessionFormatEvent, SessionFormatJsonObject } from '@x1a0f3n9/dsh-session-format'
-import { createSessionFormatCatalogWithChildren, sessionFormatCatalog } from '@x1a0f3n9/dsh-session-format-catalog'
+import { SessionFormatEventCollector } from '@deepseek-ai/dsh-session-format'
+import type { SessionFormatEvent, SessionFormatJsonObject } from '@deepseek-ai/dsh-session-format'
+import { createSessionFormatCatalogWithChildren, sessionFormatCatalog } from '@deepseek-ai/dsh-session-format-catalog'
 import { assertV4MessageSources, assertV4SourceRowAdmission, liftRetiredPluginSources } from '../src/message-sources.ts'
 import { releasedV4SessionFormatCodec } from '../src/codec.ts'
 
@@ -62,7 +62,7 @@ describe('V4 source admission', () => {
     })
     const system = {
       type: 'system/message', seq: 0, time: 1,
-      data: { turn: 1, step: 1, message: { id: 's', role: 'system', source: { kind: 'plugin', plugin: '@x1a0f3n9/dsh-system-prompt' }, content: [] } },
+      data: { turn: 1, step: 1, message: { id: 's', role: 'system', source: { kind: 'plugin', plugin: '@deepseek-ai/dsh-system-prompt' }, content: [] } },
     }
     expect(sessionFormatCatalog.encodeCurrentEvent(system)).toMatchObject({
       data: { message: { source: { kind: 'system-prompt' } } },

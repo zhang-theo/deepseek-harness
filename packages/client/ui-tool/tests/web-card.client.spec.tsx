@@ -1,17 +1,18 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { useDisclosure } from '@x1a0f3n9/dsh-client-ui-chat/src/client/chat/use-disclosure.ts'
+import { useDisclosure } from '@deepseek-ai/dsh-client-ui-chat/src/client/chat/use-disclosure.ts'
 import { cleanup, fireEvent, render } from '@testing-library/react'
-import type { StartedToolCall, ToolResultNode } from '@x1a0f3n9/dsh-client-ui-chat/client'
-import type { ToolCallOwnerProps } from '@x1a0f3n9/dsh-client-ui-tool/client'
-import { IconGlobeOutlineRegular } from '@x1a0f3n9/dsh-client-ui-primitives'
+import type { StartedToolCall, ToolResultNode } from '@deepseek-ai/dsh-client-ui-chat/client'
+import type { ToolCallOwnerProps } from '@deepseek-ai/dsh-client-ui-tool/client'
+import { IconGlobeOutlineRegular } from '@deepseek-ai/dsh-client-ui-primitives'
 import { webCardModel, webFetchHref } from '../src/client/tool/models/web-card-model.ts'
 import { GenericToolCard } from '../src/client/tool/toolviews/GenericToolCard.tsx'
 import { WebRow, webToolview } from '../src/client/tool/toolviews/web-row.tsx'
-import { makeTranslate } from '@x1a0f3n9/dsh-client-test-runtime'
-import { zh as commonZh } from '@x1a0f3n9/dsh-client-locale/src/locales/zh.ts'
-import { zh } from '@x1a0f3n9/dsh-client-ui-conversation/src/client/locales.ts'
+import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { zh as commonZh } from '@deepseek-ai/dsh-client-locale/src/locales/zh.ts'
+import { zh } from '@deepseek-ai/dsh-client-ui-conversation/src/client/locales.ts'
+import { PartialArguments } from '@deepseek-ai/dsh-util-values'
 
 afterEach(cleanup)
 
@@ -49,26 +50,37 @@ const fetchMeta = (over?: Partial<FetchMeta>): FetchMeta => ({
   url: 'https://example.com/page', statusCode: 200, truncated: false, ...over,
 })
 
-const runningSearch = (over?: Partial<StartedToolCall>): StartedToolCall => ({
-  phase: 'start' as const, callId: 'c1', name: 'web_search', argsRaw: SEARCH_ARGS,
-  turn: 1, step: 1, time: 1_000, subCalls: [], ...over,
-})
+const runningSearch = (over?: Partial<StartedToolCall>): StartedToolCall => {
+  const argsRaw = over?.argsRaw ?? SEARCH_ARGS
+  return {
+    phase: 'start' as const, args: PartialArguments.fromText(argsRaw), callId: 'c1', name: 'web_search', argsRaw,
+    turn: 1, step: 1, time: 1_000, subCalls: [], ...over,
+  }
+}
 
-const settledSearch = (over?: Partial<ToolResultNode>): ToolResultNode => ({
-  kind: 'tool-result', seq: 10, time: 2_000, callId: 'c1',
-  call: { name: 'web_search', argsRaw: SEARCH_ARGS },
-  callTime: 1_000,
-  content: [{ type: 'text', text: 'search text' }], isError: false,
-  meta: searchMeta(), subCalls: [], ...over,
-})
+const settledSearch = (over?: Partial<ToolResultNode>): ToolResultNode => {
+  const call = over?.call === undefined ? { name: 'web_search', argsRaw: SEARCH_ARGS } : over.call
+  return {
+    kind: 'tool-result', seq: 10, time: 2_000, callId: 'c1',
+    name: call?.name ?? '', args: call === null ? PartialArguments.EMPTY : PartialArguments.fromText(call.argsRaw),
+    call,
+    callTime: 1_000,
+    content: [{ type: 'text', text: 'search text' }], isError: false,
+    meta: searchMeta(), subCalls: [], ...over,
+  }
+}
 
-const settledFetch = (over?: Partial<ToolResultNode>): ToolResultNode => ({
-  kind: 'tool-result', seq: 11, time: 2_000, callId: 'c2',
-  call: { name: 'web_fetch', argsRaw: FETCH_ARGS },
-  callTime: 1_000,
-  content: [{ type: 'text', text: 'fetch body' }], isError: false,
-  meta: fetchMeta(), subCalls: [], ...over,
-})
+const settledFetch = (over?: Partial<ToolResultNode>): ToolResultNode => {
+  const call = over?.call === undefined ? { name: 'web_fetch', argsRaw: FETCH_ARGS } : over.call
+  return {
+    kind: 'tool-result', seq: 11, time: 2_000, callId: 'c2',
+    name: call?.name ?? '', args: call === null ? PartialArguments.EMPTY : PartialArguments.fromText(call.argsRaw),
+    call,
+    callTime: 1_000,
+    content: [{ type: 'text', text: 'fetch body' }], isError: false,
+    meta: fetchMeta(), subCalls: [], ...over,
+  }
+}
 
 describe('webCardModel', () => {
   it('derives a search card from result metadata, projecting every source field', () => {

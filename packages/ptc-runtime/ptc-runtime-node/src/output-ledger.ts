@@ -1,5 +1,5 @@
 /** Combined byte accounting for retained program output. */
-import type { PtcJsonValue, PtcRunFailure, PtcRunResult } from '@x1a0f3n9/dsh-ptc-runtime'
+import type { PtcJsonValue, PtcRunFailure, PtcRunResult } from '@deepseek-ai/dsh-ptc-runtime'
 import { jsonStringBytesUpTo, jsonValueBytesUpTo, truncateJsonStringBytes } from './output-json.ts'
 
 /** One run's combined outer-output ledger; binding values never enter it. */
@@ -7,7 +7,7 @@ export class OutputLedger {
   private bytes = 2 // JSON serialization of the empty logs array: []
   private entries = 0
 
-  constructor(private readonly maxBytes: number) {}
+  constructor(private readonly maxBytes: number, private readonly overflowMessage?: string) {}
 
   /** Admit one exact log entry, or report that the hard cap was crossed. */
   admit(text: string, sink: string[]): boolean {
@@ -34,7 +34,7 @@ export class OutputLedger {
 
   /** Build the explicit output-limit failure while retaining a fitting prefix of the final log. */
   limit(logs: string[]): PtcRunResult {
-    const fullMessage = `outer output exceeded ${this.maxBytes} bytes`
+    const fullMessage = this.overflowMessage ?? `outer output exceeded ${this.maxBytes} bytes`
     // The fixed diagnostic is ASCII, so every character is one byte plus the quotes.
     const messageBytes = fullMessage.length + 2
     const retained: string[] = []

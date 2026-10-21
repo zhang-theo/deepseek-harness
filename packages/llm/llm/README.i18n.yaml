@@ -20,13 +20,13 @@
 /x1a0f3n9-dsh-llm/use-this-package/when-to-choose-it:
   en: c3ecb5a1421f27db
   zh: 4bbd3c0e513845e1
-/x1a0f3n9-dsh-llm/use-this-package/minimal-composition:
-  en: 7550d716b90fcb09
-  zh: 77891a44ee623c7a
-/x1a0f3n9-dsh-llm/use-this-package/what-you-can-do:
-  en: b45d7a414141734e
-  zh: a641c8ea3827cee6
-/x1a0f3n9-dsh-llm/use-this-package/failures-and-recovery:
+/deepseek-ai-dsh-llm/use-this-package/minimal-composition:
+  en: 9d481d19dc52e404
+  zh: aa09cf4462e93ba6
+/deepseek-ai-dsh-llm/use-this-package/what-you-can-do:
+  en: dc61eb86585f6e0d
+  zh: 9c0d6b240dfd2cda
+/deepseek-ai-dsh-llm/use-this-package/failures-and-recovery:
   en: 311d8c92447b7094
   zh: 68cf5cb1c3853cc1
 /x1a0f3n9-dsh-llm/understand-the-implementation:
@@ -38,10 +38,10 @@
 /x1a0f3n9-dsh-llm/understand-the-implementation/source-map:
   en: ae1618577f4e8364
   zh: a6e8ab1563c08dfb
-/x1a0f3n9-dsh-llm/understand-the-implementation/main-flow:
-  en: 6dc955a0d80f6ca0
-  zh: f81dbcaeacd8b269
-/x1a0f3n9-dsh-llm/understand-the-implementation/invariants:
+/deepseek-ai-dsh-llm/understand-the-implementation/main-flow:
+  en: c95d4947745e39bb
+  zh: ec37b969f27629e2
+/deepseek-ai-dsh-llm/understand-the-implementation/invariants:
   en: 0163a050239248e5
   zh: 885c95bedcbe2ff4
 /x1a0f3n9-dsh-llm/further-exploration:

@@ -1,7 +1,7 @@
 import { Context } from '@deepseek-ai/cordis'
-import { CordisInspectRegistryService } from '@x1a0f3n9/dsh-cordis-host-runner'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import ToolRegistry from '@x1a0f3n9/dsh-tools'
+import { CordisInspectRegistryService } from '@deepseek-ai/dsh-cordis-host-runner'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import ToolRegistry from '@deepseek-ai/dsh-tools'
 import { describe, expect, it } from 'vitest'
 import * as CordisInspectProviders from '../src/host.ts'
 
@@ -17,7 +17,7 @@ async function host(): Promise<Context> {
   // The tool registry injects `systemPrompt`; nothing under test registers a prompt section.
   await ctx.plugin(SystemPrompt)
   await ctx.plugin(ToolRegistry)
-  await ctx.plugin(CordisInspectRegistryService)
+  await ctx.plugin(CordisInspectRegistryService, 10_000)
   return ctx
 }
 

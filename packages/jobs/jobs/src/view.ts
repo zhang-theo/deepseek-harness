@@ -3,12 +3,12 @@
  * chunks its output ring hands out. This leaf reaches no Host package, so
  * browser programs and Remote wire types import it without pulling the
  * registry's Host declaration merges.
- * @module @x1a0f3n9/dsh-jobs/view
+ * @module @deepseek-ai/dsh-jobs/view
  */
 
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 // Type-only: the Workspace registry's archive-admission family map this seam merges `job` into.
-import type {} from '@x1a0f3n9/dsh-workspace/types'
+import type {} from '@deepseek-ai/dsh-workspace/types'
 import type { JobId } from './brand.ts'
 
 /**
@@ -18,7 +18,7 @@ import type { JobId } from './brand.ts'
  */
 export type JobStatus = 'running' | 'stopping' | 'completed' | 'killed' | 'failed'
 
-declare module '@x1a0f3n9/dsh-workspace/types' {
+declare module '@deepseek-ai/dsh-workspace/types' {
   interface SessionActivityKindMap {
     /** A background job owned by this session is running or stopping. */
     job: true
@@ -31,7 +31,6 @@ declare module '@x1a0f3n9/dsh-workspace/types' {
  */
 export interface JobKindMap {
   bash: 'bash'
-  subagent: 'subagent'
 }
 
 /** The merge-extensible union of registered producer kind names. */
@@ -63,7 +62,7 @@ export interface JobChunk {
  * stream all consume this one shape.
  */
 export interface JobView {
-  /** The registry-issued id (`<kind>-N`). */
+  /** The registry-issued id (`<kind>-<short-uuid>`). */
   readonly id: JobId
   /**
    * The producer kind the job was registered with: a Host-registered

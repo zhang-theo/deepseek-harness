@@ -1,17 +1,17 @@
 import type {
   ConversationNode, ConversationTimelineSnapshot, PartialAssistant, RunningToolCall,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type { ChatConversationViewNode, ChatNodeDataMap, ChatNodeKind } from './chat-nodes.ts'
-import type { ObservableSnapshot } from '@x1a0f3n9/dsh-client-store'
+import type { ObservableSnapshot } from '@deepseek-ai/dsh-client-store'
 import type { TurnProcessSpec } from './turn-process.ts'
 
 export type {
   AssistantBlock, AssistantMessageNode, AssistantProviderMetadataView, AssistantRequestConfig,
   AssistantTiming, CommandNode, CompactionSummaryNode, ContextMessageNode, ConversationNode,
   ModelRetryNode, PartialAssistant, PreparingToolCall, RunningToolCall, StartedToolCall, SteeringMessageNode, TodoItem,
-  ToolCallBlock, ToolResultNode, TurnErrorNode, TurnMaxTokensNode, UnknownSurfaceNode,
+  ToolArgs, ToolCallBlock, ToolResultNode, TurnErrorNode, TurnMaxTokensNode, UnknownSurfaceNode,
   UserMessageNode,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
 
 /** Per-key observable used by one mounted Chat Node Seat. */
 export interface ChatNodeSource {
@@ -35,6 +35,11 @@ export interface ChatNodeStore {
   get(key: string): ChatConversationViewNode | undefined
   /** @param key - stable Conversation Context key. @returns its identity-stable observable source. */
   source(key: string): ChatNodeSource
+  /**
+   * @param key - Chat Node identity.
+   * @returns whether the visible Node belongs to the latest loaded exchange (see `ChatConversationViewNode.groupTree`).
+   */
+  bottomSource(key: string): ObservableSnapshot<boolean>
   /**
    * Observe one Turn's data for a single Node kind, including hidden Nodes, in anchor order.
    * Other Turns and kinds do not notify this source.
@@ -92,7 +97,7 @@ export interface ChatTurnProcessPresentation {
   readonly compactAnswer: boolean
 }
 
-/** Compatibility projection backing StatsPills and the legacy top-level snapshot fields. */
+/** Compatibility projection backing the composer stats pills (StatsPills.tsx) and the legacy top-level snapshot fields. */
 export interface LegacyConversationSlice {
   readonly nodes: readonly ConversationNode[]
   readonly turnTimings: ReadonlyMap<number, { readonly startTime: number; readonly endTime?: number }>
@@ -111,7 +116,7 @@ export interface ChatSnapshot {
   readonly legacy: LegacyConversationSlice
 }
 
-declare module '@x1a0f3n9/dsh-client-ui-conversation/client' {
+declare module '@deepseek-ai/dsh-client-ui-conversation/client' {
   interface ConversationViewSnapshotMap {
     chat: ChatSnapshot
   }
@@ -121,6 +126,10 @@ const EMPTY_LIST: readonly never[] = []
 const EMPTY_TIMELINE: ConversationTimelineSnapshot = { turnOrder: EMPTY_LIST, turns: new Map() }
 const EMPTY_NODE_SOURCE: ChatNodeSource = {
   getSnapshot: () => undefined,
+  subscribe: () => () => {},
+}
+const EMPTY_BOTTOM_SOURCE: ObservableSnapshot<boolean> = {
+  getSnapshot: () => false,
   subscribe: () => () => {},
 }
 const EMPTY_NODE_PROCESS_SOURCE: ChatNodeProcessSource = {
@@ -138,6 +147,7 @@ export const EMPTY_CHAT_SNAPSHOT: ChatSnapshot = {
   nodes: {
     get: () => undefined,
     source: () => EMPTY_NODE_SOURCE,
+    bottomSource: () => EMPTY_BOTTOM_SOURCE,
     turnDataSource: () => EMPTY_TURN_NODE_SOURCE,
     processSource: () => EMPTY_NODE_PROCESS_SOURCE,
     values: () => EMPTY_LIST,

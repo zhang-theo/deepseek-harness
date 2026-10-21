@@ -1,6 +1,6 @@
 /**
  * Split a credential blob into distinct API keys.
- * @module @x1a0f3n9/dsh-web-search-pool/keys
+ * @module @deepseek-ai/dsh-web-search-pool/keys
  */
 
 /**

@@ -3,7 +3,7 @@ description: "供 Host 和浏览器包使用的环形双端队列，提供摊销
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-deque
+# @deepseek-ai/dsh-deque
 
 [English](README.md) | 中文
 
@@ -34,7 +34,7 @@ kind: "package-library"
 导入双端队列，在尾部追加条目；当条目类型可能包含 `undefined` 时，在移除前检查 `size`：
 
 ```ts
-import { Deque } from '@x1a0f3n9/dsh-deque'
+import { Deque } from '@deepseek-ai/dsh-deque'
 
 const frames = new Deque<string>()
 frames.pushBack('first')
@@ -62,7 +62,6 @@ while (frames.size > 0) {
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 环形双端队列操作与后备存储生命周期 |
-| — | 不发布运行时不变式伴生入口；这个集合不拥有事件流或共享可变状态，其顺序与存储生命周期由单元测试覆盖。 |
 | [`tests/deque.spec.ts`](tests/deque.spec.ts) | FIFO、前插、环绕、扩容、压缩（compaction）、清空和复用覆盖 |
 | [`benchmarks/drain.ts`](benchmarks/drain.ts) | 随队列规模增长的可复现 backlog 排空计时 |
 

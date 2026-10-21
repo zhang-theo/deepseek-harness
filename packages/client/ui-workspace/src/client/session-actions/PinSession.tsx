@@ -8,7 +8,7 @@
  */
 import {
   IconPinFillRegular, IconPinOutlineRegular, MenuItemButton, Tooltip,
-} from '@x1a0f3n9/dsh-client-ui-primitives'
+} from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PinSessionInjected, SessionMenuItemProps, SessionRowActionProps } from '../contract/slots.ts'
 import css from '../rows/Rows.module.css'
 
@@ -55,7 +55,7 @@ export function PinSessionRowButton(props: SessionRowActionProps<PinSessionInjec
   const { pinned, archived } = usePinState(props)
   if (archived) return null
   return (
-    <Tooltip label={t(pinned ? 'actions.unpin' : 'actions.pin')} side="bottom" align="end" delayMs={500}>
+    <Tooltip label={t(pinned ? 'actions.unpin' : 'actions.pin')} side="bottom" align="end" delayMs={500} portal>
       <button
         type="button"
         className={css.iconButton}

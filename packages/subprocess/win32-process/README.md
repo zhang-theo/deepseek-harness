@@ -3,7 +3,7 @@ description: "Low-level Win32 process primitives for maintainers implementing or
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-win32-process
+# @deepseek-ai/dsh-win32-process
 
 English | [中文](README.zh.md)
 
@@ -87,5 +87,3 @@ The package contributes no stable request prefix, so it does not invalidate mode
 None.
 
 </details>
-
-**Runtime invariant:** No companion is published. Operations own only call-local native handles.

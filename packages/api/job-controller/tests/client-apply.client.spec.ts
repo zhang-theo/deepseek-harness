@@ -1,7 +1,7 @@
 import { Context } from '@deepseek-ai/cordis'
-import type { ConnectionHandle } from '@x1a0f3n9/dsh-client-connection/client'
-import { RemoteStream, type RemoteStreamOptions } from '@x1a0f3n9/dsh-api-gateway/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+import type { ConnectionHandle } from '@deepseek-ai/dsh-client-connection/client'
+import { RemoteStream, type RemoteStreamOptions } from '@deepseek-ai/dsh-api-gateway/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import { afterEach, describe, expect, it } from 'vitest'
 import * as JobClient from '../src/client/index.ts'
 import type { JobFollowFrame, JobListFrame } from '../src/types.ts'
@@ -21,6 +21,8 @@ async function mount(): Promise<{ ctx: Context; observeCalls: unknown[]; rowsCal
   const rowsCalls: unknown[] = []
   const killCalls: unknown[] = []
   const connection: ConnectionHandle = {
+    interactions: 'answer',
+    openWebSocket: () => { throw new Error('unexpected WebSocket') },
     isLoopback: true,
     generation: { getSnapshot: () => ({ id: 1, host: { home: '/home/fixture' } }), subscribe: () => () => {} },
     state: { getSnapshot: () => 'connected' as const, subscribe: () => () => {} },

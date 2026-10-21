@@ -3,7 +3,7 @@ description: "The model-facing goal tools for users and maintainers choosing, co
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-tool-goal
+# @deepseek-ai/dsh-tool-goal
 
 English | [中文](README.zh.md)
 
@@ -43,7 +43,7 @@ Call `get_goal` before `update_goal` and copy the exact `goal_id` and `revision`
 
 ```yaml
 - id: tool-goal
-  name: '@x1a0f3n9/dsh-tool-goal'
+  name: '@deepseek-ai/dsh-tool-goal'
   config:
     blockedAfterConsecutiveRounds: 3
 ```
@@ -80,7 +80,6 @@ This section explains how the tools enforce authority and render output; the obs
 | [`src/index.ts`](src/index.ts) | Plugin entry: tool registration, config, system-prompt section, result rendering |
 | [`src/authority.ts`](src/authority.ts) | Execution-time authority checks and goal-round acceptance |
 | [`src/wrapup.ts`](src/wrapup.ts) | Closing-message instruction for terminal autonomous updates |
-| — | No runtime invariant companion is published; this model-facing adapter owns no independent state or event protocol; accepted mutations are checked by the goal domain and authority behavior is package-tested. |
 
 ### Tool output
 

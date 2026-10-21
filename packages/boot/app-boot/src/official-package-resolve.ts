@@ -1,10 +1,10 @@
 /**
- * Resolve official `@x1a0f3n9/dsh-*` imports onto this fork's packages.
+ * Resolve official `@deepseek-ai/dsh-*` imports onto this fork's packages.
  *
  * Community plugins keep the official package names. pnpm `npm:@deepseek-ai/...@workspace:*`
  * overrides write broken symlinks, so source launch remaps the specifier before
  * Node walks `node_modules`.
- * @module @x1a0f3n9/dsh-app-boot/official-package-resolve
+ * @module @deepseek-ai/dsh-app-boot/official-package-resolve
  */
 
 import { registerHooks, type ResolveHookSync } from 'node:module'

@@ -30,7 +30,7 @@ it('places dynamic Session menu rows by order among the shipped ones and removes
   const scaffold = await launchWebScaffold({ extraInstallAnchors: [join(FIXTURE, 'package.json')] })
   onTestFinished(() => scaffold.close())
   const workspace = await scaffold.ctx.workspaceRegistry.create(scaffold.workspaceCwd)
-  const sessionId = await seedSession(scaffold, await readFile(SESSION_SEED, 'utf8'), 'session-menu-actions-web-e2e')
+  const sessionId = await seedSession(scaffold, await readFile(SESSION_SEED, 'utf8'), 'session-c4421b66-252e-44c0-80ed-6e320abeba25')
   await workspace.attachSession(sessionId)
   await scaffold.ctx.sessionController.rename({ sessionId, title: SESSION_TITLE })
   const entryId = await scaffold.ctx.loader.create({ name: '@fixture/live-client' })
@@ -71,13 +71,18 @@ it('places dynamic Session menu rows by order among the shipped ones and removes
     await row.hover()
     await trigger.click()
     await menu.waitFor()
-    const remainingNames = ['Pin session', 'Rename', 'Fork session', 'Archive session']
+    const remainingNames = ['Pin session', 'Rename', 'Fork session', 'Archive session', 'Copy Session ID']
     const remainingItems = menu.getByRole('menuitem')
     expect(await remainingItems.count()).toBe(remainingNames.length)
     for (const [index, name] of remainingNames.entries()) {
       expect(await remainingItems.nth(index).and(menu.getByRole('menuitem', { name, exact: true })).count()).toBe(1)
     }
     expect(await menu.getByRole('separator').count()).toBe(0)
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
+    await menu.getByRole('menuitem', { name: 'Copy Session ID', exact: true }).click()
+    await expect.poll(() => menu.count()).toBe(0)
+    await page.getByRole('alert').filter({ hasText: 'Session ID copied' }).waitFor()
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(sessionId)
     expect(console.pageErrors).toEqual([])
     await assertFixtureInventory(EXPECTED, [
       'bootstrap-rebuild.expected.md', 'enabled.expected.md', 'recovered.expected.md',
@@ -153,7 +158,7 @@ it('synchronizes two pages, disposes effects and restores an offline page from t
     await otherContext.setOffline(true)
     // Chromium offline emulation leaves established SSE sockets open. Cycling this
     // fixture's transport plugin closes them without replacing the Host or profile.
-    const transport = [...scaffold.ctx.loader.entries()].find(entry => entry.options.name === '@x1a0f3n9/dsh-client-hmr')!.fiber!
+    const transport = [...scaffold.ctx.loader.entries()].find(entry => entry.options.name === '@deepseek-ai/dsh-client-hmr')!.fiber!
     const reconnected = page.waitForResponse(response => response.url().includes('/plugins/events') && response.status() === 200)
     await transport.restart()
     await disconnected
@@ -256,11 +261,11 @@ it('reports bootstrap rebuilds without remounting the settings page or navigatin
     const originalInput = await draft.elementHandle()
     let navigations = 0
     page.on('framenavigated', () => { navigations++ })
-    const clientPath = scaffold.ctx.clientModules.clientPath('@x1a0f3n9/dsh-client-modules')!
+    const clientPath = scaffold.ctx.clientModules.clientPath('@deepseek-ai/dsh-client-modules')!
     const originalStat = await stat(clientPath)
     onTestFinished(() => utimes(clientPath, originalStat.atime, originalStat.mtime))
     await utimes(clientPath, originalStat.atime, new Date(originalStat.mtimeMs + 1_000))
-    scaffold.ctx.clientModules.rebuilt('@x1a0f3n9/dsh-client-modules')
+    scaffold.ctx.clientModules.rebuilt('@deepseek-ai/dsh-client-modules')
     const failure = page.locator('[data-client-sync-failure]')
     await failure.getByText(/replacing bootstrap module .* requires a page reload/).waitFor()
     await failure.getByRole('button', { name: '重试本页面同步' }).click()

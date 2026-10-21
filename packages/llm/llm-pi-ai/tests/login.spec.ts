@@ -3,10 +3,10 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import AuthorizationService from '@x1a0f3n9/dsh-authorization'
-import type { AuthorizationInteraction, AuthorizationNotice, AuthorizationPrompt } from '@x1a0f3n9/dsh-authorization'
-import LocalCredentialProvider from '@x1a0f3n9/dsh-credentials-local'
-import type { CredentialKey } from '@x1a0f3n9/dsh-credentials'
+import AuthorizationService from '@deepseek-ai/dsh-authorization'
+import type { AuthorizationInteraction, AuthorizationNotice, AuthorizationPrompt } from '@deepseek-ai/dsh-authorization'
+import LocalCredentialProvider from '@deepseek-ai/dsh-credentials-local'
+import type { CredentialKey } from '@deepseek-ai/dsh-credentials'
 import type { AuthEvent, AuthInteraction, AuthPrompt, AuthType, Credential } from '@earendil-works/pi-ai'
 
 const login = vi.hoisted(() => vi.fn())
@@ -20,6 +20,7 @@ vi.mock('../src/models.ts', async importOriginal => ({
 }))
 
 const { credentialStoreFrom, authContextFrom, recordKeyFor } = await import('../src/auth.ts')
+const { catalogProvider } = await import('../src/catalog.ts')
 const { registerPiAiFlows } = await import('../src/login.ts')
 
 const CODEX = recordKeyFor('openai-codex')
@@ -95,6 +96,11 @@ describe('pi-ai login flows', () => {
     // A key-only provider still gets a flow, because pi-ai collects the key
     // through its own prompt rather than leaving it to the settings form.
     expect(offered.find(entry => entry.key === recordKeyFor('deepseek'))?.methods.map(one => one.id))
+      .toEqual(['api-key'])
+    // pi-ai ships Sign in with ChatGPT for `openai`, which needs an
+    // installation ID the harness does not supply; only the key login is offered.
+    expect(catalogProvider('openai')?.auth.oauth?.loginLabel).toBe('Sign in with ChatGPT')
+    expect(offered.find(entry => entry.key === recordKeyFor('openai'))?.methods.map(one => one.id))
       .toEqual(['api-key'])
   })
 

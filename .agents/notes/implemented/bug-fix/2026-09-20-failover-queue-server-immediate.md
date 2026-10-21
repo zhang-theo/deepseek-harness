@@ -10,7 +10,7 @@ English | [中文](2026-09-20-failover-queue-server-immediate.zh.md)
 
 ## Decision
 
-`v0.1.12` default `immediateCodes` is `AUTH`, `RATE_LIMIT`, `NO_ADAPTER`, `SERVER`, `TIMEOUT`, `TRANSPORT`. Those codes skip remaining same-route retries, open the circuit on the first hit, and retry the next P. `EMPTY_RESPONSE` still stays on same-route `llm-retry`. xfdsh pins `@x1a0f3n9/dsh-failover-queue@0.1.12`. Circuit failback after `cooldownMs` is unchanged; see [failover-queue probes recovered P1](2026-09-19-failover-queue-circuit-failback.md).
+`v0.1.12` default `immediateCodes` is `AUTH`, `RATE_LIMIT`, `NO_ADAPTER`, `SERVER`, `TIMEOUT`, `TRANSPORT`. Those codes skip remaining same-route retries, open the circuit on the first hit, and retry the next P. `EMPTY_RESPONSE` still stays on same-route `llm-retry`. xfdsh pins `@deepseek-ai/dsh-failover-queue@0.1.12`. Circuit failback after `cooldownMs` is unchanged; see [failover-queue probes recovered P1](2026-09-19-failover-queue-circuit-failback.md).
 
 ## Verification
 

@@ -1,14 +1,14 @@
 /**
  * Durable and model-facing Schedule value types.
- * @module @x1a0f3n9/dsh-schedule
+ * @module @deepseek-ai/dsh-schedule
  */
 
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { MessageId } from '@x1a0f3n9/dsh-llm/brand'
-import type { Branded } from '@x1a0f3n9/dsh-brand'
-import type {} from '@x1a0f3n9/dsh-session/types'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { MessageId } from '@deepseek-ai/dsh-llm/brand'
+import type { Branded } from '@deepseek-ai/dsh-brand'
+import type {} from '@deepseek-ai/dsh-session/types'
 // Type-only: the Workspace registry's archive-admission family map this plugin merges `schedule` into.
-import type {} from '@x1a0f3n9/dsh-workspace/types'
+import type {} from '@deepseek-ai/dsh-workspace/types'
 
 /** Stable globally unique reminder identity. */
 export type ScheduleId = Branded<'ScheduleId'>
@@ -311,6 +311,12 @@ export interface FrequencyTooHighError {
   readonly message: string
 }
 
+/** Stable error returned when the target Session belongs to subagent routing, which never receives reminder delivery. */
+export interface SubagentSessionError {
+  readonly code: 'subagent_session'
+  readonly message: string
+}
+
 /** Stable fallback that does not disclose an internal exception. */
 export interface InternalScheduleError {
   readonly code: 'internal_error'
@@ -326,6 +332,7 @@ export type ScheduleToolError =
   | NotFutureError
   | TimeOutOfRangeError
   | FrequencyTooHighError
+  | SubagentSessionError
   | InternalScheduleError
 
 /** Canonical `schedule_create` value. */
@@ -342,14 +349,14 @@ export type ScheduleDeleteResult =
 /** Canonical `schedule_delete` value. */
 export type ScheduleDeleteValue = ScheduleDeleteResult | ScheduleToolError
 
-declare module '@x1a0f3n9/dsh-workspace/types' {
+declare module '@deepseek-ai/dsh-workspace/types' {
   interface SessionActivityKindMap {
     /** A scheduled follow-up for this session is still active. */
     schedule: true
   }
 }
 
-declare module '@x1a0f3n9/dsh-session/types' {
+declare module '@deepseek-ai/dsh-session/types' {
   interface SessionEventMap {
     /**
      * Versioned Schedule mutation. The owning package validates the complete

@@ -3,7 +3,7 @@ description: "Web 壳的 SPA dist 服务器：占据 webserver 回退席位，�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-host-frontend-static
+# @deepseek-ai/dsh-host-frontend-static
 
 [English](README.md) | 中文
 
@@ -30,7 +30,7 @@ kind: "package-reference"
 ### 最小配置
 
 ```yaml
-- name: '@x1a0f3n9/dsh-host-frontend-static'
+- name: '@deepseek-ai/dsh-host-frontend-static'
   config:
     distIndex: /absolute/path/to/dist/index.html
 ```
@@ -115,5 +115,3 @@ kind: "package-reference"
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。唯一受本包所有的关系是单个回退席位，但无法从 teardown 流中探测它：`internal/plugin` 在正在释放的 fiber 执行 effect disposer 前触发，因此通知发出时合法所有者仍占据席位，任何占位探测都会把每次正确释放误报为失败；这不同于 webserver companion 对保留路径的探测，后者不会与存活注册冲突。席位的注册／释放对称性由本包真实组合的 HMR（热模块替换）安全测试覆盖。

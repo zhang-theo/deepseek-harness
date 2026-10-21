@@ -2,7 +2,7 @@
  * Surface retention selection and the shared log-recorded compaction
  * transaction for automatic open-turn and manual idle-session compaction.
  *
- * @module @x1a0f3n9/dsh-compaction-basic/region
+ * @module @deepseek-ai/dsh-compaction-basic/region
  */
 
 import { randomUUID } from 'node:crypto'
@@ -14,14 +14,14 @@ import {
   isCompactCheckpointSource,
   toolPairingBalancedAfter,
   toolPairingBalancedBefore,
-} from '@x1a0f3n9/dsh-compaction'
-import type { CompactionResult } from '@x1a0f3n9/dsh-compaction'
-import type { CommandId } from '@x1a0f3n9/dsh-commands/brand'
-import { CONTEXT_WINDOW_EXCEEDED_CODE, createUserMessage, errorChain } from '@x1a0f3n9/dsh-llm'
-import type { Message, UserMessage } from '@x1a0f3n9/dsh-llm'
-import type { TokenMeasurement, TokenMeter } from '@x1a0f3n9/dsh-token-meter'
-import { SessionSeq, type Session, type SessionEvent } from '@x1a0f3n9/dsh-session'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
+} from '@deepseek-ai/dsh-compaction'
+import type { CompactionResult } from '@deepseek-ai/dsh-compaction'
+import type { CommandId } from '@deepseek-ai/dsh-commands/brand'
+import { CONTEXT_WINDOW_EXCEEDED_CODE, createUserMessage, errorChain } from '@deepseek-ai/dsh-llm'
+import type { Message, UserMessage } from '@deepseek-ai/dsh-llm'
+import type { TokenMeasurement, TokenMeter } from '@deepseek-ai/dsh-token-meter'
+import { SessionSeq, type Session, type SessionEvent } from '@deepseek-ai/dsh-session'
+import type { Agent } from '@deepseek-ai/dsh-agent'
 import { CONTEXT_OVERFLOW_FALLBACK_SUMMARY, frameSummary } from './summarizer.ts'
 import type { SummarizationInput, SummaryResult } from './summarizer.ts'
 interface RegionDependencies {

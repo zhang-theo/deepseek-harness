@@ -2,14 +2,14 @@
 
 import { expect, it, onTestFinished } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import LlmRuntime from '@x1a0f3n9/dsh-llm'
-import SessionStore from '@x1a0f3n9/dsh-session'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import ToolRuntime from '@x1a0f3n9/dsh-tools'
-import AgentRegistry from '@x1a0f3n9/dsh-agent'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
+import LlmRuntime from '@deepseek-ai/dsh-llm'
+import SessionStore from '@deepseek-ai/dsh-session'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import ToolRuntime from '@deepseek-ai/dsh-tools'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
 import { liveConfig } from '../../../settings/settings/tests/live-config.ts'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
 
 async function boot() {
   const ctx = new Context()

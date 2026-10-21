@@ -3,7 +3,7 @@ description: "面向部署方与维护者的沙箱 Bash 执行器说明，用于
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-bash-sandbox
+# @deepseek-ai/dsh-bash-sandbox
 
 [English](README.md) | 中文
 
@@ -45,14 +45,14 @@ kind: "package-reference"
 
 ```yaml
 - id: sandbox
-  name: '@x1a0f3n9/dsh-sandbox-local'
+  name: '@deepseek-ai/dsh-sandbox-local'
 - id: sandbox-policy
-  name: '@x1a0f3n9/dsh-sandbox-policy'
+  name: '@deepseek-ai/dsh-sandbox-policy'
   config:
     mode: read-only
     workspaceRoot: !!js process.cwd() # fallback for calls without a session cwd
 - id: bash
-  name: '@x1a0f3n9/dsh-bash-sandbox'
+  name: '@deepseek-ai/dsh-bash-sandbox'
 ```
 
 ### 拒绝是结果事实
@@ -83,7 +83,6 @@ kind: "package-reference"
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：`SandboxBashExecutor`、按进程保留事实、execute 包装 |
 | [`src/helpers.ts`](src/helpers.ts) | 拒绝、runner 失败与 runner spawn 失败分类 |
-| — | 不发布运行时不变式伴生入口；分类可在结果中观察，且除归属 seam 所强制执行的约定外，本包不公开独立事件序列或可变数据关系。 |
 | `tests/` | 跨 bwrap、Landlock 与 Seatbelt runner 演练的行为 |
 
 ### 主要流程
@@ -112,7 +111,7 @@ kind: "package-reference"
 - [sandbox-policy](../../sandbox/sandbox-policy/README.zh.md) —— 本执行器遵守的每会话模式与工作区根目录。
 - [sandbox-local](../../sandbox/sandbox-local/README.zh.md) —— 随附的 runner 后端：bwrap、Landlock 与 Seatbelt。
 - [tool-bash](../tool-bash/README.zh.md) —— 面向模型的 `bash` 工具及其升权面。
-- [沙箱 Agent Note](../../../.agents/notes/implemented/feature/2026-07-06-sandbox.zh.md) —— 沙箱设计、升权与切换约定。
+- [沙箱 参考](../../sandbox/sandbox/README.zh.md) —— 沙箱设计、升权与切换约定。
 
 -----
 

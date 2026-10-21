@@ -6,10 +6,10 @@ import { Service } from '@deepseek-ai/cordis'
 import type { Context } from '@deepseek-ai/cordis'
 import type {
   SettingsNamespaceView, SettingsPathOpView,
-} from '@x1a0f3n9/dsh-api-remotes/client'
-import { createSnapshotStore, type SnapshotStore } from '@x1a0f3n9/dsh-client-store'
-import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
-// Type-only, and deliberately NOT `@x1a0f3n9/dsh-api-remotes/client`: this
+} from '@deepseek-ai/dsh-api-remotes/client'
+import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
+// Type-only, and deliberately NOT `@deepseek-ai/dsh-api-remotes/client`: this
 // package is reachable from the Host build graph through its feature-package
 // callers, and api-remotes' Client face imports a Host-tsdown-generated
 // `/remote` artifact, which would deadlock the Host tsc phase. The gateway's
@@ -18,13 +18,13 @@ import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
 // `$on` and its key face without dragging a build artifact in. The runtime
 // `remote` injection belongs to the providing plugin's apply, which registers
 // the mirror's invalidation subscriptions.
-import type {} from '@x1a0f3n9/dsh-api-remotes/client'
-import type {} from '@x1a0f3n9/dsh-api-remotes/types'
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-api-remotes/types'
 // The forwarded event's own declaration: `$on`'s key face is
 // `Extract<keyof Events, keyof Selection>`, so the allowlist alone resolves to
 // never — the owning package's client-safe, type-only subpath supplies the
 // cordis `Events` entry (and with it the branded `SettingsNamespace`).
-import type {} from '@x1a0f3n9/dsh-settings/types'
+import type {} from '@deepseek-ai/dsh-settings/types'
 import type { SettingsSchemaService } from './schema.ts'
 import type { ConfigForm, ConfigFormSnapshot } from './config-form-types.ts'
 import { SettingsDescribeMirror, type SettingsDescribeFace } from './settings-mirror.ts'
@@ -52,7 +52,7 @@ export class ConfigFormController<T> implements ConfigForm<T> {
   private tail: Promise<void> = Promise.resolve()
   private writeGeneration = 0
   private disposed = false
-  private readonly unsubscribe: (() => void) | undefined
+  private readonly unsubscribe: () => void
   /**
    * Revision answered by a superseded write still ahead of the mirror: the
    * mirror only folds the LATEST settlement in, so a queued successor takes
@@ -65,29 +65,24 @@ export class ConfigFormController<T> implements ConfigForm<T> {
    * namespace carries this form's writes (reads ride the mirror).
    * @param spec - namespace identity and optional narrowing decoder.
    * @param mirror - the shared describe mirror this form derives from.
-   * @param persistence - client-selected Host persistence; non-loopback pages may remain process-local.
    * @param schema - settings-owned schema operations.
    */
   constructor(
     private readonly ctx: Context,
     private readonly spec: ConfigFormSpec<T>,
     private readonly mirror: SettingsDescribeMirror,
-    private readonly persistence: 'host' | 'memory',
     private readonly schema: SettingsSchemaService,
   ) {
     this.store = createSnapshotStore<ConfigFormSnapshot<T>>({
-      status: persistence === 'host' ? 'loading' : 'unavailable',
+      status: 'loading',
       value: undefined,
       base: undefined,
       user: undefined,
       revision: undefined,
       writable: false,
-      mode: persistence,
     })
-    if (persistence === 'host') {
-      this.unsubscribe = mirror.subscribe(() => { this.derive() })
-      this.derive()
-    }
+    this.unsubscribe = mirror.subscribe(() => { this.derive() })
+    this.derive()
   }
 
   /** @returns the current sync snapshot (stable reference until the next change). */
@@ -167,12 +162,12 @@ export class ConfigFormController<T> implements ConfigForm<T> {
   async dispose(): Promise<void> {
     this.disposed = true
     this.writeGeneration += 1
-    this.unsubscribe?.()
+    this.unsubscribe()
     await this.tail
   }
 
   private enqueue(operation: () => Promise<boolean>): Promise<boolean> {
-    if (this.persistence === 'memory' || this.disposed) return Promise.resolve(false)
+    if (this.disposed) return Promise.resolve(false)
     const task = this.tail.then(async () => {
       if (this.disposed) return false
       return await operation()
@@ -245,7 +240,6 @@ export class ConfigForms extends Service {
   readonly developerTools: DeveloperToolsPreference
   private readonly mirror: SettingsDescribeMirror
   private readonly schema: SettingsSchemaService
-  private readonly persistence: 'host' | 'memory'
   /**
    * The PROVIDING fiber, kept because a Service reads `ctx` as its *consumer's*
    * fiber: letting a shared form write through the caller's context would make
@@ -255,20 +249,17 @@ export class ConfigForms extends Service {
 
   /**
    * @param ctx - the providing plugin's context.
-   * @param config - the shared describe mirror every shared form derives from,
-   * the settings-owned schema operations, and the Host persistence the provider
-   * resolved from `remote.$host`.
+   * @param config - the shared describe mirror every shared form derives from
+   * and the settings-owned schema operations.
    */
   constructor(ctx: Context, config: {
     mirror: SettingsDescribeMirror
     schema: SettingsSchemaService
-    persistence: 'host' | 'memory'
   }) {
     super(ctx, 'configForms')
     ctx.provide('settingsScope', this)
     this.mirror = config.mirror
     this.schema = config.schema
-    this.persistence = config.persistence
     this.owner = ctx
     this.developerTools = new DeveloperToolsPreference(this.get(DEVELOPER_TOOLS_NAMESPACE))
     ctx.effect(() => async () => {
@@ -296,7 +287,7 @@ export class ConfigForms extends Service {
     const existing = this.forms.get(entryId)
     if (existing !== undefined) return existing as ConfigFormController<T>
     const form = new ConfigFormController<T>(
-      this.owner, { namespace: entryId }, this.mirror, this.persistence, this.schema,
+      this.owner, { namespace: entryId }, this.mirror, this.schema,
     )
     this.forms.set(entryId, form)
     void this.mirror.ensure()

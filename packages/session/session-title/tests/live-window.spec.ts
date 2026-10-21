@@ -1,9 +1,9 @@
 import { Context } from '@deepseek-ai/cordis'
 import { describe, expect, it } from 'vitest'
-import { createUserMessage } from '@x1a0f3n9/dsh-llm'
-import SessionStore, { SESSION_LIVE_WINDOW_EVENTS, SessionId } from '@x1a0f3n9/dsh-session'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import SessionTitleService from '@x1a0f3n9/dsh-session-title'
+import { createUserMessage } from '@deepseek-ai/dsh-llm'
+import SessionStore, { SESSION_LIVE_WINDOW_EVENTS, SessionId } from '@deepseek-ai/dsh-session'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import SessionTitleService from '@deepseek-ai/dsh-session-title'
 
 const CONFIG = {
   fallbackMaxWords: 5,

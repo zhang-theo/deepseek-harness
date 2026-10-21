@@ -160,9 +160,9 @@ export const zh = {
   'details.toolCalls': '工具调用',
   'details.subtoolCalls': '子工具调用',
   'details.error': '错误',
+  'details.lastAttemptError': '上次尝试错误',
   'details.failure.auth': 'API 密钥无效',
   'details.retry': '重试',
-  'details.scheduled': '已计划',
   'details.retryDelay': '重试延迟',
   'details.result': '结果',
   'details.compacted': '已压缩',
@@ -202,7 +202,7 @@ export const zh = {
 /** The trajectory dictionary key union. */
 export type TrajectoryKey = keyof typeof zh
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** The complete trajectory ledger, timeline, inspector, and toolbar copy. */
     trajectory: TrajectoryKey
@@ -211,7 +211,7 @@ declare module '@x1a0f3n9/dsh-client-ui-slots' {
 
 /** Namespace-bound translator threaded through trajectory presentation code. */
 export type TrajectoryTranslate =
-  import('@x1a0f3n9/dsh-client-ui-slots').TranslateNS<typeof NS>
+  import('@deepseek-ai/dsh-client-ui-slots').TranslateNS<typeof NS>
 
 /** English dictionary, checked complete against the Chinese source of truth. */
 export const en: Record<TrajectoryKey, string> = {
@@ -370,9 +370,9 @@ export const en: Record<TrajectoryKey, string> = {
   'details.toolCalls': 'Tool calls',
   'details.subtoolCalls': 'Subtool calls',
   'details.error': 'Error',
+  'details.lastAttemptError': 'Last attempt error',
   'details.failure.auth': 'API key is invalid',
   'details.retry': 'Retry',
-  'details.scheduled': 'Scheduled',
   'details.retryDelay': 'Retry delay',
   'details.result': 'Result',
   'details.compacted': 'Compacted',

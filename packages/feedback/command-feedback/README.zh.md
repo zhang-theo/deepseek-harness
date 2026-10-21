@@ -3,7 +3,7 @@ description: "会话反馈：`/feedback` 命令、Web 反馈弹窗背后的 `ses
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-command-feedback
+# @deepseek-ai/dsh-command-feedback
 
 [English](README.md) | 中文
 
@@ -61,11 +61,11 @@ kind: "package-reference"
 
 ```yaml
 - id: session
-  name: '@x1a0f3n9/dsh-session'
+  name: '@deepseek-ai/dsh-session'
 - id: commands
-  name: '@x1a0f3n9/dsh-commands'
+  name: '@deepseek-ai/dsh-commands'
 - id: command-feedback
-  name: '@x1a0f3n9/dsh-command-feedback'
+  name: '@deepseek-ai/dsh-command-feedback'
 ```
 
 Web 客户端随附该命令。无头模式、ACP 自动化和 JSON-RPC 不提供斜杠命令，因此 `/feedback` 在那里不可用。
@@ -92,7 +92,6 @@ Web 客户端随附该命令。无头模式、ACP 自动化和 JSON-RPC 不提�
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：`recordFeedback` 生产方、`sessionFeedback` Remote 服务、`/feedback` 命令注册 |
 | [`src/types.ts`](src/types.ts) | `feedback/record` 事件声明、分类表，以及 Remote 请求与结果类型 |
-| — | 未发布配套的运行时不变式；每个 `feedback/record` 都是独立的仅追加事实，不涉及跨事件关系或与可变数据的关系。 |
 
 </details>
 

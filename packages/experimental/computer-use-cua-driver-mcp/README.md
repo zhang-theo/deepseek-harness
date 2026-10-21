@@ -3,7 +3,7 @@ description: "Configure experimental local computer use with an installed Cua Dr
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-experimental-computer-use-cua-driver-mcp
+# @deepseek-ai/dsh-experimental-computer-use-cua-driver-mcp
 
 English | [中文](README.zh.md)
 
@@ -32,8 +32,8 @@ Choose this provider when Cua Driver is already installed and configured on the 
 Add these rows to a composition that already provides tools and system-prompt services. Screenshots also require an attachment store and a model route declaring image input.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-computer-use'
-- name: '@x1a0f3n9/dsh-experimental-computer-use-cua-driver-mcp'
+- name: '@deepseek-ai/dsh-computer-use'
+- name: '@deepseek-ai/dsh-experimental-computer-use-cua-driver-mcp'
   config:
     command: cua-driver
     args: [mcp]
@@ -63,8 +63,6 @@ The model sees tools under the fixed `mcp__cua-driver-mcp__` namespace. Tool nam
 <summary>Implementation internals — click to expand</summary>
 
 [`src/index.ts`](src/index.ts) groups the computer-use reservation and owned MCP child into one ordered effect. Child teardown finishes before the reservation disposer runs, including during failed activation. The MCP client owns credential scrubbing, subprocess termination, tool synchronization, cancellation, and durable image projection.
-
-No runtime invariant companion is published: the provider exposes no independent driver state to compare with its registration, and the child owns its connection and tool generations.
 
 ### Verify an installed driver
 

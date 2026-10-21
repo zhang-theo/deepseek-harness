@@ -1,13 +1,13 @@
 // Sessions remain resident after creation so their open Remote sources keep running off-screen.
 
 import type { Context } from '@deepseek-ai/cordis'
-import type { InboxState, InboxTarget } from '@x1a0f3n9/dsh-agent/types'
-import { randomUUID } from '@x1a0f3n9/dsh-util-crypto'
-import type { AttachmentIdType, FileAttachmentRef, ImageAttachmentRef } from '@x1a0f3n9/dsh-attachment'
-import type { SubagentAddress } from '@x1a0f3n9/dsh-subagent/client'
-import type { MessageId } from '@x1a0f3n9/dsh-llm/brand'
-import type { UserMessage } from '@x1a0f3n9/dsh-llm/types'
-import { SessionLogOffset, SessionSeq, type SessionId } from '@x1a0f3n9/dsh-session/types'
+import type { InboxState, InboxTarget } from '@deepseek-ai/dsh-agent/types'
+import { randomUUID } from '@deepseek-ai/dsh-util-crypto'
+import type { AttachmentIdType, FileAttachmentRef, ImageAttachmentRef } from '@deepseek-ai/dsh-attachment'
+import type { SubagentAddress } from '@deepseek-ai/dsh-subagent/client'
+import type { MessageId } from '@deepseek-ai/dsh-llm/brand'
+import type { UserMessage } from '@deepseek-ai/dsh-llm/types'
+import { SessionLogOffset, SessionSeq, type SessionId } from '@deepseek-ai/dsh-session/types'
 import { SessionEventStream } from '../transport.ts'
 import type { SessionJournalChange } from '../transport.ts'
 import type {
@@ -29,9 +29,9 @@ import type {
   SessionEventLike, SessionEventLikeEntry, SessionLiveEventEntry,
 } from '../contract/events.ts'
 import { Notifier } from './notifier.ts'
-import { isRemoteFailure } from '@x1a0f3n9/dsh-api-gateway/client'
-import { RemoteError } from '@x1a0f3n9/dsh-typert-protocol'
-import type { RemoteFailure, RemoteResult } from '@x1a0f3n9/dsh-typert-protocol'
+import { isRemoteFailure } from '@deepseek-ai/dsh-api-gateway/client'
+import { RemoteError } from '@deepseek-ai/dsh-typert-protocol'
+import type { RemoteFailure, RemoteResult } from '@deepseek-ai/dsh-typert-protocol'
 import type { SessionRemotes } from './remotes.ts'
 import { ProjectionValueStore } from './projection-store.ts'
 import type { ProjectionsBaseline } from './projection-store.ts'
@@ -289,7 +289,7 @@ export class Session implements SessionFace {
       // wire type is used; this array is not filtered or reordered.
       const routedContent = content as Exclude<PromptContentPart, { readonly type: 'file' }>[]
       const routed = await this.remote.subagents.prompt({
-        requestId: randomUUID() as SessionRequestId,
+        requestId: requestId ?? randomUUID() as SessionRequestId,
         parentSessionId: this.address.parentSessionId,
         childSessionId: this.address.childSessionId,
         mode: 'continuable',

@@ -3,7 +3,7 @@ description: "dsh Web 客户端的「内置插件」设置分区：设置导航�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-client-ui-settings-plugins
+# @deepseek-ai/dsh-client-ui-settings-plugins
 
 [English](README.md) | 中文
 
@@ -67,7 +67,6 @@ kind: "package-reference"
 <a id="known-limitations-and-deferred-work"></a>
 
 - **分区没有自己的标签页**——在功能插件注册标签页之前它只显示空提示；壳自己填不满分区。
-- **运行时不变量：**不发布伴生。分区除了投影 slot 账本之外不拥有任何关系。
 
 <a id="dev-note"></a>
 ### 开发备注

@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 import { cleanup, render } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import * as primitives from '@x1a0f3n9/dsh-client-ui-primitives'
+import * as primitives from '@deepseek-ai/dsh-client-ui-primitives'
 import {
   IconAlarmClockOutlineRegular, IconApiOutlineRegular, IconArchiveOutlineRegular, IconFolderCloseRegular,
   IconGoalOutlineRegular, IconSendOutlineRegular,
-} from '@x1a0f3n9/dsh-client-ui-primitives'
+} from '@deepseek-ai/dsh-client-ui-primitives'
 
 afterEach(cleanup)
 
@@ -83,6 +83,7 @@ describe('product icon set', () => {
       [primitives.PermissionIconReadOnlyRegular, primitives.PermissionIconReadOnlyMedium],
       [primitives.PermissionIconWorkspaceWriteRegular, primitives.PermissionIconWorkspaceWriteMedium],
       [primitives.PermissionIconFullAccessRegular, primitives.PermissionIconFullAccessMedium],
+      [primitives.PermissionIconAutoReviewRegular, primitives.PermissionIconAutoReviewMedium],
     ] as const
     for (const [Regular, Medium] of pairs) {
       const regular = render(<Regular />)

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import type { CredentialInfo } from '@x1a0f3n9/dsh-credentials/types'
-import { remoteErrorOf, remoteMethods } from '@x1a0f3n9/dsh-typert-protocol'
+import type { CredentialInfo } from '@deepseek-ai/dsh-credentials/types'
+import { remoteErrorOf, remoteMethods } from '@deepseek-ai/dsh-typert-protocol'
 import CredentialsController from '../src/credentials.ts'
 import { MemoryCredentials } from '../../../credentials/credentials/tests/memory.ts'
 
@@ -24,7 +24,7 @@ class LiteralRejectingCredentials extends MemoryCredentials {
 /** A store whose provider-owned policy rejects an otherwise valid write. */
 class RejectingCredentials extends MemoryCredentials {
   override set(): Promise<void> {
-    return Promise.reject(new Error('a read-only source shadows this reference'))
+    return Promise.reject(new Error('the stored document no longer parses'))
   }
 }
 
@@ -62,7 +62,7 @@ describe('the credentials Remote namespace a configuration surface calls', () =>
       const failure = await call().catch((error: unknown) => error)
       expect(remoteErrorOf(failure)).toMatchObject({
         code: 'gateway/internal',
-        message: 'credentials service is absent: this deployment does not mount a credential provider (e.g. @x1a0f3n9/dsh-credentials-local) in its composition',
+        message: 'credentials service is absent: this deployment does not mount a credential provider (e.g. @deepseek-ai/dsh-credentials-local) in its composition',
         details: {},
       })
     }
@@ -120,7 +120,7 @@ describe('the credentials Remote namespace a configuration surface calls', () =>
     const failure = await controller.set('DEEPSEEK_API_KEY', 'sk-live').catch((error: unknown) => error)
     const { code, message, details } = remoteErrorOf(failure) ?? {}
     expect(code).toBe('credential/rejected')
-    expect(message).toContain('read-only source')
+    expect(message).toContain('no longer parses')
     expect(details).toEqual({ ref: 'DEEPSEEK_API_KEY' })
   })
 

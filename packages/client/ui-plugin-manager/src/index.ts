@@ -2,8 +2,8 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { MAX_TIMER_DELAY_MS } from '@x1a0f3n9/dsh-timeout'
-import { Remote, TypertRemoteService } from '@x1a0f3n9/dsh-typert-protocol'
+import { MAX_TIMER_DELAY_MS } from '@deepseek-ai/dsh-timeout'
+import { Remote, TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 
 declare module '@deepseek-ai/cordis' {
   interface Context {

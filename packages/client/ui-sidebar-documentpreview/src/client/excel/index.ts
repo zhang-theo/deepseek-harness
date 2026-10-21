@@ -11,7 +11,7 @@ import { en, zh } from './locales.ts'
  * @param limits - Resolved parser limits.
  */
 export function apply(ctx: Context, limits: Config['excel']): void {
-  const id = '@x1a0f3n9/dsh-client-ui-sidebar-documentpreview/excel'
+  const id = '@deepseek-ai/dsh-client-ui-sidebar-documentpreview/excel'
   ctx.effect(() => ctx.locale.register('sidebarExcel', { zh, en }))
   const t = ctx.locale.bind('sidebarExcel')
   ctx.effect(() => ctx.documentPreviews.register({

@@ -12,7 +12,7 @@ A parent page cannot inspect or drive a cross-origin iframe's internal history. 
 
 ## Decision
 
-`@x1a0f3n9/dsh-client-ui-sidebar-browser` registers the multi-instance `browser` right-Sidebar tab type. `SidebarRightTabParamsMap.browser` accepts an optional initial URL so another Client plugin can open a Browser without importing this package's runtime values.
+`@deepseek-ai/dsh-client-ui-sidebar-browser` registers the multi-instance `browser` right-Sidebar tab type. `SidebarRightTabParamsMap.browser` accepts an optional initial URL so another Client plugin can open a Browser without importing this package's runtime values.
 
 `MarkdownDelegateProvider` gives nested Markdown anchors an optional owner callback for ordinary HTTP(S) activation while retaining native modified-click behavior. Chat places one provider around its node list and opens a new `browser` tab with the URL as typed navigation parameters when that type is registered, or uses the system browser otherwise; the Markdown renderer does not import the Browser feature.
 
@@ -28,7 +28,7 @@ A controller created from a saved checkpoint offers its last title and URL with 
 
 Occurrence cancellation releases the controller. It removes the saved checkpoint only when the Sidebar's authoritative `openTabs` inventory no longer contains that tab. The inventory publishes layout removal before `TabDomain` aborts its occurrence; plugin unload also aborts occurrences but leaves saved tab membership intact. Cleanup therefore does not interpret plugin unload as a request to erase recovery data.
 
-Browser state is presentation state. It does not enter the Session log, model request, resource model, or DockKit layout operations. The existing [right Sidebar infrastructure](2026-09-04-right-sidebar-docking-infrastructure.md), [tab type contract](../architecture/2026-09-05-sidebar-tab-types-and-navigation.md), [resource model](../architecture/2026-09-05-client-resource-model.md), and [Document Preview operations](../architecture/2026-09-08-document-preview-operations.md) retain their existing responsibilities.
+Browser state is presentation state. It does not enter the Session log, model request, resource model, or DockKit layout operations. The existing [right Sidebar infrastructure](2026-09-04-right-sidebar-docking-infrastructure.md), [tab type contract](../../../../packages/client/ui-sidebar-right/README.md), [resource model](../architecture/2026-09-05-client-resource-model.md), and [Document Preview operations](../architecture/2026-09-08-document-preview-operations.md) retain their existing responsibilities.
 
 ## Web navigation states
 

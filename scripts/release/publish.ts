@@ -17,9 +17,10 @@ import { readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { parseArgs } from 'node:util'
+import { valid, validRange } from 'semver'
 import { releaseFamily } from './families.ts'
 import { attempt, attemptEchoed, isEntry } from './process.ts'
-import { packedIdentity, readPublishOrder } from './tarball.ts'
+import { packedIdentity, readPublishOrder, type PackedIdentity } from './tarball.ts'
 
 /**
  * Registry codes that answer a write which did not settle, rather than a
@@ -208,6 +209,44 @@ async function registryState(name: string, version: string): Promise<RegistrySta
   return { kind: 'present', integrity: parsed }
 }
 
+/** Reject empty tags, npm option prefixes, characters requiring URI encoding, and version ranges. */
+function validateDistTag(distTag: string): void {
+  if (distTag === '' || distTag.startsWith('-') || encodeURIComponent(distTag) !== distTag || validRange(distTag) !== null) {
+    throw new Error(`Invalid npm dist-tag ${JSON.stringify(distTag)}: use a non-empty tag without a leading hyphen, characters requiring URI encoding, or a version range.`)
+  }
+}
+
+/** An explicit channel may be new or already name the same version after a partial publication. */
+function verifyDistTag(member: PackedIdentity, distTag: string): void {
+  const result = attempt('npm', ['dist-tag', 'ls', member.name])
+  if (result.status !== 0) {
+    const output = `${result.stdout}${result.stderr}`
+    if (output.includes('E404') || output.includes('404 Not Found')) return
+    throw new Error(`npm dist-tag ls ${member.name} failed:\n${output}`)
+  }
+  const tags = new Map<string, string>()
+  for (const line of result.stdout.split(/\r?\n/u).filter(line => line !== '')) {
+    const match = /^(\S+): (\S+)$/u.exec(line)
+    const tag = match?.[1]
+    const version = match?.[2]
+    if (tag === undefined || version === undefined || valid(version) === null || tags.has(tag)) {
+      throw new Error(`npm reported invalid dist-tags for ${member.name}: ${JSON.stringify(line)}`)
+    }
+    tags.set(tag, version)
+  }
+  if (tags.size === 0) throw new Error(`npm reported no dist-tags for ${member.name}`)
+  const version = tags.get(distTag)
+  if (version === undefined) {
+    if (registryState(member.name, member.version).kind === 'present') {
+      throw new Error(`${member.name}@${member.version} is already published without dist-tag ${distTag}; this run cannot bind an existing version to a new channel.`)
+    }
+    return
+  }
+  if (version !== member.version) {
+    throw new Error(`${member.name}@${distTag} already points to ${version}; choose an unused dist-tag instead of replacing it with ${member.version}.`)
+  }
+}
+
 /**
  * npm publish `--tag` argv.
  *
@@ -269,74 +308,51 @@ async function publishTarball(
   }
 }
 
-/** One packed family member after its registry probe. */
-interface ProbedMember {
-  readonly index: number
-  readonly tarball: string
-  readonly name: string
-  readonly version: string
-  readonly kind: PublishRegistryKind
-  readonly registryIntegrity: string | undefined
-}
-
-/** Publish the family named by `--family` from the directory named by `--from`. */
-async function main(): Promise<void> {
-  const { values } = parseArgs({
-    options: { family: { type: 'string' }, from: { type: 'string' } },
-    allowPositionals: false,
-  })
-  if (values.family === undefined || values.from === undefined) {
-    throw new Error('usage: publish.ts --family <dsh|vendor> --from <packed directory>')
-  }
-
-  const family = releaseFamily(values.family)
-  const directory = resolve(process.cwd(), values.from)
+/**
+ * Publish packed artifacts, preserving occupied explicit channels and existing version integrity.
+ * @param familyId - release family whose default channels apply when no override is supplied.
+ * @param directory - packed artifact directory containing the publication order.
+ * @param distTag - optional explicit npm channel, checked across the whole batch before uploading.
+ * @returns Resolves after every artifact has been published or verified as already present.
+ */
+export async function publishRelease(familyId: string, directory: string, distTag?: string): Promise<void> {
+  if (distTag !== undefined) validateDistTag(distTag)
+  const family = releaseFamily(familyId)
 
   // Every entry in the order settles as either published or already present, so
   // one counter answers "how far along is this run" for whoever is watching a
   // release that takes minutes per family.
-  const order = readPublishOrder(directory)
-  const total = String(order.length)
-  const probed: ProbedMember[] = []
-  for (const [index, filename] of order.entries()) {
+  const order = readPublishOrder(directory).map((filename) => {
     const tarball = join(directory, filename)
-    const { name, version } = packedIdentity(tarball)
-    const state = await registryState(name, version)
-    probed.push({
-      index,
-      tarball,
-      name,
-      version,
-      kind: state.kind,
-      registryIntegrity: state.kind === 'present' ? state.integrity : undefined,
-    })
+    return { tarball, ...packedIdentity(tarball) }
+  })
+  if (distTag !== undefined) {
+    for (const member of order) verifyDistTag(member, distTag)
   }
-
-  const { absent, present } = partitionPublishPasses(probed)
+  const total = String(order.length)
   let published = 0
   let skipped = 0
-  let quotaPaused = false
-  const allowRef = process.env.RELEASE_PUBLISH_ALLOW_REF?.trim() ?? ''
-
-  for (const member of absent) {
-    const progress = `[${String(member.index + 1)}/${total}]`
-    try {
-      await publishTarball(member.tarball, member.name, member.version, family.distTagForVersion(member.version))
-    } catch (error) {
-      if (
-        error instanceof NpmWriteQuotaError
-        && rateLimitedPublishAction(allowRef) === 'pause'
-      ) {
-        console.log(
-          `release publish: ${progress} paused at ${error.packageName}@${error.packageVersion} after npm E429;`
-          + ' remaining absent names wait for a later push',
+  for (const [index, { tarball, name, version }] of order.entries()) {
+    const progress = `[${String(index + 1)}/${total}]`
+    const state = registryState(name, version)
+    if (state.kind === 'present') {
+      const local = integrityOf(tarball)
+      if (state.integrity !== local) {
+        throw new Error(
+          `${name}@${version} is already published with different content`
+          + `\n  registry: ${state.integrity}\n  packed:   ${local}`
+          + '\nBump the version, or investigate why the build is not reproducible.',
         )
         quotaPaused = true
         break
       }
       throw error
     }
-    console.log(`release publish: ${progress} ${member.name}@${member.version} published`)
+    // Space out the writes: the gap belongs between publishes, so a run that
+    // only skips does not wait at all.
+    if (published > 0) await sleep(PUBLISH_SPACING_MS)
+    await publishTarball(tarball, name, version, distTag ?? family.distTagForVersion(version))
+    console.log(`release publish: ${progress} ${name}@${version} published`)
     published += 1
   }
 
@@ -372,6 +388,18 @@ async function main(): Promise<void> {
       ? `, paused on npm new-package write quota (${String(absent.length - published)} absent remaining)`
       : ''),
   )
+}
+
+/** Publish the family named by `--family` from the directory named by `--from`. */
+async function main(): Promise<void> {
+  const { values } = parseArgs({
+    options: { family: { type: 'string' }, from: { type: 'string' }, 'dist-tag': { type: 'string' } },
+    allowPositionals: false,
+  })
+  if (values.family === undefined || values.from === undefined) {
+    throw new Error('usage: publish.ts --family <dsh|vendor> --from <packed directory> [--dist-tag <tag>]')
+  }
+  await publishRelease(values.family, resolve(process.cwd(), values.from), values['dist-tag'])
 }
 
 if (isEntry(import.meta.url)) await main()

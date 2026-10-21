@@ -3,7 +3,7 @@ import {
   EXAMPLE_MODE_ENV,
   resolveExampleLaunch,
   resolveExampleMode,
-} from '@x1a0f3n9/dsh-loader-smoke'
+} from '@deepseek-ai/dsh-loader-smoke'
 
 const SRC_BIN = '/repo/apps/cli/src/bin.ts'
 const TSCONFIG = '/repo/tsconfig.json'

@@ -1,7 +1,7 @@
 /**
  * Shared declarations for package.json fields and plugin display metadata.
  * Each reader owns JSON validation and resolved defaults.
- * @module @x1a0f3n9/dsh-package-manifest/types
+ * @module @deepseek-ai/dsh-package-manifest/types
  */
 
 /** Package identity and metadata; local profile readers may accept a partial declaration. */
@@ -58,7 +58,7 @@ export interface PluginLocalizedMeta {
   readonly title?: LocalizedText
   /** Display introduction after locale and package-field fallback. */
   readonly description?: LocalizedText
-  /** Base64 image data URL read from the manifest's icon file; render as an image, not inline markup. */
+  /** Base64 image data URL from a package root's manifest icon or an exported `<specifier>/icon`; render as an image, not inline markup. */
   readonly icon?: string
   /** Unmodified local metadata diagnostic; the plugin remains manageable. */
   readonly error?: string

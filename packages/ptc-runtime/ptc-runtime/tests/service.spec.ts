@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { PtcRuntime } from '@x1a0f3n9/dsh-ptc-runtime'
-import type { PtcRunRequest, PtcRunResult } from '@x1a0f3n9/dsh-ptc-runtime'
+import { PtcRuntime } from '@deepseek-ai/dsh-ptc-runtime'
+import type { PtcRunRequest, PtcRunResult } from '@deepseek-ai/dsh-ptc-runtime'
 
 /**
  * Minimal concrete runtime: records requests, "executes" by invoking every
@@ -10,7 +10,7 @@ import type { PtcRunRequest, PtcRunResult } from '@x1a0f3n9/dsh-ptc-runtime'
  * the smallest subclass that honors it.
  */
 class StubRuntime extends PtcRuntime {
-  resolve(request: import('@x1a0f3n9/dsh-ptc-runtime').PtcRunRequest): import('@x1a0f3n9/dsh-ptc-runtime').PtcRunSpec { return { ...request, cwd: request.cwd ?? process.cwd(), timeoutMs: request.timeoutMs ?? 120_000 } }
+  resolve(request: import('@deepseek-ai/dsh-ptc-runtime').PtcRunRequest): import('@deepseek-ai/dsh-ptc-runtime').PtcRunSpec { return { ...request, cwd: request.cwd ?? process.cwd(), timeoutMs: request.timeoutMs ?? 120_000 } }
 
   readonly language = 'typescript'
   readonly isolation = 'in-process-stub'
@@ -44,6 +44,8 @@ describe('PtcRuntime service seam', () => {
     expect(runtime.language).toBe('typescript')
     expect(runtime.isolation).toBe('in-process-stub')
     expect(runtime.sandboxMode).toBeUndefined()
+    expect(runtime.programFormat).toBe('function-body')
+    await expect(runtime.release({})).resolves.toBeUndefined()
 
     const calls: unknown[] = []
     const result = await runtime.run(runtime.resolve({

@@ -3,7 +3,7 @@ description: "The multi-key failover search provider for ctx.web: how deployment
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-web-search-pool
+# @deepseek-ai/dsh-web-search-pool
 
 English | [中文](README.zh.md)
 
@@ -36,11 +36,11 @@ Choose this backend when search should fail over across keys and vendors, includ
 Load the web service and the pool; API keys fall back to launch-environment variables, and `free` is the last hop so a keyless deployment still searches.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-web'
+- name: '@deepseek-ai/dsh-web'
   config:
     searchProviderOrder: [search-pool, perplexity, exa, free]
     fetchProvider: http
-- name: '@x1a0f3n9/dsh-web-search-pool'
+- name: '@deepseek-ai/dsh-web-search-pool'
 ```
 
 | Field | Default | Meaning |

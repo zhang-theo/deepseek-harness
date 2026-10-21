@@ -3,7 +3,7 @@ description: "编辑前读取的文件系统策略插件：面向选择或排查
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-fs-observation-policy
+# @deepseek-ai/dsh-fs-observation-policy
 
 [English](README.md) | 中文
 
@@ -32,9 +32,9 @@ kind: "package-reference"
 先加载后端，再加载本插件，最后加载工具。策略监听器应当是 `fs/*` 意图 slot 上第一个注册的决策器。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-fs-local'
-- name: '@x1a0f3n9/dsh-fs-observation-policy'
-- name: '@x1a0f3n9/dsh-tool-fs'
+- name: '@deepseek-ai/dsh-fs-local'
+- name: '@deepseek-ai/dsh-fs-observation-policy'
+- name: '@deepseek-ai/dsh-tool-fs'
 ```
 
 ### 对模型而言的变化
@@ -95,7 +95,7 @@ kind: "package-reference"
 - [tool-fs](../tool-fs/README.zh.md)——分派 `fs/*` 事件的面向模型工具。
 - [fs-local](../fs-local/README.zh.md)——本策略所防护的宿主文件系统后端。
 - [fs-sandbox](../fs-sandbox/README.zh.md)——与本策略组合的沙箱强制后端。
-- [Fsspec 风格 seam 拆分 Agent Note](../../../.agents/notes/implemented/simplification/2026-06-26-fsspec-style-fs-seam.zh.md)——策略为何是事件插件而非提供方方法。
+- [Fsspec 风格 seam 拆分 参考说明](../fs/README.zh.md)——策略为何是事件插件而非提供方方法。
 
 -----
 
@@ -126,7 +126,7 @@ kind: "package-reference"
 - **已观察状态无法在会话恢复后保留**：该记录的持久化工作延期处理，因此恢复的会话必须重新读取文件，才能执行防护写入与编辑。
 - **没有 agent 会话的参与者绝无法满足策略**：它们的编辑会抛出 `FS_NOT_OBSERVED`，写入总会解析为 `createIfAbsent`，因此非 agent 调用方无法通过门禁覆盖现有文件。
 - **直接 `ctx.fs` 读取不会发出 `fs/observed`**：在 `read` 工具之外读取的文件仍未观察；后续防护编辑会以 `FS_NOT_OBSERVED` 拒绝，直到工具读取该文件。
-- **授权依据是版本新鲜度，而非视图完整性**：任何窗口读取都会授权对未变文件执行全文件覆盖，这有意弱于完整视图规则（见[seam 拆分 Agent Note](../../../.agents/notes/implemented/simplification/2026-06-26-fsspec-style-fs-seam.zh.md)）。
+- **授权依据是版本新鲜度，而非视图完整性**：任何窗口读取都会授权对未变文件执行全文件覆盖，这有意弱于完整视图规则（见[seam 拆分 参考说明](../fs/README.zh.md)）。
 
 <a id="dev-note"></a>
 ### 开发备注
@@ -137,5 +137,3 @@ kind: "package-reference"
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。本包没有独立事件序列或可变数据关系，相关约定在所属 seam 强制执行。

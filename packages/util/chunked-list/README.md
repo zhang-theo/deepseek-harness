@@ -3,7 +3,7 @@ description: "Immutable append-only lists for projection state, with bounded app
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-chunked-list
+# @deepseek-ai/dsh-chunked-list
 
 English | [中文](README.zh.md)
 
@@ -28,7 +28,7 @@ English | [中文](README.zh.md)
 Use this list when an append-only collection needs immutable versions and JSON-compatible storage. An empty list is `undefined`; appending returns a new head without modifying existing nodes. The list shares stored values by reference, so callers must treat them as immutable.
 
 ```ts
-import { appendChunkedList, iterateChunkedList } from '@x1a0f3n9/dsh-chunked-list'
+import { appendChunkedList, iterateChunkedList } from '@deepseek-ai/dsh-chunked-list'
 
 const first = appendChunkedList(undefined, 'first')
 const second = appendChunkedList(first, 'second')
@@ -51,8 +51,6 @@ The newest chunk stores up to 64 values. Appends copy at most that chunk and sha
 |---|---|
 | [`src/index.ts`](src/index.ts) | Persistent list operations and checkpoint validation |
 | [`tests/chunked-list.spec.ts`](tests/chunked-list.spec.ts) | Version isolation, ordering, structural sharing, and checkpoint acceptance |
-
-No runtime invariant companion is published because this library has no independently changing observations; its operations return caller-owned immutable values.
 
 </details>
 

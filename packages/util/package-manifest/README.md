@@ -3,7 +3,7 @@ description: "Shared TypeScript declarations for package identity, runtime requi
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-package-manifest
+# @deepseek-ai/dsh-package-manifest
 
 English | [中文](README.zh.md)
 
@@ -28,7 +28,7 @@ Use `DshPackageManifest` for package metadata, `DshManifest` for the public fiel
 Import from the package root. Use a development dependency when only checking your own source; use a production dependency if your published declarations reference these types.
 
 ```ts
-import type { DshClientManifest, DshPackageManifest } from '@x1a0f3n9/dsh-package-manifest'
+import type { DshClientManifest, DshPackageManifest } from '@deepseek-ai/dsh-package-manifest'
 
 const client: DshClientManifest = { platform: 'web' }
 const manifest: DshPackageManifest = {
@@ -52,7 +52,7 @@ The following metadata fields are optional. Omitting them leaves the format vers
 | `dsh.manifestVersion` | Manifest format identifier; the declared format is `1`, independent of the npm package version and Session format version. |
 | `engines.dsh` | Author-declared compatible DSH versions as a SemVer range, including exact prerelease versions. This field sits beside `engines.node` and `engines.npm`; an engines object may omit `dsh`. |
 
-`LocalizedText` carries literal text or a language map with a required English fallback. `PluginLocalizedMeta` carries optional display title, description, an image data URL resolved from `package.json.icon`, and metadata diagnostics for installed plugins. [App boot](../../boot/app-boot/README.md) reads these values; this package only supplies their types.
+`LocalizedText` carries literal text or a language map with a required English fallback. `PluginLocalizedMeta` carries optional display title, description, an image data URL resolved from a package root's `package.json.icon` or an exported `<specifier>/icon`, and metadata diagnostics for installed plugins. [App boot](../../boot/app-boot/README.md) reads these values; this package only supplies their types.
 
 Public composition declarations are defined in [`src/types.ts`](src/types.ts). Internal `configTrees`, `sessionFormatMigration`, and generated `moduleFallback` metadata remain owned by their image-packer, catalog, and launcher readers; the public types do not expose them.
 
@@ -64,7 +64,7 @@ Public composition declarations are defined in [`src/types.ts`](src/types.ts). I
 <details>
 <summary>Implementation internals — click to expand</summary>
 
-The package root only re-exports declarations from [`src/types.ts`](src/types.ts). No runtime invariant companion is published because the package has no runtime state or independently observable relationships.
+The package root only re-exports declarations from [`src/types.ts`](src/types.ts).
 
 </details>
 

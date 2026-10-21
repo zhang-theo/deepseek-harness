@@ -3,7 +3,7 @@ description: "The deployment default model selection for users and maintainers c
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-agent-default-model
+# @deepseek-ai/dsh-agent-default-model
 
 English | [中文](README.zh.md)
 
@@ -32,7 +32,7 @@ Mount this package wherever agents are created without an explicit model route. 
 The composition requires a provider and model. Consumers read the live references even when no configuration editor is mounted.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-agent-default-model'
+- name: '@deepseek-ai/dsh-agent-default-model'
   config:
     provider: deepseek
     model: deepseek-chat
@@ -75,7 +75,6 @@ The service retains its validated Config references and samples them in `current
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Live default selection and profile-backed writes |
-| — | No invariant companion is published because Config references are the only owned values. |
 
 ### Behavior notes
 

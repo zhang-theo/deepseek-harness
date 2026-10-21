@@ -6,7 +6,7 @@
  */
 
 import { open as fsOpen, type FileHandle } from 'node:fs/promises'
-import { assertV4RowAdmission } from '@x1a0f3n9/dsh-session-format-v3-to-v4'
+import { assertV4RowAdmission } from '@deepseek-ai/dsh-session-format-v3-to-v4'
 import {
   decodeSeqRanges,
   interruptedTurnClosers,
@@ -14,15 +14,15 @@ import {
   KNOWN_SESSION_EVENT_TYPES,
   SessionSeq,
   SessionLogOffset,
-} from '@x1a0f3n9/dsh-session'
+} from '@deepseek-ai/dsh-session'
 import type {
   SessionEvent,
   SessionHeader,
-} from '@x1a0f3n9/dsh-session'
+} from '@deepseek-ai/dsh-session'
 import type {
   SessionHistorySuffix,
   SessionHistorySuffixOptions,
-} from '@x1a0f3n9/dsh-session-persistence'
+} from '@deepseek-ai/dsh-session-persistence'
 import { parseHeaderRecord, type JsonlCompression } from './format.ts'
 import {
   decompressZstdFrame,

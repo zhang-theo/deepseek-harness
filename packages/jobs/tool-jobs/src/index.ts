@@ -5,23 +5,23 @@
  * collected to the owning agent: injected into a busy owner's next step, or
  * opening a turn on an idle one under the default `wakeup` delivery, unbounded
  * unless `maxConsecutiveWakes` caps it per owner.
- * @module @x1a0f3n9/dsh-tool-jobs
+ * @module @deepseek-ai/dsh-tool-jobs
  */
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { boundContextSummary, createUserMessage, type ContentBlock } from '@x1a0f3n9/dsh-llm'
-import type { ContextFormed } from '@x1a0f3n9/dsh-llm'
-import { TextRetainer } from '@x1a0f3n9/dsh-output-retention'
-import { defineTool } from '@x1a0f3n9/dsh-tools'
-import type { GenericCallView, ToolDefinition, ToolExecution } from '@x1a0f3n9/dsh-tools'
-import { JobId } from '@x1a0f3n9/dsh-jobs'
-import type { JobView, JobRead } from '@x1a0f3n9/dsh-jobs'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import type {} from '@x1a0f3n9/dsh-agent'
+import { boundContextSummary, createUserMessage, type ContentBlock } from '@deepseek-ai/dsh-llm'
+import type { ContextFormed } from '@deepseek-ai/dsh-llm'
+import { TextRetainer } from '@deepseek-ai/dsh-output-retention'
+import { defineTool } from '@deepseek-ai/dsh-tools'
+import type { GenericCallView, ToolDefinition, ToolExecution } from '@deepseek-ai/dsh-tools'
+import { JobId } from '@deepseek-ai/dsh-jobs'
+import type { JobView, JobRead } from '@deepseek-ai/dsh-jobs'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import type {} from '@deepseek-ai/dsh-agent'
 import { publicJob, renderModelDelta, statusLine } from './render.ts'
 import type { PublicJobSnapshot } from './render.ts'
-declare module '@x1a0f3n9/dsh-llm' {
+declare module '@deepseek-ai/dsh-llm' {
   interface MessageSourceMap {
     'tool-jobs': { kind: 'tool-jobs' } & ContextFormed
   }
@@ -137,9 +137,10 @@ function fitCompletionNotice(job: JobView): string {
   const compact = `${prefix}${action}`
   const compactBytes = encoder.encode(compact).byteLength
   if (compactBytes <= maxBytes) return compact
-  const actionBytes = encoder.encode(action).byteLength
-  if (actionBytes >= maxBytes) return retainTail(action, maxBytes)
-  return `${retainHead(prefix, maxBytes - actionBytes)}${action}`
+  // A partial UUID cannot identify the job. Point the model at the listing instead.
+  const recovery = 'background job ended; use job_list for id.'
+  if (encoder.encode(recovery).byteLength <= maxBytes) return recovery
+  return retainHead('job_list', maxBytes)
 }
 
 function rawSingleText(content: readonly ContentBlock[]): string | undefined {

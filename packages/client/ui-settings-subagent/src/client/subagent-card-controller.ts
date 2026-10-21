@@ -1,6 +1,6 @@
 /** Shared presentation and actions for the two Host-owned Subagent settings sections. */
 
-import type { SettingsFormShell } from '@x1a0f3n9/dsh-client-ui-primitives'
+import type { SettingsFormShell } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { SubagentLimitsCardFace, SubagentLimitsCardState } from './subagent-limits-card-controller.ts'
 import type {
   SubagentModelSelectionCardFace, SubagentModelSelectionCardState,

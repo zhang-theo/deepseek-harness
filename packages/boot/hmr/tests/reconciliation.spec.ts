@@ -17,7 +17,7 @@ import {
   loadOptionalPatches,
   PROFILE_PATCH_FILENAME,
   reconcileProfilePatches,
-} from '@x1a0f3n9/dsh-app-boot'
+} from '@deepseek-ai/dsh-app-boot'
 
 const NAME = 'dsh-test-bin'
 

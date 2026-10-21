@@ -1,12 +1,12 @@
 import type {
   ConversationLocation, ConversationNodeContext, ConversationNodeDefinition,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { ChatConversationViewNode } from '@x1a0f3n9/dsh-client-ui-chat/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { ChatConversationViewNode } from '@deepseek-ai/dsh-client-ui-chat/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {
   ToolWorkflowAgentEndData, ToolWorkflowAgentStartData,
-} from '@x1a0f3n9/dsh-tool-workflow/types'
-import type { WorkflowAgentOutcome, WorkflowStopReason } from '@x1a0f3n9/dsh-workflow/types'
+} from '@deepseek-ai/dsh-tool-workflow/types'
+import type { WorkflowAgentOutcome, WorkflowStopReason } from '@deepseek-ai/dsh-workflow/types'
 
 /** Status shown for a workflow, phase, or member. */
 export type WorkflowRunStatus = 'running' | 'completed' | 'failed' | 'cancelled' | 'interrupted'
@@ -34,7 +34,7 @@ export interface WorkflowRunChatData {
   readonly phases: readonly WorkflowRunPhaseData[]
 }
 
-declare module '@x1a0f3n9/dsh-client-ui-chat/client' {
+declare module '@deepseek-ai/dsh-client-ui-chat/client' {
   interface ChatNodeDataMap {
     /** Durable top-level workflow run and all members that actually started. */
     'workflow-run': WorkflowRunChatData
@@ -80,11 +80,16 @@ function statusFromOutcome(outcome: WorkflowAgentOutcome): WorkflowRunStatus {
   }
 }
 
-function locationClosed(location: ConversationLocation): boolean {
-  if (location.kind === 'step') {
-    return location.step.status === 'closed' || location.turn.status === 'closed'
-  }
-  return location.kind === 'turn' && location.turn.status === 'closed'
+/**
+ * A foreground run writes its run-end before its Tool Step ends, and a
+ * background run outlives that Step, so an ordinary Step or Turn closure says
+ * nothing about liveness. Only a Turn closed after a crash or at a fork
+ * boundary proves that a run without run-end stopped.
+ */
+function turnAbandoned(location: ConversationLocation): boolean {
+  if (location.kind !== 'step' && location.kind !== 'turn') return false
+  const reason = location.turn.end?.data.reason.kind
+  return reason === 'interrupted' || reason === 'forked'
 }
 
 function projectWorkflow(
@@ -93,7 +98,7 @@ function projectWorkflow(
 ): WorkflowRunChatData {
   const state = context.state as WorkflowState
   const interrupted = state.stopReason === undefined
-    && locationClosed(location)
+    && turnAbandoned(location)
   const phases = new Map<string, { phase: string | null; members: WorkflowRunMemberData[] }>()
   for (const member of state.members) {
     const phase = member.phase === undefined ? null : member.phase

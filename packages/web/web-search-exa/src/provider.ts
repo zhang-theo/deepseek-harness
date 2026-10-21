@@ -3,16 +3,16 @@
  * highlight contents). It maps the first non-blank highlight to `snippet`, maps
  * `publishedDate` to `publishedAt`, drops entries without a snippet, and omits `content`
  * because Exa returns no generated answer.
- * @module @x1a0f3n9/dsh-web-search-exa/provider
+ * @module @deepseek-ai/dsh-web-search-exa/provider
  */
 
-import { WebError } from '@x1a0f3n9/dsh-web'
+import { WebError } from '@deepseek-ai/dsh-web'
 import type {
   WebSearchProvider,
   WebSearchRequest,
   WebSearchResult,
   WebSearchSource,
-} from '@x1a0f3n9/dsh-web'
+} from '@deepseek-ai/dsh-web'
 import type { ExaError, ExaResult, ExaSearchResponse } from './types.ts'
 
 /** Stable id this provider registers under. */

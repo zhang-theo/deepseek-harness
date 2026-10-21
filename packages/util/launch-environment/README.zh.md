@@ -3,13 +3,13 @@ description: "本次运行环境的不可变快照，记住每个值来自哪一
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-launch-environment
+# @deepseek-ai/dsh-launch-environment
 
 [English](README.md) | 中文
 
 ## 概述
 
-使用 `@x1a0f3n9/dsh-launch-environment` 解析启动时的环境值，无需信任压平的 `process.env`。它会冻结继承的进程值、调用目录的 `.env` 和 Harness 主目录的 `.env`，再按固定可信顺序返回胜出的值及其来源。调用方可以在敏感查找中排除某些层；无论之后顺序如何变化，被省略的层都不可达。快照不可变，但每一层仍会被复制到 `process.env`，因此它不隔离子进程。请把它作为库导入；不能从 `cordis.yml` 挂载它。
+使用 `@deepseek-ai/dsh-launch-environment` 解析启动时的环境值，无需信任压平的 `process.env`。它会冻结继承的进程值、调用目录的 `.env` 和 Harness 主目录的 `.env`，再按固定可信顺序返回胜出的值及其来源。调用方可以在敏感查找中排除某些层；无论之后顺序如何变化，被省略的层都不可达。快照不可变，但每一层仍会被复制到 `process.env`，因此它不隔离子进程。请把它作为库导入；不能从 `cordis.yml` 挂载它。
 
 ## 目录
 
@@ -29,7 +29,7 @@ kind: "package-library"
 ### 解析一个值
 
 ```ts
-import { launchEnvironmentOf } from '@x1a0f3n9/dsh-launch-environment'
+import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
 
 declare const ctx: import('@deepseek-ai/cordis').Context
 const endpoint = launchEnvironmentOf(ctx).get('DEEPSEEK_BASE_URL')?.value
@@ -68,7 +68,6 @@ const endpoint = launchEnvironmentOf(ctx).get('DEEPSEEK_BASE_URL')?.value
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | `createLaunchEnvironmentSnapshot`、`launchEnvironmentOf` 与 `ctx.launchEnvironment` 槽位 |
-| — | 不发布运行时不变式伴生入口；快照在任何 fiber 启动前即已冻结，并且本包不拥有任何事件流或可变运行时数据；单元测试会强制检查其查找与拒绝规则。 |
 
 ### 快照如何保持冻结
 

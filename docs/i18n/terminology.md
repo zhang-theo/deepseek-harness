@@ -127,6 +127,7 @@
 | event log | 事件日志 | | | |
 | event stream | 事件流 | | | |
 | event-sourced | 事件溯源 | | | 沿用 DDD 社区通行译法 |
+| exchange | 交互段 | | 回合、交换 | Chat 中从真人输入开启的轮次起、到下一个这样的轮次为止的连续轮次；见术语表 |
 | Executive summary | 摘要 | | | 事故复盘标题用语 |
 | executor | 执行器 | | | |
 | expected output | 预期输出 | | 金标 | 指 snapshot 比较产物；翻译语料的人工校准样例不在此列 |
@@ -158,7 +159,7 @@
 | opt-out ratio | opt-out 比例 | | 退出检查比例 | |
 | orphan | 遗留 | | 孤儿、孤立 | 指英文源已不存在的 `.zh.md`（如「遗留译文」）；进程语境按 OS 惯用语译「孤儿进程」 |
 | orphan branch | 孤立分支 | | 孤儿分支 | 沿用 git 官方中文翻译 |
-| package | 包 | | | 指 npm 包（`@x1a0f3n9/dsh-*`）；`package.json` 等代码标识保持原样 |
+| package | 包 | | | 指 npm 包（`@deepseek-ai/dsh-*`）；`package.json` 等代码标识保持原样 |
 | pairing | 配对 | | | |
 | parent-subset grants | 父级子集授权 | | 父集合授权 | 指授权范围仅限于父级所持授权的子集 |
 | peer dependency | 对等依赖 | 对等依赖（peer dependency） | | |

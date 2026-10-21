@@ -12,11 +12,11 @@ The fork `master` had mixed upstream and xfdsh commits. Rebasing that history on
 
 Reset `master` to `upstream/master`. Port fork behavior onto a feature branch as a rescope plus keep-file overlay, then merge `--no-ff` into `dev-x1a0f3n9`. Do not replay the old 80-commit fork stack onto the new master.
 
-Product rules stay: `xfdsh` uses `~/.xfdsh` for plugins/profiles, `DSH_SESSION_HOME=~/.dsh` for history, and port `7777`. Official plugins keep their import names and resolve through `@x1a0f3n9/dsh-*`. Conversation delete/rewind/regenerate stays in `dsh-session-timeline`. Preinstalled timeline and `dshmarket` entries are cataloged so Settings can disable them. A stale `danger-full-access` escalation request is treated as already satisfied.
+Product rules stay: `xfdsh` uses `~/.xfdsh` for plugins/profiles, `DSH_SESSION_HOME=~/.dsh` for history, and port `7777`. Official plugins keep their import names and resolve through `@deepseek-ai/dsh-*`. Conversation delete/rewind/regenerate stays in `dsh-session-timeline`. Preinstalled timeline and `dshmarket` entries are cataloged so Settings can disable them. A stale `danger-full-access` escalation request is treated as already satisfied.
 
 ## Verification
 
-`master` is `upstream/master` at `dsh-v0.1.5-alpha.2`. Feature work lives on `features/port-fork-onto-upstream` and merges into `dev-x1a0f3n9` only. Unit tests cover fork defaults, session-home resolution, standing-mode escalation, and official/fork client-module aliases. `node --import tsx/esm apps/cli/src/bin.ts web --no-open` listened on `http://127.0.0.1:7777`, served `@x1a0f3n9/dsh-client-modules`, `dsh-session-timeline`, and `dshmarket` client modules, and left `~/.dsh/profiles` mtimes unchanged.
+`master` is `upstream/master` at `dsh-v0.1.5-alpha.2`. Feature work lives on `features/port-fork-onto-upstream` and merges into `dev-x1a0f3n9` only. Unit tests cover fork defaults, session-home resolution, standing-mode escalation, and official/fork client-module aliases. `node --import tsx/esm apps/cli/src/bin.ts web --no-open` listened on `http://127.0.0.1:7777`, served `@deepseek-ai/dsh-client-modules`, `dsh-session-timeline`, and `dshmarket` client modules, and left `~/.dsh/profiles` mtimes unchanged.
 
 ## Alternatives considered
 
@@ -27,5 +27,5 @@ Product rules stay: `xfdsh` uses `~/.xfdsh` for plugins/profiles, `DSH_SESSION_H
 ## Consequences
 
 - New fork work still uses `features/*` or `fix/*` branches and `--no-ff` merges into `dev-x1a0f3n9`.
-- Official plugin client inject lists that name `@x1a0f3n9/dsh-*` resolve to the fork module table.
+- Official plugin client inject lists that name `@deepseek-ai/dsh-*` resolve to the fork module table.
 - `dshmarket` remains a preinstalled, disableable web-app catalog entry.

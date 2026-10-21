@@ -3,7 +3,7 @@ description: "Local storage for your attached images below DSH_HOME, for users a
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-attachment-local
+# @deepseek-ai/dsh-attachment-local
 
 English | [中文](README.zh.md)
 
@@ -32,7 +32,7 @@ In the default composition, images and generic files attached to prompts or comm
 Mount the plugin with no required configuration. The defaults below define what you can attach; the generated configuration catalog is the exhaustive source for every field.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-attachment-local'
+- name: '@deepseek-ai/dsh-attachment-local'
 ```
 
 | Field | Default | Meaning |
@@ -99,7 +99,6 @@ Generic-file bytes have one canonical object at `<DSH_HOME>/attachments/v1/file-
 | [`src/normalization.ts`](src/normalization.ts) + [`src/encoding.ts`](src/encoding.ts) | Provider-independent normalization and bounded format/quality candidates |
 | [`src/request-image.ts`](src/request-image.ts) | Route-specific request transforms, cache identity, and singleflight |
 | [`src/image.ts`](src/image.ts) | Full raster decode and metadata verification |
-| — | No runtime invariant companion is published; immutable writes and verified reads are enforced directly at the backend boundary. |
 
 </details>
 

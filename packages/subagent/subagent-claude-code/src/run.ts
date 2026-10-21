@@ -3,7 +3,7 @@
  * real CLI process under the shared subprocess owner, map only strict SDK
  * success to completion, and dispose to whole-range quiescence.
  *
- * @module @x1a0f3n9/dsh-subagent-claude-code/run
+ * @module @deepseek-ai/dsh-subagent-claude-code/run
  */
 
 import { randomUUID } from 'node:crypto'
@@ -15,9 +15,9 @@ import {
   type SDKResultMessage,
   type SpawnOptions,
 } from '@anthropic-ai/claude-agent-sdk'
-import type { ContentBlock } from '@x1a0f3n9/dsh-llm'
-import { brandString } from '@x1a0f3n9/dsh-brand'
-import type { SessionId } from '@x1a0f3n9/dsh-session'
+import type { ContentBlock } from '@deepseek-ai/dsh-llm'
+import { brandString } from '@deepseek-ai/dsh-brand'
+import type { SessionId } from '@deepseek-ai/dsh-session'
 import {
   settleRunResult,
   subprocessRunHandle,
@@ -25,13 +25,13 @@ import {
   type SubagentRun,
   type SubagentStartRequest,
   type SubagentStopReason,
-} from '@x1a0f3n9/dsh-subagent'
+} from '@deepseek-ai/dsh-subagent'
 import {
   scrubbedParentEnv,
   type SubprocessHandle,
   type SubprocessOutcome,
   type SubprocessSpawnSpec,
-} from '@x1a0f3n9/dsh-subprocess'
+} from '@deepseek-ai/dsh-subprocess'
 import {
   claudeSpawnSpec,
   ManagedClaudeCodeProcess,
@@ -148,7 +148,7 @@ function unattendedDiagnostic(
  * run inputs and error normalization instead of adding a shared lifecycle owner. */
 /** Fully resolved inputs for one official Claude Agent SDK query. */
 export interface ClaudeCodeRunSpec {
-  /** Parent Session workspace supplied to the SDK and real CLI. */
+  /** Selected child working directory supplied to the SDK and real CLI. */
   readonly cwd: string
   /** Profile-selected native model; omitted to preserve Claude settings. */
   readonly model?: string

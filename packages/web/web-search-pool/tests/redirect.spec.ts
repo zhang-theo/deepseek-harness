@@ -6,7 +6,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createServer, type IncomingMessage, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
-import { searchWithAdapter } from '@x1a0f3n9/dsh-web-search-pool'
+import { searchWithAdapter } from '@deepseek-ai/dsh-web-search-pool'
 
 const TEST_API_KEY = 'redirect-test-key'
 const TEST_QUERY = 'private redirect query'

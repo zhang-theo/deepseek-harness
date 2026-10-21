@@ -8,17 +8,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
 import Include from '@deepseek-ai/cordis-plugin-include'
-import LlmRuntime from '@x1a0f3n9/dsh-llm'
-import AgentRegistry from '@x1a0f3n9/dsh-agent'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import { credentialRef } from '@x1a0f3n9/dsh-credentials'
-import LocalCredentialProvider from '@x1a0f3n9/dsh-credentials-local'
+import LlmRuntime from '@deepseek-ai/dsh-llm'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import { credentialRef } from '@deepseek-ai/dsh-credentials'
+import LocalCredentialProvider from '@deepseek-ai/dsh-credentials-local'
 import { profileComposition } from '../../../settings/settings/tests/profile-composition.ts'
-import { getOrCreateAnonymousUserId } from '@x1a0f3n9/dsh-anonymous-user-id'
-import DeepSeekLlmApiExtensionRegistry from '@x1a0f3n9/dsh-deepseek-llm-api-extensions'
-import * as SessionLogDeepSeek from '@x1a0f3n9/dsh-session-log-deepseek'
-import * as DeepSeekPluginPackageInventory from '@x1a0f3n9/dsh-plugin-package-inventory-deepseek'
-import * as LlmDeepSeek from '@x1a0f3n9/dsh-llm-deepseek-api-key'
+import { getOrCreateAnonymousUserId } from '@deepseek-ai/dsh-anonymous-user-id'
+import DeepSeekLlmApiExtensionRegistry from '@deepseek-ai/dsh-deepseek-llm-api-extensions'
+import * as SessionLogDeepSeek from '@deepseek-ai/dsh-session-log-deepseek'
+import * as DeepSeekPluginPackageInventory from '@deepseek-ai/dsh-plugin-package-inventory-deepseek'
+import * as LlmDeepSeek from '@deepseek-ai/dsh-llm-deepseek-api-key'
 import { assemble } from './assemble.ts'
 import { closeMockServers, mockServer, textEvents } from './mock-server.ts'
 import { sourceModuleLoader } from './helpers.ts'
@@ -55,31 +55,31 @@ async function loadComposition(
   const configPath = join(root, 'cordis.yml')
   await writeFile(configPath, [
     '- id: llm',
-    "  name: '@x1a0f3n9/dsh-llm'",
+    "  name: '@deepseek-ai/dsh-llm'",
     '- id: session',
-    "  name: '@x1a0f3n9/dsh-session'",
+    "  name: '@deepseek-ai/dsh-session'",
     '- id: agents',
-    "  name: '@x1a0f3n9/dsh-agent'",
+    "  name: '@deepseek-ai/dsh-agent'",
     '- id: deepseek-llm-api-extensions',
-    "  name: '@x1a0f3n9/dsh-deepseek-llm-api-extensions'",
+    "  name: '@deepseek-ai/dsh-deepseek-llm-api-extensions'",
     '- id: session-log-deepseek',
-    "  name: '@x1a0f3n9/dsh-session-log-deepseek'",
+    "  name: '@deepseek-ai/dsh-session-log-deepseek'",
     ...options.enableSessionLog !== undefined
       ? ['  config:', `    enabled: ${String(options.enableSessionLog)}`]
       : [],
     '- id: plugin-package-inventory-deepseek',
-    "  name: '@x1a0f3n9/dsh-plugin-package-inventory-deepseek'",
+    "  name: '@deepseek-ai/dsh-plugin-package-inventory-deepseek'",
     ...options.withDynamic
       ? [
         '- id: credentials',
-        "  name: '@x1a0f3n9/dsh-credentials-local'",
+        "  name: '@deepseek-ai/dsh-credentials-local'",
         '  config:',
         `    path: ${JSON.stringify(credentialsPath)}`,
         '    debounceMs: 10',
       ]
       : [],
     '- id: llm-deepseek',
-    "  name: '@x1a0f3n9/dsh-llm-deepseek-api-key'",
+    "  name: '@deepseek-ai/dsh-llm-deepseek-api-key'",
     '  config:',
     `    baseURL: ${JSON.stringify(options.baseURL)}`,
     '',
@@ -91,14 +91,14 @@ async function loadComposition(
   await ctx.plugin(Loader)
   ctx.loader.builtins.include = Include
   const modules = new Map<string, unknown>([
-    ['@x1a0f3n9/dsh-llm', LlmRuntime],
-    ['@x1a0f3n9/dsh-session', SessionStore],
-    ['@x1a0f3n9/dsh-agent', AgentRegistry],
-    ['@x1a0f3n9/dsh-deepseek-llm-api-extensions', DeepSeekLlmApiExtensionRegistry],
-    ['@x1a0f3n9/dsh-session-log-deepseek', SessionLogDeepSeek],
-    ['@x1a0f3n9/dsh-plugin-package-inventory-deepseek', DeepSeekPluginPackageInventory],
-    ['@x1a0f3n9/dsh-credentials-local', LocalCredentialProvider],
-    ['@x1a0f3n9/dsh-llm-deepseek-api-key', LlmDeepSeek],
+    ['@deepseek-ai/dsh-llm', LlmRuntime],
+    ['@deepseek-ai/dsh-session', SessionStore],
+    ['@deepseek-ai/dsh-agent', AgentRegistry],
+    ['@deepseek-ai/dsh-deepseek-llm-api-extensions', DeepSeekLlmApiExtensionRegistry],
+    ['@deepseek-ai/dsh-session-log-deepseek', SessionLogDeepSeek],
+    ['@deepseek-ai/dsh-plugin-package-inventory-deepseek', DeepSeekPluginPackageInventory],
+    ['@deepseek-ai/dsh-credentials-local', LocalCredentialProvider],
+    ['@deepseek-ai/dsh-llm-deepseek-api-key', LlmDeepSeek],
   ])
   // The custom importer bypasses Node resolution; mirror the package manifests
   // a deployed cordis.yml has beside its declared dependencies.
@@ -125,6 +125,27 @@ async function loadComposition(
 
 
 describe('llm-deepseek real dynamic composition', () => {
+  it('updates the model catalog when the stored API key is removed or added', async () => {
+    vi.stubEnv('DEEPSEEK_API_KEY', '')
+    const { ctx } = await loadComposition({ withDynamic: true, baseURL: 'https://api.deepseek.com/anthropic' })
+    const credentials = ctx.get('credentials')!
+    const models = await ctx.llm.listModels('deepseek-official')
+    expect(models).not.toHaveLength(0)
+
+    await credentials.unset(KEY_REF)
+    expect(await ctx.llm.listModels('deepseek-official')).toEqual([])
+    expect(ctx.llm.listConfigurableProviders().map(row => row.provider)).toContain('deepseek-official')
+
+    await credentials.set(KEY_REF, 'stored-by-ui')
+    expect(await ctx.llm.listModels('deepseek-official')).toEqual(models)
+
+    const failure = new Error('credential lookup failed')
+    const resolve = vi.spyOn(credentials, 'resolve').mockRejectedValue(failure)
+    try {
+      await expect(ctx.llm.listModels('deepseek-official')).rejects.toBe(failure)
+    } finally { resolve.mockRestore() }
+  })
+
   it('keeps package inventory on when the Loader composition disables session upload', async () => {
     vi.stubEnv('DEEPSEEK_API_KEY', 'entry-key')
     const server = await mockServer([{ kind: 'sse', events: textEvents }])
@@ -136,9 +157,9 @@ describe('llm-deepseek real dynamic composition', () => {
     const request = server.requests[0] as { dsh_plugin_packages: { version: number; packages: unknown[] } }
     expect(request).not.toHaveProperty('dsh_session_log')
     expect(request.dsh_plugin_packages.packages).toEqual(expect.arrayContaining([
-      { name: '@x1a0f3n9/dsh-deepseek-llm-api-extensions', version: '0.1.0-rc.8' },
-      { name: '@x1a0f3n9/dsh-llm-deepseek-api-key', version: '0.1.0-rc.8' },
-      { name: '@x1a0f3n9/dsh-session-log-deepseek', version: '0.1.0-rc.8' },
+      { name: '@deepseek-ai/dsh-deepseek-llm-api-extensions', version: '0.1.0-rc.8' },
+      { name: '@deepseek-ai/dsh-llm-deepseek-api-key', version: '0.1.0-rc.8' },
+      { name: '@deepseek-ai/dsh-session-log-deepseek', version: '0.1.0-rc.8' },
     ]))
     expect(request.dsh_plugin_packages.version).toBe(1)
     expect(SessionLogDeepSeek.acceptedThrough(session)).toBe(-1)
@@ -219,8 +240,8 @@ describe('llm-deepseek real dynamic composition', () => {
     // Restart over the same harness home.
     const restarted = await loadComposition({ withDynamic: true, baseURL: second.url, reuseRoot: home })
     const credentials = restarted.ctx.get('credentials')!
-    // The stored key is still the provider's own writable file entry — not a
-    // read-only launch override, which is what hoisting it would have made it.
+    // The stored key is still the provider's own file entry — not a
+    // launch-environment value, which is what hoisting it would have made it.
     expect(await credentials.resolve(KEY_REF)).toEqual({ value: 'stored-by-ui', source: 'file' })
     expect(await credentials.describe(KEY_REF)).toEqual({ configured: true, source: 'file', writable: true })
     // Rotation still works after the restart, and the next request uses it.

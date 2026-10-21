@@ -26,10 +26,10 @@
 /x1a0f3n9-dsh-client-ui-plan/use-this-package/failures:
   en: a13078ade4ef3b9d
   zh: 2c8b3e8b62ad5652
-/x1a0f3n9-dsh-client-ui-plan/understand-the-implementation:
-  en: 1360fc232aee29e7
-  zh: 0beca76c9214a079
-/x1a0f3n9-dsh-client-ui-plan/further-exploration:
+/deepseek-ai-dsh-client-ui-plan/understand-the-implementation:
+  en: 31edfe487dfa0c08
+  zh: c687a5fa5391415a
+/deepseek-ai-dsh-client-ui-plan/further-exploration:
   en: 59f62ef6269abf82
   zh: c8b4ee607be1e432
 /x1a0f3n9-dsh-client-ui-plan/model-experience:
@@ -41,6 +41,6 @@
 /x1a0f3n9-dsh-client-ui-plan/known-limitations-and-deferred-work:
   en: f74784ddad90a7e1
   zh: 638ce5a243e6b5cc
-/x1a0f3n9-dsh-client-ui-plan/known-limitations-and-deferred-work/dev-note:
-  en: c95ae111420d6513
-  zh: 9d58639022d2ab36
+/deepseek-ai-dsh-client-ui-plan/known-limitations-and-deferred-work/dev-note:
+  en: e67f633dc6fe7773
+  zh: 3bb0c20c93f16f98

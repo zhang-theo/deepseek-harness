@@ -10,7 +10,7 @@ import { pnpmInvocation } from '../../../../scripts/pnpm-invocation.ts'
 
 const experimentalDirectory = fileURLToPath(new URL('../..', import.meta.url))
 const packages = ['webworker-runtime', 'webworker-packer']
-const packageNames = new Set(packages.map(name => `@x1a0f3n9/dsh-experimental-${name}`))
+const packageNames = new Set(packages.map(name => `@deepseek-ai/dsh-experimental-${name}`))
 
 it('loads both tarballs through plain Node and mounts their base image and overlay', { retry: 0 }, async (test) => {
   const root = await mkdtemp(join(tmpdir(), 'dsh-webworker-packed-'))
@@ -73,28 +73,28 @@ it('loads both tarballs through plain Node and mounts their base image and overl
     import assert from 'node:assert/strict'
     import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
     import { fileURLToPath } from 'node:url'
-    import * as packer from '@x1a0f3n9/dsh-experimental-webworker-packer'
-    import * as runtime from '@x1a0f3n9/dsh-experimental-webworker-runtime'
-    import * as client from '@x1a0f3n9/dsh-experimental-webworker-runtime/client'
-    import { sessionFormatCatalog } from '@x1a0f3n9/dsh-session-format-catalog'
+    import * as packer from '@deepseek-ai/dsh-experimental-webworker-packer'
+    import * as runtime from '@deepseek-ai/dsh-experimental-webworker-runtime'
+    import * as client from '@deepseek-ai/dsh-experimental-webworker-runtime/client'
+    import { sessionFormatCatalog } from '@deepseek-ai/dsh-session-format-catalog'
     for (const name of ['webworker-packer', 'webworker-runtime']) {
-      assert.equal(import.meta.resolve('@x1a0f3n9/dsh-experimental-' + name),
-        new URL('./node_modules/@x1a0f3n9/dsh-experimental-' + name + '/lib/index.js', import.meta.url).href)
+      assert.equal(import.meta.resolve('@deepseek-ai/dsh-experimental-' + name),
+        new URL('./node_modules/@deepseek-ai/dsh-experimental-' + name + '/lib/index.js', import.meta.url).href)
     }
     assert.equal(typeof client.connectWorkerHost, 'function')
-    const worker = fileURLToPath(import.meta.resolve('@x1a0f3n9/dsh-experimental-webworker-runtime/worker'))
+    const worker = fileURLToPath(import.meta.resolve('@deepseek-ai/dsh-experimental-webworker-runtime/worker'))
     assert.ok(existsSync(worker))
     assert.equal(readFileSync(worker, 'utf8').match(/^import[ \\t]/m), null)
-    const base = packer.packVfsImage({ config: '[]\\n', profile: 'packed-consumer', workspaces: new Map(), resolveFrom: process.cwd(), entries: [] })
+    const base = packer.packVfsImage({ profile: 'packed-consumer', roster: [], workspaces: new Map(), resolveFrom: process.cwd(), entries: [] })
     assert.deepEqual(base.missing, [])
     mkdirSync('subject/lib', { recursive: true })
-    const subject = '@x1a0f3n9/dsh-image-export-fixture'
+    const subject = '@deepseek-ai/dsh-image-export-fixture'
     writeFileSync('subject/package.json', JSON.stringify({ name: subject, files: ['lib'], exports: {
       '.': { default: './lib/index.js' }, './types': { types: './lib/index.d.ts' },
     } }))
     writeFileSync('subject/lib/index.js', 'export const value = 1')
     writeFileSync('subject/lib/index.d.ts', 'export declare const value: number')
-    const typedOptions = { config: '- id: subject\\n  name: "' + subject + '"\\n', profile: 'typed-consumer',
+    const typedOptions = { profile: 'typed-consumer', roster: [subject],
       workspaces: new Map([[subject, fileURLToPath(new URL('./subject', import.meta.url))]]),
       resolveFrom: process.cwd(), entries: [] }
     const typed = packer.packVfsImage(typedOptions)

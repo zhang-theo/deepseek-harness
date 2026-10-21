@@ -1,15 +1,15 @@
 /**
  * Durable agent session-event vocabulary shared with type-only consumers.
  *
- * @module @x1a0f3n9/dsh-agent/types
+ * @module @deepseek-ai/dsh-agent/types
  */
 
-import type { UserMessage } from '@x1a0f3n9/dsh-llm/types'
+import type { UserMessage } from '@deepseek-ai/dsh-llm/types'
 // Type-only: the Workspace registry's archive-admission family map this registry merges `turn` into.
-import type {} from '@x1a0f3n9/dsh-workspace/types'
-import type { OptionalSessionSeq, SessionId, SessionSeq } from '@x1a0f3n9/dsh-session/types'
-import type { TypertContext, TypertLookup } from '@x1a0f3n9/dsh-typert-protocol'
-import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
+import type {} from '@deepseek-ai/dsh-workspace/types'
+import type { OptionalSessionSeq, SessionId, SessionSeq } from '@deepseek-ai/dsh-session/types'
+import type { TypertContext, TypertLookup } from '@deepseek-ai/dsh-typert-protocol'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 
 /** Public live-agent handle; the runtime face augments its live capabilities. */
 export interface Agent {
@@ -17,14 +17,14 @@ export interface Agent {
   readonly id: SessionId
 }
 
-declare module '@x1a0f3n9/dsh-workspace/types' {
+declare module '@deepseek-ai/dsh-workspace/types' {
   interface SessionActivityKindMap {
     /** The session's own Agent is inside a turn, including one waiting for an approval or an answer. */
     turn: true
   }
 }
 
-declare module '@x1a0f3n9/dsh-typert-protocol' {
+declare module '@deepseek-ai/dsh-typert-protocol' {
   interface TypertLookupMap {
     agent: TypertLookup<Agent, SessionId>
   }
@@ -55,7 +55,7 @@ export interface InboxWireState {
   readonly 'next-step': readonly JsonValue[]
 }
 
-declare module '@x1a0f3n9/dsh-session-projection/types' {
+declare module '@deepseek-ai/dsh-session-projection/types' {
   interface SessionProjectionStateMap {
     /** Pending agent input reconstructed from durable inbox splices. */
     inbox: InboxState
@@ -86,7 +86,7 @@ export interface TurnBoundaryProjection {
   readonly lastTurn: number
 }
 
-declare module '@x1a0f3n9/dsh-session/types' {
+declare module '@deepseek-ai/dsh-session/types' {
   interface SessionEventMap {
     /**
      * One normalized mutation of an agent's durable pending-message lists.

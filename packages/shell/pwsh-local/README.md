@@ -3,7 +3,7 @@ description: "The local PowerShell executor for deployments and maintainers choo
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-pwsh-local
+# @deepseek-ai/dsh-pwsh-local
 
 English | [中文](README.zh.md)
 
@@ -37,7 +37,7 @@ Load the executor with the budgets you want; every field has a default, so the s
 
 ```yaml
 - id: bash
-  name: '@x1a0f3n9/dsh-pwsh-local'
+  name: '@deepseek-ai/dsh-pwsh-local'
   config:
     cwd: C:\path\to\workspace
     timeoutMs: 120000
@@ -94,7 +94,6 @@ The executor is the PowerShell Service Provider for the `ctx.shell` seam built o
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry: `PwshLocalExecutor`, `Config`, settings wiring, argv seam |
 | [`src/resolve.ts`](src/resolve.ts) | Pure `resolvePwshPath`/`candidatePwshPaths` executable resolution |
-| — | No runtime invariant companion is published; this package exposes no independent event sequence or mutable data relation beyond contracts enforced at its owning seam. |
 | `tests/` | Exercised behavior: budgets, classification, resolution, background handles |
 
 ### Main flow

@@ -3,7 +3,7 @@ description: "Canonical Session-log ratings, categories, and notes for finalized
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-message-feedback
+# @deepseek-ai/dsh-message-feedback
 
 English | [中文](README.zh.md)
 
@@ -63,8 +63,6 @@ Cold material mutations emit `feedback/committed` after flush with a borrowed re
 |---|---|
 | [`src/index.ts`](src/index.ts) | Remote service, payload validation, event projection, and persistence ownership |
 | [`src/types.ts`](src/types.ts) | Requests, results, and Session event declarations; types only |
-
-No runtime invariant companion is published: the service derives feedback directly from validated canonical events and owns no independently mutable projection.
 
 See the [feedback subsystem](../../../docs/subsystems/feedback.md), [Session persistence](../../../docs/subsystems/persistence.md), and [browser consumer](../../client/ui-message-feedback/README.md) for their respective APIs.
 

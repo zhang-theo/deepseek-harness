@@ -5,12 +5,12 @@
  * and that any number of observers read at absolute byte offsets — and the
  * event stream announcing every commit, while producers retain their
  * execution resources. The process-local registry lives in
- * `@x1a0f3n9/dsh-jobs-local`.
- * @module @x1a0f3n9/dsh-jobs
+ * `@deepseek-ai/dsh-jobs-local`.
+ * @module @deepseek-ai/dsh-jobs
  */
 
 import { Context, Service } from '@deepseek-ai/cordis'
-import type { SessionId } from '@x1a0f3n9/dsh-session'
+import type { SessionId } from '@deepseek-ai/dsh-session'
 import { installJobArchiveAdmission } from './archive-admission.ts'
 import type { JobEvents, JobId, JobOutputRead, JobRead, JobSpec, JobView } from './types.ts'
 
@@ -31,10 +31,13 @@ export type {
   JobOutputRead,
   JobOutputSource,
   JobRead,
+  JobRegisteredData,
+  JobSettledData,
   JobSettleCause,
   JobSourceRead,
   JobSpec,
   JobStatus,
+  JobToolCall,
   JobView,
 } from './types.ts'
 
@@ -88,7 +91,7 @@ export abstract class JobRegistry extends Service {
     // would register a ctx.jobs with no method implementations and fail far
     // from the misconfiguration. Fail loud at load instead.
     if (new.target === JobRegistry) {
-      throw new Error('@x1a0f3n9/dsh-jobs is the abstract job registry seam; load an implementation such as @x1a0f3n9/dsh-jobs-local instead')
+      throw new Error('@deepseek-ai/dsh-jobs is the abstract job registry seam; load an implementation such as @deepseek-ai/dsh-jobs-local instead')
     }
     super(ctx, 'jobs')
     // Archive admission: the Workspace registry asks what still runs for a
@@ -105,7 +108,7 @@ export abstract class JobRegistry extends Service {
    * rejection leaves no job id or execution resource. A throwing starter
    * leaves nothing registered; after it returns, registration cannot fail.
    * @param spec - job identity, owner, output sources, and synchronous starter.
-   * @returns the registry-issued `<kind>-N` id.
+   * @returns the registry-issued `<kind>-<short-uuid>` id.
    */
   abstract start(spec: JobSpec): JobId
 

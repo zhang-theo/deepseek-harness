@@ -1,7 +1,7 @@
 /** Historical child identity reduced to the fields required by a parent's catalog. */
 
-import { SessionFormatError, SessionFormatUnsupportedMigrationError, isSessionFormatJsonObject, sessionFormatCount } from '@x1a0f3n9/dsh-session-format'
-import type { SessionFormatArtifact, SessionFormatJsonObject, SessionFormatJsonValue } from '@x1a0f3n9/dsh-session-format'
+import { SessionFormatError, SessionFormatUnsupportedMigrationError, isSessionFormatJsonObject, sessionFormatCount } from '@deepseek-ai/dsh-session-format'
+import type { SessionFormatArtifact, SessionFormatJsonObject, SessionFormatJsonValue } from '@deepseek-ai/dsh-session-format'
 
 /**
  * Collect a child's own descriptor without requiring one before its parent catalog is read.
@@ -70,9 +70,10 @@ export function childCatalogFact(source: SessionFormatJsonObject): SessionFormat
  * @returns validated catalog payload.
  */
 export function catalogFact(value: SessionFormatJsonValue, subject = 'subagent/catalog'): SessionFormatJsonObject {
-  if (!isSessionFormatJsonObject(value) || (value['version'] !== 0 && value['version'] !== 1)
+  if (!isSessionFormatJsonObject(value) || (value['version'] !== 0 && value['version'] !== 1 && value['version'] !== 2)
     || typeof value['childId'] !== 'string'
-    || (value['mode'] !== 'continuable' && value['mode'] !== 'one-shot' && value['mode'] !== 'unknown')
+    || (value['mode'] !== 'continuable' && value['mode'] !== 'one-shot' && value['mode'] !== 'external' && value['mode'] !== 'unknown')
+    || ((value['version'] === 2) !== (value['mode'] === 'external'))
     || (value['version'] === 0 && value['mode'] === 'unknown')
     || (value['mode'] === 'continuable' && typeof value['label'] !== 'string')
     || (value['label'] !== undefined && typeof value['label'] !== 'string')) {

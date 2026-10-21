@@ -24,11 +24,11 @@ function fixture(payload: string, options: { surface?: string; event?: string } 
   put(root, 'tsconfig.host.json', JSON.stringify({ compilerOptions: {
     target: 'es2024', module: 'esnext', moduleResolution: 'bundler', strict: true, skipLibCheck: true,
     types: [], paths: {
-      '@x1a0f3n9/dsh-session/types': ['./packages/core/session/src/types.ts'],
+      '@deepseek-ai/dsh-session/types': ['./packages/core/session/src/types.ts'],
       '@fixture/payload': ['./packages/domain/payload/src/types.ts'],
     },
   }, include: ['packages/**/src/**/*.ts'] }))
-  put(root, 'packages/core/session/package.json', '{"name":"@x1a0f3n9/dsh-session"}')
+  put(root, 'packages/core/session/package.json', '{"name":"@deepseek-ai/dsh-session"}')
   put(root, 'packages/domain/payload/package.json', '{"name":"@fixture/payload"}')
   put(root, 'packages/session/session-persistence-jsonl/src/format.ts', "interface HeaderLine {type: 'session'; version: number; id: string; delegationDepth: number}\nexport {}\n")
   put(root, 'packages/domain/payload/src/types.ts', payload)
@@ -172,7 +172,7 @@ describe('persistent source type extraction', () => {
   it('discovers plugin event merges and keeps ordinary event additions out of the envelope digest', () => {
     const root = fixture('export interface Payload {id: string}')
     const before = extractPersistenceSchema(root)
-    put(root, 'packages/domain/extension/src/index.ts', `import '@x1a0f3n9/dsh-session/types'; declare module '@x1a0f3n9/dsh-session/types' {
+    put(root, 'packages/domain/extension/src/index.ts', `import '@deepseek-ai/dsh-session/types'; declare module '@deepseek-ai/dsh-session/types' {
 interface SessionEventMap {
 /** A plugin event. */
 'plugin/new': { optional?: boolean }
@@ -186,7 +186,7 @@ interface SessionEventMap {
 
   it('includes JSX-module events and rejects unsupported inherited declarations there', () => {
     const root = fixture('export interface Payload {id: string}')
-    put(root, 'packages/domain/extension/src/index.tsx', `import '@x1a0f3n9/dsh-session/types'; declare module '@x1a0f3n9/dsh-session/types' {
+    put(root, 'packages/domain/extension/src/index.tsx', `import '@deepseek-ai/dsh-session/types'; declare module '@deepseek-ai/dsh-session/types' {
 interface SessionEventMap {
 /** A JSX-module event. */
 'plugin/tsx': { value: number }
@@ -197,16 +197,16 @@ interface SessionEventMap {
     settings.include.push('packages/**/src/**/*.tsx')
     writeFileSync(config, JSON.stringify(settings))
     expect(extractPersistenceSchema(root).roots.some(root => root.event === 'plugin/tsx')).toBe(true)
-    put(root, 'packages/domain/extension/src/index.tsx', `import '@x1a0f3n9/dsh-session/types';
+    put(root, 'packages/domain/extension/src/index.tsx', `import '@deepseek-ai/dsh-session/types';
 interface Extra { 'plugin/inherited': {value: number} }
-declare module '@x1a0f3n9/dsh-session/types' { interface SessionEventMap extends Extra {} }
+declare module '@deepseek-ai/dsh-session/types' { interface SessionEventMap extends Extra {} }
 `)
     expect(() => extractPersistenceSchema(root)).toThrow('uses extends')
   })
 
   it('rejects an event map whose compiler vocabulary exceeds the discovered source corpus', () => {
     const root = fixture("import '../../../../vendor/events.ts'; export interface Payload {id: string}")
-    put(root, 'vendor/events.ts', `import '@x1a0f3n9/dsh-session/types'; declare module '@x1a0f3n9/dsh-session/types' {
+    put(root, 'vendor/events.ts', `import '@deepseek-ai/dsh-session/types'; declare module '@deepseek-ai/dsh-session/types' {
 interface SessionEventMap {
 /** A contribution outside the package source corpus. */
 'outside/event': { value: number }
@@ -346,7 +346,7 @@ describe('explicitly reserved JSON properties', () => {
     const before = extractedEvent('export interface Payload { id: string;\n/** @persistenceReserved */\ntool?: never }')
     const after = extractedEvent('export interface Payload { id: string; tool?: string }')
     expect(classifyPersistenceChange(before, after)).toEqual([expect.objectContaining({
-      path: 'event:test/record.data.tool', kind: 'type-changed', requiresVersionBump: true,
+      path: 'event:test/record.data.tool', kind: 'type-changed', requiresCompatibilityReview: true,
     })])
   })
 
@@ -420,7 +420,7 @@ describe('source compatibility authoring', () => {
     expect(property.compatibility).toEqual({ version: 1, policy: 'session-source-attribution', binding: `session.${role}-message.source`,
       discriminator: 'kind', unknownKinds: 'preserve', attributionKinds: ['attribution'] })
     expect(classifyPersistenceChange(before.roots.find(root => root.kind === 'event')!, root))
-      .toEqual([expect.objectContaining({ kind: 'attribution-kind-added', requiresVersionBump: false })])
+      .toEqual([expect.objectContaining({ kind: 'attribution-kind-added', requiresCompatibilityReview: false })])
     expect(parsePersistenceSnapshot({ ...after, types: [] })).toEqual({ ...after, types: [] })
   })
 
@@ -502,18 +502,18 @@ declare module './message.js' {
 }`)
     const after = extractPersistenceSchema(root)
     expect(classifyPersistenceChange(before.roots.find(root => root.kind === 'event')!, after.roots.find(root => root.kind === 'event')!))
-      .toEqual([expect.objectContaining({ kind: 'attribution-kind-added', requiresVersionBump: false })])
+      .toEqual([expect.objectContaining({ kind: 'attribution-kind-added', requiresCompatibilityReview: false })])
   })
 
   it('does not qualify unmarked additions or structurally equal unbound fields', () => {
     const before = sourceFixture('')
     const after = sourceFixture("unmarked: {kind: 'new'}")
     expect(classifyPersistenceChange(extractPersistenceSchema(before).roots.find(root => root.kind === 'event')!,
-      extractPersistenceSchema(after).roots.find(root => root.kind === 'event')!).some(change => change.requiresVersionBump)).toBe(true)
+      extractPersistenceSchema(after).roots.find(root => root.kind === 'event')!).some(change => change.requiresCompatibilityReview)).toBe(true)
     const left = fixture("export interface Payload { source: {kind: 'old'} }")
     const right = fixture("export interface Payload { source: {kind: 'old'} | {kind: 'new'} }")
     expect(classifyPersistenceChange(extractPersistenceSchema(left).roots.find(root => root.kind === 'event')!,
-      extractPersistenceSchema(right).roots.find(root => root.kind === 'event')!).some(change => change.requiresVersionBump)).toBe(true)
+      extractPersistenceSchema(right).roots.find(root => root.kind === 'event')!).some(change => change.requiresCompatibilityReview)).toBe(true)
   })
 
   it.each([

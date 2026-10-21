@@ -1,9 +1,9 @@
 import { resolve } from 'node:path'
-import * as nativeCommand from '@x1a0f3n9/dsh-native-command'
+import * as nativeCommand from '@deepseek-ai/dsh-native-command'
 import { Context } from '@deepseek-ai/cordis'
-import AgentRegistry from '@x1a0f3n9/dsh-agent'
-import SessionStore from '@x1a0f3n9/dsh-session'
-import FsLocal from '@x1a0f3n9/dsh-fs-local'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import SessionStore from '@deepseek-ai/dsh-session'
+import FsLocal from '@deepseek-ai/dsh-fs-local'
 import { onTestFinished } from 'vitest'
 import { describe, expect, it, vi } from 'vitest'
 import {

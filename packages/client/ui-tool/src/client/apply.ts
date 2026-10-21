@@ -1,13 +1,12 @@
 /** Register the Tool call tree, details renderer, and built-in atomic views. */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
-import type { RemoteHostFacts } from '@x1a0f3n9/dsh-api-remotes/client'
-import type { HostObservable } from '@x1a0f3n9/dsh-client-ui-slots'
-import type {} from '@x1a0f3n9/dsh-api-remotes/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-renderer/client'
-import type {} from '@x1a0f3n9/dsh-client-ui-session/client'
+import type { RemoteHostFacts } from '@deepseek-ai/dsh-api-remotes/client'
+import type { HostObservable } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import { ToolCallTree } from './tool/ToolCallTree.tsx'
-import { bindToolCallArgumentsPartial } from './tool/tool-call-arguments-partial.ts'
 import { CONVERSATION_NS as NS } from './locale.ts'
 import { askQuestionToolview } from './tool/toolviews/ask-question-row.tsx'
 import { bashToolviewSample } from './tool/toolviews/bash-sample.tsx'
@@ -37,10 +36,7 @@ export function apply(ctx: ClientContext): void {
     key: 'tool-call',
     locale: NS,
     children: {
-      'tool.call.toolview': {
-        kind: 'keyed', scope: 'session',
-        inject: { hooks: { toolCallArgumentsPartial: bindToolCallArgumentsPartial } },
-      },
+      'tool.call.toolview': { kind: 'keyed', scope: 'session' },
     },
     inject: toolInject,
   }, ToolCallTree))

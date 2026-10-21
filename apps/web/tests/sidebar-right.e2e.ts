@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url'
 import type { Browser, ConsoleMessage, Locator, Page } from 'playwright'
 import { chromium } from 'playwright'
 import { afterAll, beforeAll, describe, expect, it, onTestFailed } from 'vitest'
-import { createMessage, createUserMessage } from '@x1a0f3n9/dsh-llm'
+import { createMessage, createUserMessage } from '@deepseek-ai/dsh-llm'
 import { acknowledgeReloadConnectionLoss, launchWebScaffold, watchConsole, type WebScaffold } from './scaffold.ts'
 import {
   connectFreshWorkspace, newEnglishPage, saveFailureShot, ZH_BROWSER_LOCALE,
@@ -373,6 +373,24 @@ describe('web e2e: shipped right Sidebar', () => {
       await page.keyboard.press('Backspace')
       await expect.poll(async () => (await composer.innerText()).trim()).toBe('')
       expect(answered).toBe(true)
+    })
+
+    it('keeps the frame unscrolled when PageUp moves the composer caret beside the collapsed panel', async () => {
+      onTestFailed(() => saveFailureShot(page, 'web-e2e-sidebar-right-pageup'))
+      const frame = page.locator('[class*="frame"]').first()
+      const composer = page.locator('textarea, [contenteditable="true"]').first()
+      // The expand button exists only while the panel is collapsed, when its
+      // docked hosts sit translated past the frame's right edge.
+      await expandOf(page).waitFor({ timeout: 15_000 })
+      await composer.click()
+      await composer.pressSequentially('caret')
+      // Outside macOS, PageUp moves the caret and reveals it against the start
+      // edge of every scrollable ancestor, `overflow: hidden` ones included.
+      await page.keyboard.press('PageUp')
+      expect(await frame.evaluate(node => node.scrollLeft)).toBe(0)
+      await page.keyboard.press('ControlOrMeta+a')
+      await page.keyboard.press('Backspace')
+      await expect.poll(async () => (await composer.innerText()).trim()).toBe('')
     })
 
     it('starts collapsed behind a header button and squeezes the conversation when opened', async () => {

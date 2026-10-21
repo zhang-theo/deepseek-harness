@@ -1,7 +1,7 @@
 /** Carrier-independent tab commands and renderer-facing state. */
-import { createSnapshotStore, type BoundActions, type SnapshotStore } from '@x1a0f3n9/dsh-client-store'
-import type { TabId } from '@x1a0f3n9/dsh-client-ui-dockkit'
-import type { HostObservable } from '@x1a0f3n9/dsh-client-ui-slots'
+import { createSnapshotStore, type BoundActions, type SnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
+import type { HostObservable } from '@deepseek-ai/dsh-client-ui-slots'
 import type { BrowserFrameState } from './BrowserFrame.ts'
 import type { BrowserPage, BrowserPageFactory } from './BrowserPage.ts'
 import { currentBrowserTarget, type BrowserTabState } from './BrowserPersistence.ts'

@@ -1,16 +1,18 @@
 /** Click-to-record toolbar activity; transcripts remain in the original Session draft. */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { HostObservable, InjectFace, PropsLocale, PropsRuntime } from '@x1a0f3n9/dsh-client-ui-slots'
-import type { TokenSpan } from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { TranscriptionRequest } from '@x1a0f3n9/dsh-experimental-api-speech-to-text/types'
-import type { SpeechPreparationOptions, SpeechProviderId, SpeechSelection, SpeechSelectionPatch, Transcript } from '@x1a0f3n9/dsh-experimental-speech-to-text/types'
-import type { RemoteResult } from '@x1a0f3n9/dsh-typert-protocol'
-import { RecordingError, audioBase64, type Recording } from './audio.ts'
+import type { HostObservable, InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type { TokenSpan } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { TranscriptionRequest } from '@deepseek-ai/dsh-experimental-api-speech-to-text/types'
+import type { SpeechPreparationOptions, SpeechProviderId, SpeechSelection, SpeechSelectionPatch, Transcript } from '@deepseek-ai/dsh-experimental-speech-to-text/types'
+import type { RemoteResult } from '@deepseek-ai/dsh-typert-protocol'
+import { audioBase64, type Recording } from './audio.ts'
+import { failureText } from './failure-text.ts'
+import type { MicrophoneDevice } from './microphone-device.ts'
 import type { SpeechReadiness } from './readiness.ts'
 import { Waveform } from './Waveform.tsx'
 import { VoiceSetupDialog } from './VoiceSetupDialog.tsx'
 import { NS } from './locales.ts'
-import { Button, IconCloseOutlineRegular, IconStopFillRegular, IconMicrophoneOutlineRegular, StateDot, Tooltip } from '@x1a0f3n9/dsh-client-ui-primitives'
+import { Button, IconCloseOutlineRegular, IconStopFillRegular, IconMicrophoneOutlineRegular, StateDot, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
 import css from './VoiceInput.module.css'
 
 /** Host calls injected without exposing a Cordis Context to React. */
@@ -19,6 +21,8 @@ export interface VoiceInputActions {
   openSettings: () => void
   /** @returns one microphone operation owned by the plugin lifecycle. */
   createRecording: () => Recording
+  /** Remember the browser microphone used by previews and subsequent recordings. */
+  selectMicrophone: (device: MicrophoneDevice) => void
   transcribe: (request: TranscriptionRequest, signal: AbortSignal) => Promise<RemoteResult<Transcript>>
   prepare: (providerId: SpeechProviderId, options?: SpeechPreparationOptions) => Promise<void>
   cancelPreparation: (providerId: SpeechProviderId) => Promise<void>
@@ -27,7 +31,7 @@ export interface VoiceInputActions {
 
 /** Entry-injected Host readiness and microphone operations. */
 export interface VoiceInputInjected extends VoiceInputActions {
-  hooks: { speechReadiness: HostObservable<SpeechReadiness> }
+  hooks: { speechReadiness: HostObservable<SpeechReadiness>; microphoneDevice: HostObservable<MicrophoneDevice> }
 }
 
 /** Composer-owned expansion and draft actions; preferences stay in plugin settings. */
@@ -95,8 +99,6 @@ export function VoiceInput({ sessionId, inputActions, locked, onActiveChange,
   }, [sessionId])
 
   const feedback = (text: string): void => { setMessage(text); setPhase('feedback') }
-  const failureText = (failure: unknown): string => failure instanceof RecordingError ? t(failure.kind)
-    : t('failed', { message: failure instanceof Error ? failure.message : String(failure) })
   const finish = async (): Promise<void> => {
     const active = current.current
     if (!active || active.phase !== 'recording') return
@@ -115,7 +117,7 @@ export function VoiceInput({ sessionId, inputActions, locked, onActiveChange,
       setPhase('idle')
     } catch (failure) {
       await disposeRecording(active.capture)
-      if (run === generation.current) feedback(failureText(failure))
+      if (run === generation.current) feedback(failureText(failure, t))
     } finally { if (run === generation.current) current.current = undefined }
   }
   const start = async (): Promise<void> => {
@@ -131,7 +133,7 @@ export function VoiceInput({ sessionId, inputActions, locked, onActiveChange,
         if (run !== generation.current || current.current !== active || active.phase === 'transcribing') return
         current.current = undefined
         clearTimeout(active.timer); active.abort.abort()
-        feedback(failureText(failure))
+        feedback(failureText(failure, t))
       })
       if (run !== generation.current || current.current !== active) return
       active.phase = 'recording'
@@ -139,7 +141,7 @@ export function VoiceInput({ sessionId, inputActions, locked, onActiveChange,
       active.timer = setTimeout(() => { void finish() }, active.maxDurationSeconds * 1000)
     } catch (failure) {
       await disposeRecording(active.capture)
-      if (run === generation.current) { current.current = undefined; feedback(failureText(failure)) }
+      if (run === generation.current) { current.current = undefined; feedback(failureText(failure, t)) }
     }
   }
   if (!expanded) return <>

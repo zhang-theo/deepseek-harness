@@ -1,9 +1,9 @@
 /** The sidebar's Plugins entry icon; the sidebar owns the button, label, and selected state around it. */
 
 import type { ReactNode } from 'react'
-import { IconPluginPinwheelOutlineRegular } from '@x1a0f3n9/dsh-client-ui-primitives'
-import type { PropsRuntime } from '@x1a0f3n9/dsh-client-ui-slots'
-import type {} from '@x1a0f3n9/dsh-client-ui-sidebar/client'
+import { IconPluginPinwheelOutlineRegular } from '@deepseek-ai/dsh-client-ui-primitives'
+import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 
 /**
  * Render the plugin glyph at the size the sidebar asks for.

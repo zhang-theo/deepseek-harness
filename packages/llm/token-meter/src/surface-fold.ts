@@ -1,8 +1,8 @@
 /**
- * Positional pricing shared by measurement and the context-breakdown fold:
- * measurement retains attachment details for route pricing; breakdown keeps
- * only retained node identities, heuristic prices, and system classification.
- * The occupancy projection uses the scalar shadow-price protocol instead.
+ * Positional pricing for measurement: each retained node keeps its identity,
+ * heuristic price, and the attachment details route pricing replaces. The
+ * occupancy and context-breakdown projections use the scalar shadow-price
+ * protocol instead.
  *
  * The fold is a plan/commit pair: {@link planSurfaceTokens} runs every
  * fallible step read-only and {@link commitSurfaceTokens} mutates in place,
@@ -11,12 +11,12 @@
  * Nodes also carry durable attachment occurrences and their structural prices,
  * so `measure()` can price the request representation sent to the model.
  *
- * @module @x1a0f3n9/dsh-token-meter/surface-fold
+ * @module @deepseek-ai/dsh-token-meter/surface-fold
  */
 
-import { deriveEventMessage } from '@x1a0f3n9/dsh-session'
-import type { SessionSeq, SurfaceEvent } from '@x1a0f3n9/dsh-session'
-import type { ContentBlock, ImageBlock, Message } from '@x1a0f3n9/dsh-llm'
+import { deriveEventMessage } from '@deepseek-ai/dsh-session'
+import type { SessionSeq, SurfaceEvent } from '@deepseek-ai/dsh-session'
+import type { ContentBlock, ImageBlock, Message } from '@deepseek-ai/dsh-llm'
 import { estimateMessage, estimateStructuralBlock } from './estimate.ts'
 
 type FileAttachmentRef = Extract<ContentBlock, { type: 'file' }>['attachment']

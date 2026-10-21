@@ -13,7 +13,7 @@ it.each([false, true])('settles startup after parent IPC disconnect (boot failur
   const modules = join(root, 'node_modules', '@deepseek-ai')
   const hostDirectory = fileURLToPath(new URL('../../desktop-host/', import.meta.url))
   const manifest = JSON.parse(readFileSync(join(hostDirectory, 'package.json'), 'utf8')) as { dependencies: Record<string, string> }
-  const stubbed = new Set(['@x1a0f3n9/dsh-app-boot', '@x1a0f3n9/dsh', '@x1a0f3n9/dsh-home-paths'])
+  const stubbed = new Set(['@deepseek-ai/dsh-app-boot', '@deepseek-ai/dsh', '@deepseek-ai/dsh-home-paths'])
   for (const name of Object.keys(manifest.dependencies)) {
     const destination = join(root, 'node_modules', name)
     mkdirSync(dirname(destination), { recursive: true })
@@ -28,7 +28,11 @@ it.each([false, true])('settles startup after parent IPC disconnect (boot failur
   }
   writeFileSync(join(root, 'package.json'), '{"type":"module"}')
   writeFileSync(join(modules, 'dsh-app-boot', 'package.json'), '{"type":"module","exports":"./index.js"}')
-  writeFileSync(join(modules, 'dsh-app-boot', 'index.js'), 'export const loadProfileDirectory = () => ({ skippedBundles: [] }); export const reportSkippedBundles = () => {}; export const loadLayeredEnv = () => ({})')
+  writeFileSync(join(modules, 'dsh-app-boot', 'index.js'), `
+    export const loadProfileDirectory = () => ({ skippedBundles: [] });
+    export const reportSkippedBundles = () => {};
+    export const loadLayeredEnv = () => ({});
+  `)
   writeFileSync(join(modules, 'dsh', 'package.json'), '{"type":"module","exports":{"./profile-boot":"./profile-boot.js"}}')
   writeFileSync(join(modules, 'dsh', 'profile-boot.js'), `
     import { writeFileSync } from 'node:fs';

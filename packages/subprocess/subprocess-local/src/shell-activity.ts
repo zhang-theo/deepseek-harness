@@ -2,7 +2,7 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { basename, join } from 'node:path'
-import type { SubprocessTerminalActivity, SubprocessTerminalSpawnSpec } from '@x1a0f3n9/dsh-subprocess'
+import type { SubprocessTerminalActivity, SubprocessTerminalSpawnSpec } from '@deepseek-ai/dsh-subprocess'
 
 function quote(value: string): string { return `'${value.replaceAll("'", "'\\''")}'` }
 

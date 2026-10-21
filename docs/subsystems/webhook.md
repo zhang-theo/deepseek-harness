@@ -2,7 +2,7 @@
 
 English | [中文](webhook.zh.md)
 
-The Webhook subsystem turns authenticated external deliveries into optional ordinary root Sessions. Provider adapters own authentication and generic JSON intake; trusted programmatic rules own conditions and external calls; `ctx.webhookRuntime` owns callback lifetime plus Workspace-backed Session creation. The [implemented decision](../../.agents/notes/implemented/feature/2026-08-22-fire-and-forget-webhook-sessions.md) records why the runtime keeps no delivery or completion state.
+The Webhook subsystem turns authenticated external deliveries into optional ordinary root Sessions. Provider adapters own authentication and generic JSON intake; trusted programmatic rules own conditions and external calls; `ctx.webhookRuntime` owns callback lifetime plus Workspace-backed Session creation. The [historical implemented decision](../../.agents/notes/archived/feature/2026-08-22-fire-and-forget-webhook-sessions.md) records why the runtime keeps no delivery or completion state.
 
 ## Shared values
 
@@ -32,7 +32,7 @@ Failed attachment disposes the new Agent before a prompt exists. A failure betwe
 
 ## GitHub adapter
 
-`@x1a0f3n9/dsh-webhook-github` registers an exact route on an injected WebServer, resolves its credential reference for each request, verifies the untouched `application/json` body before parsing, and returns `202` immediately after in-memory dispatch. Its normalized event guarantees a signed lossless-JSON object; rules validate the event-specific fields they consume.
+`@deepseek-ai/dsh-webhook-github` registers an exact route on an injected WebServer, resolves its credential reference for each request, verifies the untouched `application/json` body before parsing, and returns `202` immediately after in-memory dispatch. Its normalized event guarantees a signed lossless-JSON object; rules validate the event-specific fields they consume.
 
 The [GitHub review guide](../user/guide/github-review.md) mounts this route on an isolated second WebServer so exposing webhook ingress does not expose the browser API.
 
@@ -66,5 +66,5 @@ register<K extends string>(rule: WebhookRule<K>): () => Promise<void>
 dispatch<K extends string>(delivery: VerifiedWebhookDelivery<K>): void
 ```
 
-Source: [`packages/webhook/webhook/src/index.ts`](../../packages/webhook/webhook/src/index.ts)
+Source: [`packages/experimental/webhook/src/index.ts`](../../packages/experimental/webhook/src/index.ts)
 <!-- END GENERATED cordis-surface -->

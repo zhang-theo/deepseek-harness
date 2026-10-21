@@ -3,7 +3,7 @@ description: "面向 web GUI 宿主的工作区目录选择 seam：原生与浏�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-host-directory-picker
+# @deepseek-ai/dsh-host-directory-picker
 
 [English](README.md) | 中文
 
@@ -109,5 +109,3 @@ web GUI 让操作者通过 OS 选择器或应用内浏览器选择工作区目�
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。这个无状态 Service Definition 只定义 capability vocabulary，观察由 backend 与 Remote controller 负责。

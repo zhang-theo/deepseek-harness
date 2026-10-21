@@ -1,6 +1,6 @@
 /** Fixed V3 event vocabulary and namespaced historical opaque events. */
 
-import type { SessionFormatEvent } from '@x1a0f3n9/dsh-session-format'
+import type { SessionFormatEvent } from '@deepseek-ai/dsh-session-format'
 
 // This historical list must not inherit additions or removals from the current Session event list.
 /* jscpd:ignore-start */

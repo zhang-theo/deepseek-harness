@@ -3,7 +3,7 @@
 
 - insert:
     - id: webhook-runtime
-      name: '@x1a0f3n9/dsh-webhook'
+      name: '@deepseek-ai/dsh-webhook'
 
     - id: github-webhook-real-e2e-rule
       name: './github-webhook-rule.mjs'
@@ -22,13 +22,13 @@
         webServer: true
       config:
         - id: github-webhook-real-e2e-server
-          name: '@x1a0f3n9/dsh-host-webserver'
+          name: '@deepseek-ai/dsh-host-webserver'
           config:
             host: '127.0.0.1'
             port: !!js Number(process.env.DSH_GITHUB_WEBHOOK_PORT)
 
         - id: github-webhook-real-e2e-adapter
-          name: '@x1a0f3n9/dsh-webhook-github'
+          name: '@deepseek-ai/dsh-webhook-github'
           config:
             source: github-real-e2e
             path: /github

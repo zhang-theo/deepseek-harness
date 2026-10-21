@@ -4,14 +4,14 @@ import { createHash, randomUUID } from 'node:crypto'
 import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import type { Sharp } from 'sharp'
-import { AttachmentError, ImageVariantId } from '@x1a0f3n9/dsh-attachment'
+import { AttachmentError, ImageVariantId } from '@deepseek-ai/dsh-attachment'
 import type {
   ImageMediaType,
   ImageAttachmentRef,
   ImageRequestTarget,
   RequestImageAttachment,
   StoredImageAttachment,
-} from '@x1a0f3n9/dsh-attachment'
+} from '@deepseek-ai/dsh-attachment'
 import {
   IMAGE_ENCODING_QUALITIES,
   WEBP_ENCODING_EFFORT,

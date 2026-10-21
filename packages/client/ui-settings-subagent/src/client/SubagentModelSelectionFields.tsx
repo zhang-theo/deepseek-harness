@@ -1,7 +1,7 @@
 /** User control for model-selectable subagent delegation in new sessions. */
 
-import { Switch } from '@x1a0f3n9/dsh-client-ui-primitives'
-import type { PropsLocale } from '@x1a0f3n9/dsh-client-ui-slots'
+import { Switch } from '@deepseek-ai/dsh-client-ui-primitives'
+import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
 import type {
   SubagentModelCandidate,
   SubagentModelSelectionCardFace,

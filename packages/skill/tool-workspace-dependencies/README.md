@@ -3,7 +3,7 @@ description: "The load_workspace_dependencies tool: absolute paths into a bundle
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-tool-workspace-dependencies
+# @deepseek-ai/dsh-tool-workspace-dependencies
 
 English | [中文](README.zh.md)
 
@@ -25,12 +25,12 @@ Deployments that ship their own script runtimes (Desktop's primary runtime, or a
 <a id="use-this-package"></a>
 ## Use this package
 
-Mount the plugin beside the tool registry with the payload directory. Configuration validation requires a nonempty `source` and rejects empty `root` values before activation; both paths must be absolute. The bundled Office skills (`@x1a0f3n9/dsh-skill-office`) reference this tool by name for their default interpreter.
+Mount the plugin beside the tool registry with the payload directory. Configuration validation requires a nonempty `source` and rejects empty `root` values before activation; both paths must be absolute. The bundled Office skills (`@deepseek-ai/dsh-skill-office`) reference this tool by name for their default interpreter.
 
 ### Minimal configuration
 
 ```yaml
-- name: '@x1a0f3n9/dsh-tool-workspace-dependencies'
+- name: '@deepseek-ai/dsh-tool-workspace-dependencies'
   config:
     source: /path/to/primary-runtime
 ```
@@ -43,6 +43,8 @@ Mount the plugin beside the tool registry with the payload directory. Configurat
 ### Payload layout
 
 `runtime.json` records `desktopVersion`, `platform` (`win32`, `darwin`, or `linux`), `arch`, optional `payloadDigest`, top-level `python`, optional `node`/`pnpm` versions, and the complete `pythonPackages` distribution-version map. A pnpm entry requires Node.js. Python libraries, including numpy and pandas, appear only in `pythonPackages`. Entries live under `dependencies/`: `python/bin/python3` (`python/python.exe` on Windows) with `site-packages` beneath it, and, when declared, `node/bin/node` with `node/node_modules` and `pnpm/bin/pnpm.mjs`. A manifest whose platform or architecture differs from the running process is rejected.
+
+On macOS and Linux, the builder retains `python` and `python3` as relative links to the sibling versioned interpreter (for example, `python3.12`). Installation preserves these two aliases and materializes other links. Alias validation requires the exact sibling filename and a regular target file; carriers that cannot preserve links, including Python wheels, retain supported regular command files. Windows keeps its ordinary `python.exe` file.
 
 The packaged `sdk` profile uses its bundled Python and Office skills by default; `DSH_PRIMARY_RUNTIME` overrides the resource location, and an empty value opts out. Source launches without a carrier default remain opt-in. See [runtime configuration](../../../python/sdk-runtime/README.md) for independent skill selection. Missing skill resources produce a startup warning; invalid or incomplete external runtime payloads fail the first tool call. Profile configuration changes require restarting the SDK process.
 
@@ -65,7 +67,6 @@ A container can copy both directories into an immutable image layer and set `DSH
 | File | Responsibility |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Manifest validation, path derivation, in-place and installed preparation, tool registration. |
-| — | No runtime invariant companion is published: the payload manifest is validated on every preparation, and the tool registry owns registration lifecycle. |
 
 </details>
 
@@ -122,7 +123,5 @@ Append-only tool result in the turn history; no prompt section is added.
 
 <details>
 <summary>Working context for maintainers — click to expand</summary>
-
-Placement and carrier choices are recorded in the [shared-runtime Agent Note](../../../.agents/notes/implemented/architecture/2026-09-17-shared-office-runtime.md).
 
 </details>

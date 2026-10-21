@@ -11,7 +11,7 @@
  * stop-on-throw) or touch the agent loop. Composed by a backend in its
  * constructor.
  *
- * @module @x1a0f3n9/dsh-session-telemetry/coordinator
+ * @module @deepseek-ai/dsh-session-telemetry/coordinator
  */
 
 import type { Context } from '@deepseek-ai/cordis'
@@ -22,8 +22,8 @@ import {
   type SessionEvent,
   type SessionSeq as SessionSeqType,
   type SessionSeqCursor,
-} from '@x1a0f3n9/dsh-session'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
+} from '@deepseek-ai/dsh-session'
+import type { Agent } from '@deepseek-ai/dsh-agent'
 import type { SessionTelemetrySink, SessionTelemetryRecord, SessionTelemetrySeverity } from './index.ts'
 
 /** Whether capture follows live events or reads the canonical log only when requested. */
@@ -178,15 +178,17 @@ export class SessionTelemetryCoordinator {
 
   /** Copy, redact, and hand one canonical event to the backend. */
   private captureEvent(session: Session, event: SessionEvent): void {
+    const { data, ...envelope } = event
     this.deliver(session, {
       record: this.redact({
+        sourceEvent: { sessionId: session.id, envelope: structuredClone(envelope) },
         channel: 'ledger',
         time: event.time,
         severity: severityOf(event),
         attributes: identityOf(session, event),
         // The canonical event object is mutable and the backend serializes
         // later; append-time validation guarantees this clone cannot throw.
-        body: structuredClone(event.data),
+        body: structuredClone(data),
       }),
       seq: event.seq,
     })

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { RemoteError } from '@x1a0f3n9/dsh-typert-protocol'
+import { RemoteError } from '@deepseek-ai/dsh-typert-protocol'
 import { planResourceProvider } from '../src/client/plan-resource.ts'
 
 const address = 'dsh-resource://plan/session/call'

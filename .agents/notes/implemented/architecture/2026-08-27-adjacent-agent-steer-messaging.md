@@ -26,7 +26,7 @@ Every accepted message uses `Agent.steer()`. A running target receives it at the
 Every direction uses one durable source. The service derives `senderSessionId` from the authorized Agent and frames the model-visible content as `Agent <sender-id> sent a message:`, so attribution cannot diverge from authority.
 
 ```ts
-import type { SessionId } from '@x1a0f3n9/dsh-session'
+import type { SessionId } from '@deepseek-ai/dsh-session'
 
 interface AgentMessageSource {
   readonly kind: 'agent-message'
@@ -46,7 +46,7 @@ interface SendMessageInput {
 }
 ```
 
-Parents and children inherit the same definition in the same registry order. The standard definition carries a process-stable internal identity that a scoped same-name tool does not satisfy. A child `toolFilter` may explicitly remove the inherited tool, and a scoped replacement may provide different semantics; neither case receives the standard call instruction. When the standard tool remains visible, the continuation manager appends the JSON-encoded direct parent id and the instruction to send one self-contained result before finishing, plus earlier actionable findings, to the child's initial user task. For a fork child this task follows the inherited completed-turn prefix; no child-only system-prompt section or tool schema precedes that prefix.
+Parents and children inherit the same definition in the same registry order. The standard definition carries a process-stable internal identity that a scoped same-name tool does not satisfy. An independently selected preset may omit the tool, a historical descriptor filter may remove it on resume, and a scoped replacement may provide different semantics; neither case receives the standard call instruction. When the standard tool remains visible, the continuation manager appends the JSON-encoded direct parent id and the instruction to send one self-contained result before finishing, plus earlier actionable findings, to the child's initial user task. For a fork child this task follows the inherited completed-turn prefix; no child-only system-prompt section or tool schema precedes that prefix.
 
 The instruction is guidance, not settlement enforcement. Sending does not end the child's turn, zero or several calls remain mechanically valid, and the runtime never rejects a child for staying silent. The manager-owned `subagent-settled` notice remains unconditional and separately attributed because it records how an Activation ended and preserves terminal output when the child cannot cooperate.
 
@@ -54,7 +54,7 @@ Human browser prompts are not model-authored Agent messages. The remote prompt p
 
 ### Complete removal and reintroduction condition
 
-The standalone `@x1a0f3n9/dsh-tool-subagent-report` package, `report` schema, `tool:report` prompt section, `reportDelivery` configuration, report-specific message source, catalog entries, composition rows, and supported-behavior snapshots are absent. The unified tool gives up the recipient-free child shortcut and the old ability for a structural return tool to survive an explicit child allow-list. Those capabilities return only if a concrete use case requires semantics that an adjacent `agent_id` and fixed Steer cannot express; reintroducing them requires a distinct model operation and prefix-cost evidence, not an alias over `sendMessage()`.
+The standalone `@deepseek-ai/dsh-tool-subagent-report` package, `report` schema, `tool:report` prompt section, `reportDelivery` configuration, report-specific message source, catalog entries, composition rows, and supported-behavior snapshots are absent. The unified tool gives up the recipient-free child shortcut and the old ability for a structural return tool to survive an explicit child allow-list. Those capabilities return only if a concrete use case requires semantics that an adjacent `agent_id` and fixed Steer cannot express; reintroducing them requires a distinct model operation and prefix-cost evidence, not an alias over `sendMessage()`.
 
 ## Alternatives considered
 
@@ -79,4 +79,4 @@ The standalone `@x1a0f3n9/dsh-tool-subagent-report` package, `report` schema, `t
 - The initial task carries JSON-encoded dynamic parent addressing after a fork prefix, while the request-head system prompt and tool ordering remain reusable.
 - Human prompts, settlement notices, QueueDock, and the base bundle's one-shot fork policy remain separate decisions.
 
-This decision consolidates and removes the fully superseded report-tool and child-report-obligation records. It supersedes the `followup` naming choice in [Intent-named subagent continuation operations](../../archived/simplification/2026-07-27-intent-named-subagent-continuation-operations.md) and retains the accepted-order guarantee in [Child Agent messages precede their settlement notices](../bug-fix/2026-08-17-subagent-message-settlement-ordering.md).
+This decision consolidates and removes the fully superseded report-tool and child-report-obligation records. It supersedes the `followup` naming choice in [Intent-named subagent continuation operations](../../archived/simplification/2026-07-27-intent-named-subagent-continuation-operations.md) and retains the accepted-order guarantee in [Child Agent messages precede their settlement notices](../../../../packages/subagent/subagent/README.md).

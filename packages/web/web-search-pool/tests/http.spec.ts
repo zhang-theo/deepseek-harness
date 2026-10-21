@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { WebError } from '@x1a0f3n9/dsh-web'
+import { WebError } from '@deepseek-ai/dsh-web'
 import {
   classifyHttpStatus,
   poolFetchJson,
   poolFetchText,
   SearchPoolHttpError,
-} from '@x1a0f3n9/dsh-web-search-pool'
+} from '@deepseek-ai/dsh-web-search-pool'
 
 afterEach(() => {
   vi.unstubAllGlobals()

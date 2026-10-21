@@ -1,6 +1,6 @@
 /** Account cancellation follows logged routes and the owning plugin lifetime. */
 import { Context } from '@deepseek-ai/cordis'
-import { LlmError } from '@x1a0f3n9/dsh-llm'
+import { LlmError } from '@deepseek-ai/dsh-llm'
 import { expect, it, vi } from 'vitest'
 import { installAccountTaskCancellation } from '../src/account-tasks.ts'
 

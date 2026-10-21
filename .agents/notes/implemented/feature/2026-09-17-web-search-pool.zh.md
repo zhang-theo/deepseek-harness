@@ -10,7 +10,7 @@ Status: implemented
 
 ## Decision
 
-交付 `@x1a0f3n9/dsh-web-search-pool`，插件名 `web-search-pool`，提供方 id `search-pool`。它是一个 `WebSearchProvider`：按 failover 或 rotate 依次尝试 Tavily、Perplexity、Exa、Serper、Brave、Jina，最后是无需密钥的 `free`。每个后端的多把密钥按逗号或空白拆分。配额/鉴权失败会让该 `${backend}:${key}` 熔断打开得比瞬时失败更久。没有密钥就跳过 Tavily，避免在 `free` 之前烧掉匿名 Tavily 配额。带凭证的适配器使用 `redirect: 'error'`。fetch 仍是 `http`。xfdsh web-app 目录把它预置为默认打开，并覆盖 `searchProviderOrder: [search-pool, perplexity, exa, free]`，不固定 `searchProvider`，因此设置里的 Default 仍表示走顺序，叶子固定仍然生效。关掉目录卡片会卸载该插件；覆盖层随后跳过不可用的 `search-pool` id。已交付的 base 仍是 `[perplexity, exa, free]`。`free`、Exa、Perplexity 和 DeepSeek 仍可单独固定。Tavily extract/map/crawl 保持关闭。
+交付 `@deepseek-ai/dsh-web-search-pool`，插件名 `web-search-pool`，提供方 id `search-pool`。它是一个 `WebSearchProvider`：按 failover 或 rotate 依次尝试 Tavily、Perplexity、Exa、Serper、Brave、Jina，最后是无需密钥的 `free`。每个后端的多把密钥按逗号或空白拆分。配额/鉴权失败会让该 `${backend}:${key}` 熔断打开得比瞬时失败更久。没有密钥就跳过 Tavily，避免在 `free` 之前烧掉匿名 Tavily 配额。带凭证的适配器使用 `redirect: 'error'`。fetch 仍是 `http`。xfdsh web-app 目录把它预置为默认打开，并覆盖 `searchProviderOrder: [search-pool, perplexity, exa, free]`，不固定 `searchProvider`，因此设置里的 Default 仍表示走顺序，叶子固定仍然生效。关掉目录卡片会卸载该插件；覆盖层随后跳过不可用的 `search-pool` id。已交付的 base 仍是 `[perplexity, exa, free]`。`free`、Exa、Perplexity 和 DeepSeek 仍可单独固定。Tavily extract/map/crawl 保持关闭。
 
 相关：[有序 web 搜索不会回落到 DeepSeek](../bug-fix/2026-09-11-web-search-order-no-fallthrough.zh.md)；叶子 `free` 见[无需密钥的 Bing/DuckDuckGo web 搜索](2026-09-13-keyless-web-search-free.zh.md)。
 

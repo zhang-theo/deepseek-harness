@@ -1,13 +1,13 @@
 import { Context } from '@deepseek-ai/cordis'
-import AgentRegistry from '@x1a0f3n9/dsh-agent'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import { createUserMessage, LlmAdapter, type StreamChunk } from '@x1a0f3n9/dsh-llm'
-import SessionStore, { SessionId, SessionLogOffset, SessionSeq } from '@x1a0f3n9/dsh-session'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import { createUserMessage, LlmAdapter, type StreamChunk } from '@deepseek-ai/dsh-llm'
+import SessionStore, { SessionId, SessionLogOffset, SessionSeq } from '@deepseek-ai/dsh-session'
 import {
   createInboxStub,
   mountAgentLoopTestDependencies,
   mountAgentLoopTestHarness,
-} from '@x1a0f3n9/dsh-agent-loop-testkit'
+} from '@deepseek-ai/dsh-agent-loop-testkit'
 import { describe, expect, it, vi } from 'vitest'
 import { ApiSessionAgentController } from '../src/agent.ts'
 import { SessionCommandController } from '../src/commands.ts'

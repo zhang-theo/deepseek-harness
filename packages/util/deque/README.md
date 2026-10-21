@@ -3,7 +3,7 @@ description: "Circular deque for Host and browser packages that need amortized c
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-deque
+# @deepseek-ai/dsh-deque
 
 English | [中文](README.zh.md)
 
@@ -34,7 +34,7 @@ Use `Deque<T>` when entries can accumulate across asynchronous work and the cons
 Import the deque, append entries at the tail, and check `size` before removing an entry whose type may include `undefined`:
 
 ```ts
-import { Deque } from '@x1a0f3n9/dsh-deque'
+import { Deque } from '@deepseek-ai/dsh-deque'
 
 const frames = new Deque<string>()
 frames.pushBack('first')
@@ -62,7 +62,6 @@ The deque stores entries in a circular array. Removing an entry clears that slot
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Circular deque operations and backing-storage lifecycle |
-| — | No runtime invariant companion is published because this collection owns no event stream or shared mutable state; unit tests cover its ordering and storage lifecycle. |
 | [`tests/deque.spec.ts`](tests/deque.spec.ts) | FIFO, front insertion, wrapping, growth, compaction, clearing, and reuse coverage |
 | [`benchmarks/drain.ts`](benchmarks/drain.ts) | Reproducible backlog-drain timing across increasing queue sizes |
 

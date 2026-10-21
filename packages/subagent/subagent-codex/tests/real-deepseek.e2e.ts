@@ -1,3 +1,5 @@
+import { mountWorkingDirectoryFixture } from '../../subagent/tests/working-directory-fixture.ts'
+import { startExternalActivation } from '../../subagent/tests/external-activation-helpers.ts'
 import { execFile } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import {
@@ -13,11 +15,11 @@ import { dirname, join, resolve } from 'node:path'
 import { promisify } from 'node:util'
 import { Context } from '@deepseek-ai/cordis'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import SubagentRuntime from '@x1a0f3n9/dsh-subagent'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import type { SubprocessHandle } from '@x1a0f3n9/dsh-subprocess'
-import LocalSubprocessRuntime from '@x1a0f3n9/dsh-subprocess-local'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import SubagentRuntime from '@deepseek-ai/dsh-subagent'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import type { SubprocessHandle } from '@deepseek-ai/dsh-subprocess'
+import LocalSubprocessRuntime from '@deepseek-ai/dsh-subprocess-local'
 import * as codex from '../src/index.ts'
 import {
   startDeepSeekResponsesBridge,
@@ -98,6 +100,7 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)(
       const ctx = new Context()
       contexts.push(ctx)
       await ctx.plugin(SessionProjectionRegistry)
+      await mountWorkingDirectoryFixture(ctx)
       await ctx.plugin(SubagentRuntime)
       await ctx.plugin(LocalSubprocessRuntime)
       const handles: SubprocessHandle[] = []
@@ -118,7 +121,7 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)(
         id: 'deepseek-e2e-parent',
         session: { header: { cwd: workspace } },
       } as unknown as Agent
-      const run = await ctx.subagents.start('codex', {
+      const run = await startExternalActivation(ctx, 'codex', {
         prompt: [{
           type: 'text',
           text: `Reply with exactly ${nonce} and nothing else. Do not use tools.`,

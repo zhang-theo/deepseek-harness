@@ -3,7 +3,7 @@ description: "The local filesystem spill backend: how spilled text is saved to p
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-spill-local
+# @deepseek-ai/dsh-spill-local
 
 English | [中文](README.zh.md)
 
@@ -32,7 +32,7 @@ Mount this backend in a composition that spills text to the local filesystem. It
 Loading the plugin with no config is safe: files land in a lazily-created private (0700) per-process directory under the OS temp directory. Set `root` when the files must live under a known location.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-spill-local'
+- name: '@deepseek-ai/dsh-spill-local'
   config:
     root: /absolute/path/to/spill
     cleanupPeriodDays: 30
@@ -85,7 +85,6 @@ The backend owns storage details only, on one principle: **a spilled artifact mu
 | [`src/index.ts`](src/index.ts) | Plugin entry: `Config`, the `LocalSpillStore` service, cleanup lifecycle, locator and retrieval-hint assembly |
 | [`src/cleanup.ts`](src/cleanup.ts) | One-shot age sweep, filesystem-identity checks, symlink and ownership safeguards |
 | [`src/store.ts`](src/store.ts) | Cordis-free storage mechanics: private root, session directory, safe-name encoding, exclusive write |
-| — | No runtime invariant companion is published; this package exposes no independent event sequence or mutable data relation beyond contracts enforced at its owning seam. |
 
 ### File naming and write
 

@@ -1,7 +1,7 @@
 {
-  "name": "@x1a0f3n9/dsh-api-terminal-controller",
+  "name": "@deepseek-ai/dsh-api-terminal-controller",
   "description": "Session-owned interactive terminals with shell discovery, screen recovery and typed Remote control",
-  "version": "0.1.7-rc.4",
+  "version": "0.2.1-rc.2",
   "publishConfig": {
     "access": "public"
   },
@@ -35,15 +35,16 @@
       "default": "./lib/typert.remote-client.js"
     },
     "./src/*": "./src/*",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
   },
   "dsh": {
     "client": {
       "inject": [
-        "@x1a0f3n9/dsh-api-gateway"
+        "@deepseek-ai/dsh-api-gateway"
       ],
       "external": [
-        "@x1a0f3n9/dsh-api-gateway/client"
+        "@deepseek-ai/dsh-api-gateway/client"
       ],
       "platform": "web"
     }
@@ -54,35 +55,39 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@x1a0f3n9/dsh-deque": "workspace:*",
-    "@x1a0f3n9/dsh-lazy-require": "workspace:*",
-    "@x1a0f3n9/dsh-typert-protocol": "workspace:*",
+    "@deepseek-ai/dsh-deque": "workspace:*",
+    "@deepseek-ai/dsh-lazy-require": "workspace:*",
+    "@deepseek-ai/dsh-typert-protocol": "workspace:*",
+    "@deepseek-ai/dsh-util-values": "workspace:*",
     "@deepseek-ai/schemastery": "workspace:~",
-    "@xterm/headless": "^6.0.0",
     "@xterm/addon-serialize": "^0.14.0",
-    "zod": "^4.4.3"
+    "@xterm/headless": "^6.0.0",
+    "zod": "4.4.3"
   },
   "peerDependencies": {
-    "@x1a0f3n9/dsh-subprocess": "workspace:*",
+    "@deepseek-ai/dsh-subprocess": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:~",
-    "@x1a0f3n9/dsh-agent": "workspace:*",
-    "@x1a0f3n9/dsh-api-gateway": "workspace:*",
-    "@x1a0f3n9/dsh-brand": "workspace:*",
-    "@x1a0f3n9/dsh-client-store": "workspace:*",
-    "@x1a0f3n9/dsh-fs": "workspace:*",
-    "@x1a0f3n9/dsh-remote-mock": "workspace:*",
-    "@x1a0f3n9/dsh-sandbox": "workspace:*",
-    "@x1a0f3n9/dsh-sandbox-policy": "workspace:*",
-    "@x1a0f3n9/dsh-session": "workspace:*",
-    "@x1a0f3n9/dsh-session-projection": "workspace:*",
-    "@x1a0f3n9/dsh-subprocess": "workspace:*",
-    "@x1a0f3n9/dsh-subprocess-local": "workspace:*",
-    "@x1a0f3n9/dsh-util-crypto": "workspace:*"
+    "@deepseek-ai/dsh-agent": "workspace:*",
+    "@deepseek-ai/dsh-api-gateway": "workspace:*",
+    "@deepseek-ai/dsh-brand": "workspace:*",
+    "@deepseek-ai/dsh-client-connection": "workspace:*",
+    "@deepseek-ai/dsh-client-store": "workspace:*",
+    "@deepseek-ai/dsh-fs": "workspace:*",
+    "@deepseek-ai/dsh-remote-mock": "workspace:*",
+    "@deepseek-ai/dsh-sandbox": "workspace:*",
+    "@deepseek-ai/dsh-sandbox-policy": "workspace:*",
+    "@deepseek-ai/dsh-session": "workspace:*",
+    "@deepseek-ai/dsh-session-projection": "workspace:*",
+    "@deepseek-ai/dsh-subprocess": "workspace:*",
+    "@deepseek-ai/dsh-subprocess-local": "workspace:*",
+    "@deepseek-ai/dsh-util-crypto": "workspace:*",
+    "@deepseek-ai/dsh-working-directory": "workspace:*"
   },
   "files": [
+    "locale/*.json",
     "lib/index.js",
     "lib/client.js",
     "lib/types/**/*.js",

@@ -1,11 +1,11 @@
 /** An independent, expandable notice explaining a non-human Turn trigger. */
 import { useId, useState, type ComponentType } from 'react'
 import {
-  IconAgentPresetOutlineRegular, IconAlarmClockOutlineRegular, IconBranchOutlineRegular,
+  IconAgentPresetOutlineRegular, IconClockOutlineRegular, IconBranchOutlineRegular,
   IconChevronDownOutlineRegular, IconContextInjectionOutlineRegular, IconCordisPluginOutlineRegular,
   IconGoalOutlineRegular, IconGlobeOutlineRegular, IconPaperPlaneOutlineRegular, IconQueueOutlineRegular,
   type IconProps,
-} from '@x1a0f3n9/dsh-client-ui-primitives'
+} from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ChatNodeViewProps } from '../contract/slots.ts'
 import { formatMessageClock } from './message-chrome.ts'
 import { NoticeBody } from './ContextBody.tsx'
@@ -20,7 +20,7 @@ const TRIGGER_ICONS: Record<TurnTriggerIcon, ComponentType<IconProps>> = {
   subagent: IconAgentPresetOutlineRegular,
   github: IconBranchOutlineRegular,
   webhook: IconGlobeOutlineRegular,
-  schedule: IconAlarmClockOutlineRegular,
+  schedule: IconClockOutlineRegular,
   job: IconQueueOutlineRegular,
   plugin: IconCordisPluginOutlineRegular,
 }

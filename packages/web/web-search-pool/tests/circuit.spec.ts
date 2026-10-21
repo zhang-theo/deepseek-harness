@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { SearchPoolCircuit } from '@x1a0f3n9/dsh-web-search-pool'
+import { SearchPoolCircuit } from '@deepseek-ai/dsh-web-search-pool'
 
 const options = { failureThreshold: 3, windowMs: 1000, cooldownMs: 500, quotaCooldownMs: 2000 }
 

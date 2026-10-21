@@ -1,6 +1,6 @@
 /** Runtime inspection, session queries, and workflow reports from recorded text. */
 import type { ToolDetailsModel } from '../components/ToolDetails.tsx'
-import { hasSpillNotice } from '@x1a0f3n9/dsh-spill-policy/notice'
+import { hasSpillNotice } from '@deepseek-ai/dsh-spill-policy/notice'
 import {
   detailJson, detailList, detailRecord, inspectionItems,
   type DetailItem, type DetailTranslate,

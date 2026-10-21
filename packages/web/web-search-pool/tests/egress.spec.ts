@@ -1,8 +1,8 @@
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { installProxyFromEnvironment } from '@x1a0f3n9/dsh-http-proxy'
-import { searchWithAdapter } from '@x1a0f3n9/dsh-web-search-pool'
+import { installProxyFromEnvironment } from '@deepseek-ai/dsh-http-proxy'
+import { searchWithAdapter } from '@deepseek-ai/dsh-web-search-pool'
 
 let seen: string[] = []
 let proxy: Server

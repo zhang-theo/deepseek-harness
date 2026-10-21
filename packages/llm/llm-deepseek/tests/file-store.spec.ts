@@ -2,8 +2,8 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { AttachmentId, ImageVariantId } from '@x1a0f3n9/dsh-attachment'
-import type { ImageAttachmentRef, RequestImageAttachment } from '@x1a0f3n9/dsh-attachment'
+import { AttachmentId, ImageVariantId } from '@deepseek-ai/dsh-attachment'
+import type { ImageAttachmentRef, RequestImageAttachment } from '@deepseek-ai/dsh-attachment'
 import { DeepSeekFileStore, MAX_IMAGE_BYTES } from '../src/file-store.ts'
 import { DeepSeekFileId } from '../src/file-id.ts'
 import { deepSeekFileScope, DeepSeekUploadIndex } from '../src/upload-index.ts'
@@ -98,10 +98,10 @@ describe('DeepSeekFileStore', () => {
     expect((await store.ensureUploaded(VERSION, { ...CONNECTION, baseURL: `${CONNECTION.baseURL}/v1/` }, POLICY)).record).toEqual(first.record)
     const reopened = new DeepSeekFileStore({ index, fetch: remote.fetchImpl, now: () => now })
     expect((await reopened.ensureUploaded(VERSION, CONNECTION, POLICY)).record).toEqual(first.record)
-    await reopened.invalidate(VERSION, other.record.fileId, CONNECTION)
+    await reopened.invalidate([{ variantId: VERSION.variantId, fileId: other.record.fileId }], CONNECTION)
     expect((await reopened.ensureUploaded(VERSION, CONNECTION, POLICY)).record).toEqual(first.record)
     expect(remote.uploads()).toBe(2)
-    await reopened.invalidate(VERSION, first.record.fileId, CONNECTION)
+    await reopened.invalidate([{ variantId: VERSION.variantId, fileId: first.record.fileId }], CONNECTION)
     const replacement = await reopened.ensureUploaded(VERSION, CONNECTION, POLICY)
     expect(replacement.record.fileId).not.toBe(first.record.fileId)
     expect((await reopened.ensureUploaded(VERSION, alternate, POLICY)).record).toEqual(other.record)

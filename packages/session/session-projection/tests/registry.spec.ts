@@ -7,10 +7,10 @@
  * and effect-tied removal of registrations and change listeners (HMR safety).
  */
 
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import { z } from 'zod'
-import { createSystemMessage, createUserMessage } from '@x1a0f3n9/dsh-llm'
+import { createSystemMessage, createUserMessage } from '@deepseek-ai/dsh-llm'
 import SessionStore, {
   SESSION_FORMAT_VERSION,
   SESSION_LIVE_WINDOW_EVENTS,
@@ -18,12 +18,12 @@ import SessionStore, {
   SessionId,
   SessionLogOffset,
   SessionSeq,
-} from '@x1a0f3n9/dsh-session'
-import type { SessionEvent, SessionHeader } from '@x1a0f3n9/dsh-session'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import type { ProjectionDefinition } from '@x1a0f3n9/dsh-session-projection'
+} from '@deepseek-ai/dsh-session'
+import type { SessionEvent, SessionHeader } from '@deepseek-ai/dsh-session'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import type { ProjectionDefinition } from '@deepseek-ai/dsh-session-projection'
 
-declare module '@x1a0f3n9/dsh-session-projection/types' {
+declare module '@deepseek-ai/dsh-session-projection/types' {
   interface SessionProjectionStateMap {
     'test/marks': MarksState
     'test/count': number
@@ -37,7 +37,7 @@ declare module '@x1a0f3n9/dsh-session-projection/types' {
   }
 }
 
-declare module '@x1a0f3n9/dsh-session/types' {
+declare module '@deepseek-ai/dsh-session/types' {
   interface SessionEventMap {
     'test/mark': { marks: string[] }
   }
@@ -592,6 +592,22 @@ describe('SessionProjectionRegistry drive', () => {
     mark(session, ['after-dispose'])
     expect(notifications).toEqual(['test/marks'])
     expect(ctx.sessionProjections.snapshot(session).values).toEqual({})
+  })
+
+  it('keeps a yielded registration live until the composite finishes using it', async () => {
+    const { ctx, session } = await harness()
+    onTestFinished(async () => { await ctx.fiber.dispose() })
+    let observed: MarksState | undefined
+    const fiber = await ctx.plugin(Object.assign((inner: Context) => {
+      inner.effect(function* () {
+        yield inner.sessionProjections.register(marksUnit())
+        yield () => { observed = inner.sessionProjections.stateOf(session, 'test/marks') }
+      })
+    }, { inject: ['sessionProjections'] }))
+    mark(session, ['live'])
+    await fiber.dispose()
+    expect(observed).toEqual({ marks: ['live'] })
+    expect(ctx.sessionProjections.stateOf(session, 'test/marks')).toBeUndefined()
   })
 
   it('snapshot serves client views and excludes host-only state', async () => {

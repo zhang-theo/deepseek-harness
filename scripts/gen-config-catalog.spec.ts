@@ -70,6 +70,22 @@ describe('shared config schema catalog', () => {
     expect(provider?.pastes?.[0]?.text).toBe('export type Config = BrowserConfig')
   })
 
+  it.each([false, true])('checks package-local schema imports and undeclared fields (invalid=%s)', (invalid) => {
+    const { root, write } = fixture()
+    write('packages/test/provider/src/config.ts', invalid
+      ? sharedSchema.replace('headless: Schema.boolean()', 'headless: Schema.boolean(), hidden: Schema.string()')
+      : sharedSchema)
+    write('packages/test/provider/src/index.ts', `
+import { Shared, type BrowserConfig } from './config.ts'
+export type Config = BrowserConfig
+export const Config = Shared
+export function apply(ctx: unknown, config: Config): void {}
+`)
+    if (invalid) expect(() => collectConfigCatalog(root)).toThrow("schema validates key 'hidden'")
+    else expect(new Set(collectConfigCatalog(root).find(entry => entry.pkg === '@test/provider')?.schemaKeys))
+      .toEqual(new Set(['mode', 'headless', 'endpoint']))
+  })
+
   it('rejects a schema field absent from the shared config type', () => {
     const { root } = fixture(sharedSchema.replace('headless: Schema.boolean()', 'headless: Schema.boolean(), hidden: Schema.string()'))
     expect(() => collectConfigCatalog(root)).toThrow("schema validates key 'hidden' but config type 'Config' declares no such member")
@@ -143,14 +159,14 @@ export const Shared = Schema.union([MissingSchema])
 describe('config catalog rendering', () => {
   const entries = (inject: string[]): CatalogEntry[] => [
     {
-      pkg: '@x1a0f3n9/dsh-demo',
+      pkg: '@deepseek-ai/dsh-demo',
       dir: 'packages/demo/demo',
       entry: 'packages/demo/demo/src/index.ts',
       kind: 'config',
       inject,
       pastes: [{ text: 'export interface DemoConfig {}', source: 'packages/demo/demo/src/index.ts:3' }],
     },
-    { pkg: '@x1a0f3n9/dsh-plain', dir: 'packages/demo/plain', entry: 'packages/demo/plain/src/index.ts', kind: 'no-config', inject },
+    { pkg: '@deepseek-ai/dsh-plain', dir: 'packages/demo/plain', entry: 'packages/demo/plain/src/index.ts', kind: 'no-config', inject },
   ]
   const paths = translationPairPaths('docs/config-catalog.md')
   const record = (inject: string[]) => computeTranslationPairingRecord(
@@ -163,7 +179,7 @@ describe('config catalog rendering', () => {
   it('keeps package data in generated regions shared by both languages', () => {
     const en = generatedRegions(render(entries(['jobs']), 'en')).map(region => region.text)
     expect(en.map(region => region.split('\n')[0])).toEqual([
-      '<!-- BEGIN GENERATED config-catalog:@x1a0f3n9/dsh-demo -->',
+      '<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-demo -->',
       '<!-- BEGIN GENERATED config-catalog:no-config -->',
       '<!-- BEGIN GENERATED config-catalog:seam -->',
       '<!-- BEGIN GENERATED config-catalog:library -->',

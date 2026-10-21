@@ -26,7 +26,7 @@ sibling、自身目标、超过一条边的 ancestor、陈旧 Agent 对象、未
 两个方向使用同一种持久来源。服务从已授权 Agent 推导 `senderSessionId`，并把模型可见内容组装为 `Agent <sender-id> sent a message:`，因此来源信息不会偏离权限。
 
 ```ts
-import type { SessionId } from '@x1a0f3n9/dsh-session'
+import type { SessionId } from '@deepseek-ai/dsh-session'
 
 interface AgentMessageSource {
   readonly kind: 'agent-message'
@@ -46,7 +46,7 @@ interface SendMessageInput {
 }
 ```
 
-parent 与 child 以相同注册表顺序继承相同定义。标准定义携带进程稳定的内部身份，同名的作用域工具不满足该身份。child `toolFilter` 可以显式移除继承的工具，作用域替代工具也可以提供不同语义；两种情况都不会收到标准调用指令。当标准工具仍可见时，继续执行管理器会把经过 JSON 编码的直接 parent id、结束前发送一份自包含结果的指令，以及更早发送可操作发现的指令追加到 child 初始用户任务。对 fork child 而言，该任务位于继承的已完成轮次前缀之后；没有 child 专属系统提示词 section 或工具 schema 位于此前缀之前。
+parent 与 child 以相同注册表顺序继承相同定义。标准定义携带进程稳定的内部身份，同名的作用域工具不满足该身份。独立选择的 preset 可以省略该工具，历史 descriptor 过滤器可在恢复时移除该工具，作用域替代工具也可以提供不同语义；两种情况都不会收到标准调用指令。当标准工具仍可见时，继续执行管理器会把经过 JSON 编码的直接 parent id、结束前发送一份自包含结果的指令，以及更早发送可操作发现的指令追加到 child 初始用户任务。对 fork child 而言，该任务位于继承的已完成轮次前缀之后；没有 child 专属系统提示词 section 或工具 schema 位于此前缀之前。
 
 该指令是指导，不是结算强制。发送不会结束 child 轮次，机制仍允许零次或多次调用，runtime 绝不会因 child 保持沉默而拒绝它。由管理器负责的 `subagent-settled` 通知仍无条件发送并采用独立来源，因为它记录 Activation 如何结束，并在 child 无法配合时保留终态输出。
 
@@ -54,7 +54,7 @@ parent 与 child 以相同注册表顺序继承相同定义。标准定义携带
 
 ### 完整移除与重新引入条件
 
-独立的 `@x1a0f3n9/dsh-tool-subagent-report` 包、`report` schema、`tool:report` 提示词 section、`reportDelivery` 配置、report 专属消息来源、目录项、组合行和受支持行为快照均已不存在。统一工具放弃了无需接收方的 child 快捷方式，也放弃了让结构性返回工具绕过显式 child allow-list 的旧能力。只有具体用例需要相邻 `agent_id` 与固定 Steer 无法表达的语义时，这些能力才会重新出现；重新引入需要独立的模型操作与前缀成本证据，而非 `sendMessage()` 之上的别名。
+独立的 `@deepseek-ai/dsh-tool-subagent-report` 包、`report` schema、`tool:report` 提示词 section、`reportDelivery` 配置、report 专属消息来源、目录项、组合行和受支持行为快照均已不存在。统一工具放弃了无需接收方的 child 快捷方式，也放弃了让结构性返回工具绕过显式 child allow-list 的旧能力。只有具体用例需要相邻 `agent_id` 与固定 Steer 无法表达的语义时，这些能力才会重新出现；重新引入需要独立的模型操作与前缀成本证据，而非 `sendMessage()` 之上的别名。
 
 ## 考虑过的替代方案
 
@@ -79,4 +79,4 @@ parent 与 child 以相同注册表顺序继承相同定义。标准定义携带
 - 初始任务在 fork 前缀之后携带经过 JSON 编码的动态 parent 地址，而请求头系统提示词与工具顺序保持可复用。
 - 人类提示、结算通知、QueueDock 与 base bundle 的一次性 fork 策略仍是独立决策。
 
-本决策合并并删除了已完全被取代的 report 工具与 child report 义务记录。它取代[按意图命名的 subagent 继续执行操作](../../archived/simplification/2026-07-27-intent-named-subagent-continuation-operations.md)中的 `followup` 命名选择，并保留[Child Agent 消息先于其结算通知](../bug-fix/2026-08-17-subagent-message-settlement-ordering.zh.md)中的接受顺序保证。
+本决策合并并删除了已完全被取代的 report 工具与 child report 义务记录。它取代[按意图命名的 subagent 继续执行操作](../../archived/simplification/2026-07-27-intent-named-subagent-continuation-operations.md)中的 `followup` 命名选择，并保留[Child Agent 消息先于其结算通知](../../../../packages/subagent/subagent/README.zh.md)中的接受顺序保证。

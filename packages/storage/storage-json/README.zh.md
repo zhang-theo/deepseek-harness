@@ -3,7 +3,7 @@ description: "JSON 存储后端：面向在配置根目录下选择、配置或�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-storage-json
+# @deepseek-ai/dsh-storage-json
 
 [English](README.md) | 中文
 
@@ -36,11 +36,11 @@ kind: "package-reference"
 唯一的插件字段是 `root`，用于保存单元文件与目录。它是必填项，因为本后端不回退到 `process.cwd()`。后端按需以 `0o700` 模式创建根目录。领域规范选择其布局；本插件不提供布局覆盖项。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-storage'
-- name: '@x1a0f3n9/dsh-storage-json'
+- name: '@deepseek-ai/dsh-storage'
+- name: '@deepseek-ai/dsh-storage-json'
   config:
     root: /var/lib/dsh/data
-- name: '@x1a0f3n9/dsh-storage-domain'
+- name: '@deepseek-ai/dsh-storage-domain'
   config:
     backend: json
 ```
@@ -96,7 +96,6 @@ kind: "package-reference"
 | [`src/per-record-unit.ts`](src/per-record-unit.ts) | 一个 `per-record` 单元：目录树读取、路径安全记录与单文档写入 |
 | [`src/format.ts`](src/format.ts) | 带版本校验的整单元与记录序列化 |
 | [`src/atomic.ts`](src/atomic.ts) | 原子文件替换：临时文件写入、fsync、rename、目录 fsync |
-| — | 不发布运行时不变式伴生入口；此处要求保证写入持久性及发布后重新解析的等价性，这两点需要通过介质往返测试（共享后端符合性测试套件）验证；本后端不公开任何可持续观察的进程内关系。 |
 
 </details>
 

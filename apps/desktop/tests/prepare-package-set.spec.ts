@@ -23,14 +23,14 @@ describe('desktop package-set selection', () => {
 
   it('includes only the available internal production closure', () => {
     const available = new Map<string, PackedDesktopPackage>([
-      ['@x1a0f3n9/dsh', packed('@x1a0f3n9/dsh', {
-        dependencies: { '@x1a0f3n9/dsh-base': '^1.0.0', external: '^2.0.0' },
+      ['@deepseek-ai/dsh', packed('@deepseek-ai/dsh', {
+        dependencies: { '@deepseek-ai/dsh-base': '^1.0.0', external: '^2.0.0' },
         optionalDependencies: { '@deepseek-ai/platform-package': '1.0.0', '@deepseek-ai/missing-platform': '1.0.0' },
       })],
-      ['@x1a0f3n9/dsh-desktop-host', packed('@x1a0f3n9/dsh-desktop-host', {
-        dependencies: { '@x1a0f3n9/dsh': '^1.0.0' },
+      ['@deepseek-ai/dsh-desktop-host', packed('@deepseek-ai/dsh-desktop-host', {
+        dependencies: { '@deepseek-ai/dsh': '^1.0.0' },
       })],
-      ['@x1a0f3n9/dsh-base', packed('@x1a0f3n9/dsh-base', {
+      ['@deepseek-ai/dsh-base', packed('@deepseek-ai/dsh-base', {
         peerDependencies: { '@deepseek-ai/cordis': '^1.0.0' },
       })],
       ['@deepseek-ai/cordis', packed('@deepseek-ai/cordis')],
@@ -40,47 +40,48 @@ describe('desktop package-set selection', () => {
     expect(selectDesktopPackageClosure(available).map(entry => entry.manifest.name)).toEqual([
       '@deepseek-ai/cordis',
       '@deepseek-ai/platform-package',
-      '@x1a0f3n9/dsh',
-      '@x1a0f3n9/dsh-base',
-      '@x1a0f3n9/dsh-desktop-host',
+      '@deepseek-ai/dsh',
+      '@deepseek-ai/dsh-base',
+      '@deepseek-ai/dsh-desktop-host',
     ])
   })
 
   it.each([
-    '@x1a0f3n9/dsh-base', '@deepseek-ai/cordis', '@deepseek-ai/node-addon-system',
+    '@deepseek-ai/dsh-base', '@deepseek-ai/cordis', '@deepseek-ai/node-addon-system',
   ])('rejects required prepared package %s absent from the packed release inputs', (dependency) => {
     const available = new Map<string, PackedDesktopPackage>([
-      ['@x1a0f3n9/dsh', packed('@x1a0f3n9/dsh', {
+      ['@deepseek-ai/dsh', packed('@deepseek-ai/dsh', {
         dependencies: { [dependency]: '^1.0.0' },
       })],
-      ['@x1a0f3n9/dsh-desktop-host', packed('@x1a0f3n9/dsh-desktop-host', {
-        dependencies: { '@x1a0f3n9/dsh': '^1.0.0' },
+      ['@deepseek-ai/dsh-desktop-host', packed('@deepseek-ai/dsh-desktop-host', {
+        dependencies: { '@deepseek-ai/dsh': '^1.0.0' },
       })],
     ])
     expect(() => selectDesktopPackageClosure(available)).toThrow(/unpacked package/u)
     expect(() => selectDesktopPackageClosure(new Map([
-      ['@x1a0f3n9/dsh', packed('@x1a0f3n9/dsh')],
+      ['@deepseek-ai/dsh', packed('@deepseek-ai/dsh')],
     ]))).toThrow(/omit @x1a0f3n9\/dsh-desktop-host/u)
   })
 
   it('leaves independently published Office packages to npm resolution', () => {
     const available = new Map<string, PackedDesktopPackage>([
-      ['@x1a0f3n9/dsh', packed('@x1a0f3n9/dsh', {
+      ['@deepseek-ai/dsh', packed('@deepseek-ai/dsh', {
         dependencies: {
           '@deepseek-ai/libreoffice-kit': '0.0.1',
           '@deepseek-ai/libreoffice-kit-wasm': '0.0.1',
         },
       })],
-      ['@x1a0f3n9/dsh-desktop-host', packed('@x1a0f3n9/dsh-desktop-host')],
+      ['@deepseek-ai/dsh-desktop-host', packed('@deepseek-ai/dsh-desktop-host')],
     ])
     expect(selectDesktopPackageClosure(available).map(entry => entry.manifest.name)).toEqual([
-      '@x1a0f3n9/dsh', '@x1a0f3n9/dsh-desktop-host',
+      '@deepseek-ai/dsh', '@deepseek-ai/dsh-desktop-host',
     ])
   })
 
-  it('requires the Desktop Host entry', () => {
+  it('requires both Desktop Host and public CLI entries', () => {
     const files = [
       'package/lib/index.js',
+      'package/lib/cli.js',
     ]
     expect(() => {
       assertDesktopHostPackageFiles(files)
@@ -88,5 +89,6 @@ describe('desktop package-set selection', () => {
     expect(() => {
       assertDesktopHostPackageFiles(files.slice(1))
     }).toThrow(/lib\/index\.js/u)
+    expect(() => { assertDesktopHostPackageFiles(files.slice(0, 1)) }).toThrow(/lib\/cli\.js/u)
   })
 })

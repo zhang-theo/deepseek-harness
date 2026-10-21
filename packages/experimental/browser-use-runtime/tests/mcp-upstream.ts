@@ -10,15 +10,17 @@ import { Context } from '@deepseek-ai/cordis'
 import type { Plugin } from '@deepseek-ai/cordis'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
 import Include from '@deepseek-ai/cordis-plugin-include'
-import BrowserUse from '@x1a0f3n9/dsh-browser-use'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import Tools from '@x1a0f3n9/dsh-tools'
-import Llm from '@x1a0f3n9/dsh-llm'
-import { ToolCallId } from '@x1a0f3n9/dsh-llm'
-import Sessions, { SessionId } from '@x1a0f3n9/dsh-session'
-import Agents from '@x1a0f3n9/dsh-agent'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
-import Projections from '@x1a0f3n9/dsh-session-projection'
+import BrowserUse from '@deepseek-ai/dsh-browser-use'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import Tools from '@deepseek-ai/dsh-tools'
+import Llm from '@deepseek-ai/dsh-llm'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
+import Sessions, { SessionId } from '@deepseek-ai/dsh-session'
+import Agents from '@deepseek-ai/dsh-agent'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
+import Projections from '@deepseek-ai/dsh-session-projection'
+import LocalFileSystem from '@deepseek-ai/dsh-fs-local'
+import WorkingDirectory from '@deepseek-ai/dsh-working-directory'
 import { expect, vi } from 'vitest'
 import type { BrowserMcpConfig } from '../src/mcp.ts'
 
@@ -58,6 +60,7 @@ export async function verifyMcpBrowser(
     const modules = new Map<string, unknown>([
       ['browserUse', BrowserUse], ['prompt', SystemPrompt], ['tools', Tools], ['llm', Llm],
       ['sessions', Sessions], ['agents', Agents], ['loop', AgentLoop], ['projections', Projections], ['browser', provider],
+      ['fs', LocalFileSystem], ['workingDirectory', WorkingDirectory],
     ])
     const configPath = join(root, 'cordis.yml')
     await writeFile(configPath, JSON.stringify([...modules.keys()].map(name => ({ id: name, name, config: name === 'loop' ? { agents: [] } : name === 'browser' ? browserConfig : {} }))))

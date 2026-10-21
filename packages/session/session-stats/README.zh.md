@@ -3,7 +3,7 @@ description: "面向客户端与维护者的全日志会话计数与墙钟时间
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-session-stats
+# @deepseek-ai/dsh-session-stats
 
 [English](README.md) | 中文
 
@@ -30,9 +30,9 @@ kind: "package-reference"
 ### 组合
 
 ```yaml
-- name: '@x1a0f3n9/dsh-session'
-- name: '@x1a0f3n9/dsh-session-projection'
-- name: '@x1a0f3n9/dsh-session-stats'
+- name: '@deepseek-ai/dsh-session'
+- name: '@deepseek-ai/dsh-session-projection'
+- name: '@deepseek-ai/dsh-session-stats'
 ```
 
 ### 各字段含义
@@ -130,5 +130,3 @@ kind: "package-reference"
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。本包只拥有一个纯投影折叠区，其 wire payload 在每次快照和变更流发射时都由投影注册表进行 schema 校验。该折叠区依赖的事件关系（每个已进入步骤恰有一个 `step/end`、宿主分配的轮次编号单调递增，以及分片和工具事件携带各自的步骤坐标与调用 id）由 dsh-agent-loop 与 Session surface 拥有并在运行时检查，而不由本包拥有。

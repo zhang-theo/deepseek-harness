@@ -9,7 +9,7 @@
  * instance (revoking every path granted so far); `dispose` revokes every
  * revocable grant, leaves the standing workspace edits in place, and reports
  * every cleanup failure.
- * @module @x1a0f3n9/dsh-sandbox-windows-acl/grant
+ * @module @deepseek-ai/dsh-sandbox-windows-acl/grant
  */
 
 import { grantWrite, revokeWrite } from './acl.ts'

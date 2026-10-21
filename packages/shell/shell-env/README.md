@@ -3,7 +3,7 @@ description: "The managed DSH_* shell environment for users and maintainers choo
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-shell-env
+# @deepseek-ai/dsh-shell-env
 
 English | [中文](README.zh.md)
 
@@ -37,7 +37,7 @@ Other plugins contribute facts by registering a contributor with a stable name, 
 
 ```ts
 import type { Context } from '@deepseek-ai/cordis'
-import type {} from '@x1a0f3n9/dsh-shell-env'
+import type {} from '@deepseek-ai/dsh-shell-env'
 
 export const inject = ['shellEnv']
 
@@ -87,7 +87,6 @@ This section explains the design decisions behind the registry and points at the
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry, `ShellEnvRegistry` service, and the built-in facts |
-| — | No runtime invariant companion is published; the environment registry validates ownership and collected values at each registration/collection; it publishes no independent snapshot that a companion could cross-check. |
 
 ### Collection
 

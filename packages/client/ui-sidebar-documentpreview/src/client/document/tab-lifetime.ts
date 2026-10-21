@@ -1,6 +1,6 @@
 /** Document view state belongs to tab records, including while their bodies are hidden. */
 import type { Context } from '@deepseek-ai/cordis'
-import type { TabId } from '@x1a0f3n9/dsh-client-ui-dockkit'
+import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 
 /**
  * Release retained view state on tab closure or plugin disposal.

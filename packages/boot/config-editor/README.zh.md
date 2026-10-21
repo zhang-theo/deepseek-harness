@@ -3,7 +3,7 @@ description: "保存当前 profile 配置，并通过 Loader 应用。"
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-config-editor
+# @deepseek-ai/dsh-config-editor
 
 [English](README.md) | 中文
 
@@ -27,7 +27,7 @@ kind: "package-reference"
 
 ```yaml
 - id: config-editor
-  name: '@x1a0f3n9/dsh-config-editor'
+  name: '@deepseek-ai/dsh-config-editor'
 ```
 
 使用 [settings](../../settings/settings/README.zh.md) 提供只编辑即时字段的表单。编辑完整配置的调用方可使用 `ctx.configEditor.edit()`；普通字段保留 Loader 的正常生命周期。
@@ -40,7 +40,7 @@ kind: "package-reference"
 
 [编辑器](src/index.ts) 在派生候选配置前应用外部更改，与其他 profile 操作共同锁定 profile manifest，并原子替换配置覆盖项。它保留替换值以外的 YAML 注释和 `!!js` 表达式。应用失败时恢复之前的文档并重新加载之前的 patch。
 
-此包不发布 invariant companion：编辑器不维护独立配置投影。Loader 和持久化的 profile patch 拥有配置状态。
+读取配置时，没有 profile config 覆盖项的条目共用一次组合结果。有覆盖项的条目分别组合，仅移除自身的覆盖项；profile 插入的条目和其他条目的覆盖项仍然生效。返回的配置为独立副本，组合结果不跨读取缓存。
 
 </details>
 

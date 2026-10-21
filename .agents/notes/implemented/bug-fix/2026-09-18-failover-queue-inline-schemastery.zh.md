@@ -6,7 +6,7 @@ Status: implemented
 
 ## Problem
 
-预装的 `@x1a0f3n9/dsh-failover-queue` client factory 会 `require("@deepseek-ai/schemastery")`。该 specifier 不是 platform seed。仓库内的 client bundle 会把 vendored schemastery 内联进去。插件的 tsdown 配置把 peer dependency 留成了 external，因此 Web 启动会以 `missed the module table` 失败。
+预装的 `@deepseek-ai/dsh-failover-queue` client factory 会 `require("@deepseek-ai/schemastery")`。该 specifier 不是 platform seed。仓库内的 client bundle 会把 vendored schemastery 内联进去。插件的 tsdown 配置把 peer dependency 留成了 external，因此 Web 启动会以 `missed the module table` 失败。
 
 ## Decision
 

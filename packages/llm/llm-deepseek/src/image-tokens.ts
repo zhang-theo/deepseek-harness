@@ -11,8 +11,8 @@
  * @module dsh-llm-deepseek/image-tokens
  */
 
-import { longEdgeDimensions } from '@x1a0f3n9/dsh-attachment'
-import type { ProjectedDimensions } from '@x1a0f3n9/dsh-attachment'
+import { longEdgeDimensions } from '@deepseek-ai/dsh-attachment'
+import type { ProjectedDimensions } from '@deepseek-ai/dsh-attachment'
 /** Vision patch edge in pixels. */
 const PATCH_SIZE = 14
 /** Per-axis patch-to-token downsampling ratio. */

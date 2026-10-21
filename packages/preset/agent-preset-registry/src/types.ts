@@ -1,5 +1,5 @@
 /** Client-safe payloads and event declarations owned by the agent-preset domain. */
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 
 
 /**
@@ -36,7 +36,7 @@ export interface AgentPresetDocument {
   readonly description?: string
 }
 
-declare module '@x1a0f3n9/dsh-typert-protocol' {
+declare module '@deepseek-ai/dsh-typert-protocol' {
   interface RemoteErrorDetailsMap {
     /** No declaration supplies the requested identity. */
     'agent-preset/not-found': { readonly agentPreset: string; readonly available: readonly string[] }
@@ -47,7 +47,7 @@ declare module '@x1a0f3n9/dsh-typert-protocol' {
   }
 }
 
-declare module '@x1a0f3n9/dsh-session-projection/types' {
+declare module '@deepseek-ai/dsh-session-projection/types' {
   interface SessionProjectionStateMap {
     agentPreset: string | null
   }

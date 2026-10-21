@@ -3,7 +3,7 @@ window.__ModuleLoader__.load({
   id: '@fixture/live-client',
   factory(require) {
     const React = require('react')
-    const { MenuItemButton } = require('@x1a0f3n9/dsh-client-ui-primitives')
+    const { MenuItemButton } = require('@deepseek-ai/dsh-client-ui-primitives')
     const style = document.createElement('style')
     style.dataset.plugin = '@fixture/live-client'
     style.textContent = '[data-live-client] { color: rgb(12, 34, 56); position: absolute; bottom: 20px; right: 20px; }'
@@ -89,7 +89,7 @@ window.__ModuleLoader__.load({
           )
         })
         ctx.slots.inject('sidebar.workspaces.session.menu.item', function* () {
-          // The shipped rows end at archive (400); these follow as one group,
+          // The shipped rows end at Session ID (450); these follow as one group,
           // opened by the export row's hairline.
           yield registerSessionAction('fixture.export-session', 500, 'exportSession', true)
           yield registerSessionAction('fixture.copy-session-id', 600, 'copySessionId', false)

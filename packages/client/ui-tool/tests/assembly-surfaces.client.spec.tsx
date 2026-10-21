@@ -1,20 +1,21 @@
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 import { toolSessionEvents } from './tool-fixtures.client.ts'
 // @vitest-environment jsdom
 /** Tool assembly acceptance through the real ui-conversation host. */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, waitFor } from '@testing-library/react'
-import { LocaleRuntime } from '@x1a0f3n9/dsh-client-locale/client'
-import type { ISession } from '@x1a0f3n9/dsh-api-session-controller/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { WorkspaceId } from '@x1a0f3n9/dsh-workspace/types'
-import type { TodoItem } from '@x1a0f3n9/dsh-client-ui-conversation/client'
+import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
+import type { ISession } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { WorkspaceId } from '@deepseek-ai/dsh-workspace/types'
+import type { TodoItem } from '@deepseek-ai/dsh-client-ui-conversation/client'
 import {
   apply as applyChat, inject as injectChat, type ToolResultNode,
-} from '@x1a0f3n9/dsh-client-ui-chat/client'
-import type { PropsRenderSlots } from '@x1a0f3n9/dsh-client-ui-slots'
-import { SlotTestRuntime, usePinnedBrowserLanguages, stubConfigForm } from '@x1a0f3n9/dsh-client-test-runtime'
-import { apply as applyConversation, inject as injectConversation } from '@x1a0f3n9/dsh-client-ui-conversation/client'
+} from '@deepseek-ai/dsh-client-ui-chat/client'
+import type { PropsRenderSlots } from '@deepseek-ai/dsh-client-ui-slots'
+import { SlotTestRuntime, usePinnedBrowserLanguages, stubConfigForm } from '@deepseek-ai/dsh-client-test-runtime'
+import { apply as applyConversation, inject as injectConversation } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import { PartialArguments } from '@deepseek-ai/dsh-util-values'
 import { apply as applyTool, inject as injectTool } from '../src/client/apply.ts'
 
 // The service reads its initial locale from the browser; these specs assert
@@ -51,19 +52,24 @@ const TODOS: TodoItem[] = [
 
 const todoResult = (seq: number): ToolResultNode => ({
   kind: 'tool-result', seq, time: seq * 1_000, callId: `todo-${seq}`,
+  name: 'todo_write', args: PartialArguments.fromText(JSON.stringify({ todos: TODOS })),
   call: { name: 'todo_write', argsRaw: JSON.stringify({ todos: TODOS }) },
   callTime: seq * 1_000 - 500,
   content: [], isError: false, subCalls: [],
 })
 
-const bashResult = (seq: number, callId: string, over?: Partial<ToolResultNode>): ToolResultNode => ({
-  kind: 'tool-result', seq, time: seq * 1_000, callId,
-  call: { name: 'bash', argsRaw: '{"command":"ls -la","description":"List files"}' },
-  callTime: seq * 1_000 - 500,
-  content: [{ type: 'text', text: 'total 2\ndemo.txt\n' }], isError: false,
-  subCalls: [],
-  ...over,
-})
+const bashResult = (seq: number, callId: string, over?: Partial<ToolResultNode>): ToolResultNode => {
+  const call = over?.call === undefined ? { name: 'bash', argsRaw: '{"command":"ls -la","description":"List files"}' } : over.call
+  return {
+    kind: 'tool-result', seq, time: seq * 1_000, callId,
+    name: call?.name ?? '', args: call === null ? PartialArguments.EMPTY : PartialArguments.fromText(call.argsRaw),
+    call,
+    callTime: seq * 1_000 - 500,
+    content: [{ type: 'text', text: 'total 2\ndemo.txt\n' }], isError: false,
+    subCalls: [],
+    ...over,
+  }
+}
 
 /** Test-owned AppFrame role: declares and renders the resident conversation area. */
 type AppRootProps = PropsRenderSlots<'main'>

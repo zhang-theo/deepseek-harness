@@ -6,7 +6,7 @@ English | [中文](2026-09-18-failover-queue-inline-schemastery.zh.md)
 
 ## Problem
 
-The prebundled `@x1a0f3n9/dsh-failover-queue` client factory called `require("@deepseek-ai/schemastery")`. That specifier is not a platform seed word. In-tree client bundles inline vendored schemastery. The plugin's tsdown config left peer dependencies external, so Web boot failed with `missed the module table`.
+The prebundled `@deepseek-ai/dsh-failover-queue` client factory called `require("@deepseek-ai/schemastery")`. That specifier is not a platform seed word. In-tree client bundles inline vendored schemastery. The plugin's tsdown config left peer dependencies external, so Web boot failed with `missed the module table`.
 
 ## Decision
 

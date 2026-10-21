@@ -3,7 +3,7 @@ description: "The LSP capability seam (ctx.lsp): provider selection by file exte
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-lsp
+# @deepseek-ai/dsh-lsp
 
 English | [中文](README.zh.md)
 
@@ -36,11 +36,11 @@ Choose this service when a deployment wants model-visible code navigation backed
 The seam needs a provider and a consumer to do anything. A minimal composition mounts the service, a stdio provider, and the tool:
 
 ```yaml
-- name: '@x1a0f3n9/dsh-fs-local'
-- name: '@x1a0f3n9/dsh-subprocess-local'
-- name: '@x1a0f3n9/dsh-lsp'
-- name: '@x1a0f3n9/dsh-lsp-stdio'
-- name: '@x1a0f3n9/dsh-tool-lsp'
+- name: '@deepseek-ai/dsh-fs-local'
+- name: '@deepseek-ai/dsh-subprocess-local'
+- name: '@deepseek-ai/dsh-lsp'
+- name: '@deepseek-ai/dsh-lsp-stdio'
+- name: '@deepseek-ai/dsh-tool-lsp'
 ```
 
 Server commands, extension mappings, and the filesystem/subprocess pairing are configured in the provider and tool packages; see [dsh-lsp-stdio](../lsp-stdio/README.md) and [dsh-tool-lsp](../tool-lsp/README.md).
@@ -87,7 +87,6 @@ This section explains the design decisions behind the seam and where the code re
 | [`src/index.ts`](src/index.ts) | Plugin entry: `Lsp` service, `registerProvider`/`query`, `finalExtension`, `LspError` codes |
 | [`src/types.ts`](src/types.ts) | Seam vocabulary: request, result, provider, and service contracts |
 | [`src/brand.ts`](src/brand.ts) | `LspProviderId` branded-id type and factory |
-| — | No runtime invariant companion is published; provider ids and extension routes are private, atomically updated state; the seam exposes neither an enumerable snapshot nor lifecycle events to compare independently. |
 
 ### Registration and selection lifecycle
 

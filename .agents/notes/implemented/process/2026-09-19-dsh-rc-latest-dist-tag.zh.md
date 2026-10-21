@@ -6,7 +6,7 @@ Status: implemented
 
 ## Problem
 
-这个 fork 给朋友的安装方式是 `npm install --global @x1a0f3n9/dsh`。`DshFamily.distTagForVersion` 把每个 `rc` 都映射到 npm 的 `next`，所以不带 tag 的命令会把 `latest` 解析到更旧的 pin（`0.1.5-rc.2`），而 `0.1.5-rc.4` 停在 `next` 上。朋友不该再写 `@next`。
+这个 fork 给朋友的安装方式是 `npm install --global @deepseek-ai/dsh`。`DshFamily.distTagForVersion` 把每个 `rc` 都映射到 npm 的 `next`，所以不带 tag 的命令会把 `latest` 解析到更旧的 pin（`0.1.5-rc.2`），而 `0.1.5-rc.4` 停在 `next` 上。朋友不该再写 `@next`。
 
 ## Decision
 
@@ -20,15 +20,15 @@ Status: implemented
 
 ## Alternatives considered
 
-**文档写成 `@x1a0f3n9/dsh@next`，让 `latest` 停在更旧的 rc。** 否决：朋友真正会敲的安装命令是不带 tag 的包名。
+**文档写成 `@deepseek-ai/dsh@next`，让 `latest` 停在更旧的 rc。** 否决：朋友真正会敲的安装命令是不带 tag 的包名。
 
 **只为了重新占上 `latest` 就 bump 到 `0.1.5-rc.5`。** 否决：tarball 已经是 `0.1.5-rc.4`；该改的是 registry 上的 dist-tag。
 
-**只给 `@x1a0f3n9/dsh` 移动 `latest`。** 否决：依赖版本并不靠 dist-tag，但这个家族不该对外展示两条当前通道。
+**只给 `@deepseek-ai/dsh` 移动 `latest`。** 否决：依赖版本并不靠 dist-tag，但这个家族不该对外展示两条当前通道。
 
 ## Consequences
 
-- `npm install --global @x1a0f3n9/dsh` 和 `npx --package @x1a0f3n9/dsh xfdsh web` 会解析到当前 rc。
+- `npm install --global @deepseek-ai/dsh` 和 `npx --package @deepseek-ai/dsh xfdsh web` 会解析到当前 rc。
 - 之后若首次发布更旧的 dsh `rc`，可能把 `latest` 拉回去；`release:dist-tag` 不必重发也能做同样的事。
 - 残留的 `next` tag 仍可能指向某个 rc。它不是文档里的安装通道。
 

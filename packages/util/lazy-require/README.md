@@ -3,7 +3,7 @@ description: "Caller-relative lazy loading for CommonJS-compatible Host dependen
 kind: "package-library"
 ---
 
-# @x1a0f3n9/dsh-lazy-require
+# @deepseek-ai/dsh-lazy-require
 
 English | [中文](README.zh.md)
 
@@ -28,7 +28,7 @@ English | [中文](README.zh.md)
 Pass the dependency's literal specifier and the caller's `import.meta.url`:
 
 ```ts
-import { createLazyRequire } from '@x1a0f3n9/dsh-lazy-require'
+import { createLazyRequire } from '@deepseek-ai/dsh-lazy-require'
 
 interface NativeModule { open(): void }
 const requireNative = createLazyRequire<NativeModule>('native-package', import.meta.url)
@@ -79,8 +79,6 @@ None.
 
 - **CommonJS-compatible dependencies only** — ESM-only packages require an asynchronous factory owned by their caller.
 - **WebWorker packaging needs an explicit request** — the static packer does not discover dependencies named only in `createLazyRequire()` calls. A package used in a Preview image must keep the dependency reachable through a supported literal request until the packer recognizes this helper.
-
-No runtime invariant companion is published because the loader holds no independently observable mutable relationship.
 
 <a id="dev-note"></a>
 ### Dev Note

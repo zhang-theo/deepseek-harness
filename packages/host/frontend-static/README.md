@@ -3,7 +3,7 @@ description: "SPA dist server for the Web shell: claims the webserver fallback s
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-host-frontend-static
+# @deepseek-ai/dsh-host-frontend-static
 
 English | [中文](README.zh.md)
 
@@ -30,7 +30,7 @@ Compose this plugin in a browser-facing host that serves the built Web shell: it
 ### Minimal configuration
 
 ```yaml
-- name: '@x1a0f3n9/dsh-host-frontend-static'
+- name: '@deepseek-ai/dsh-host-frontend-static'
   config:
     distIndex: /absolute/path/to/dist/index.html
 ```
@@ -115,5 +115,3 @@ These limits define when a served asset class is not yet covered. They are curre
 None.
 
 </details>
-
-**Runtime invariant:** No companion is published. The only owned relation is the single fallback seat, which cannot be probed from the teardown stream — `internal/plugin` fires before the disposing fiber's effects run, so the legitimate owner still holds the seat at notification time and any claim probe would false-positive on every correct disposal (unlike the webserver companion, whose reserved-path probes never collide with a live registration). The seat's register/release symmetry is covered by the package's real-composition HMR-safety test instead.

@@ -1,6 +1,6 @@
 /**
  * Exclusive named registration for the browser-use capability.
- * @module @x1a0f3n9/dsh-browser-use
+ * @module @deepseek-ai/dsh-browser-use
  */
 
 import { Context, Service } from '@deepseek-ai/cordis'

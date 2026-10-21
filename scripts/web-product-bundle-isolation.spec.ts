@@ -8,6 +8,7 @@ import { pathToFileURL } from 'node:url'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import { browserDependencyAnalysis, productWebBundleIsolation } from '../apps/web/product-isolation.ts'
 import { WebProductBundleIsolation } from './web-product-bundle-isolation.ts'
+import { EXPERIMENTAL_PACKAGE_NAME_EXCEPTIONS } from './experimental-package-policy.ts'
 import { BundleInputIsolation } from './bundle-input-isolation.ts'
 
 const filesystem = vi.hoisted(() => ({ missingRoot: false }))
@@ -38,11 +39,11 @@ function fixture() {
     writeFileSync(join(root, path), content)
   }
   write('package.json', '{"name":"isolation-fixture","type":"module"}')
-  write('apps/web/package.json', '{"name":"@x1a0f3n9/dsh-web-frontend","type":"module"}')
+  write('apps/web/package.json', '{"name":"@deepseek-ai/dsh-web-frontend","type":"module"}')
   write('apps/web/index.html', '<script type="module" src="/src/main.js"></script>')
   write('apps/web/src/main.js', 'globalThis.product = true')
   write('apps/web/src/preview.js', 'import "../../../packages/experimental/prototype/index.js"')
-  write('packages/experimental/prototype/package.json', '{"name":"@x1a0f3n9/dsh-experimental-prototype","type":"module"}')
+  write('packages/experimental/prototype/package.json', '{"name":"@deepseek-ai/dsh-experimental-prototype","type":"module"}')
   write('packages/experimental/prototype/index.js', 'globalThis.experimental = true')
   write('packages/experimental/prototype/style.css', '.experimental { color: red }')
   write('packages/experimental/prototype/tiny.svg', '<svg xmlns="http://www.w3.org/2000/svg"/>')
@@ -120,11 +121,11 @@ describe('default Web bundle input isolation', () => {
       .rejects.toThrow(/Web product isolation: experimental input/)
   })
 
-  it('checks npm alias package identity independently of its directory name', async () => {
+  it.each(['@deepseek-ai/dsh-experimental-aliased', ...Object.values(EXPERIMENTAL_PACKAGE_NAME_EXCEPTIONS)])('checks npm alias package identity %s independently of its directory name', async (name) => {
     const test = fixture()
     test.write('apps/web/src/main.js', 'import "ordinary-name"')
     test.write('apps/web/node_modules/ordinary-name/package.json',
-      '{"name":"@x1a0f3n9/dsh-experimental-aliased","type":"module","main":"index.js"}')
+      JSON.stringify({ name, type: 'module', main: 'index.js' }))
     test.write('apps/web/node_modules/ordinary-name/index.js', 'globalThis.aliased = true')
     await expect(test.run()).rejects.toThrow(/belongs to experimental package/)
   })
@@ -221,6 +222,19 @@ describe('default Web bundle input isolation', () => {
 })
 
 describe('bundler input ownership', () => {
+  it.each(Object.values(EXPERIMENTAL_PACKAGE_NAME_EXCEPTIONS))('rejects retained identity %s in unresolved inputs and source-map ownership', (name) => {
+    const test = fixture()
+    const ownership = new BundleInputIsolation(test.root, 'fixture')
+    for (const reference of [name, `${name}/client`, `\u0000virtual:${name}/client?raw`]) {
+      expect(() => { ownership.assertInput(reference) }).toThrow(/experimental input/)
+    }
+    const absentWindowsSource = `C:\\omitted\\node_modules\\${name.replaceAll('/', '\\')}\\src\\index.ts`
+    expect(() => { ownership.assertSourceMapInput(absentWindowsSource) }).toThrow(/experimental input/)
+    test.write('apps/web/node_modules/upstream/package.json', JSON.stringify({ name }))
+    expect(() => { ownership.assertSourceMapInput(join(test.web, 'node_modules/upstream/src/omitted.js')) })
+      .toThrow(/belongs to experimental package/)
+  })
+
   it('refuses source-map paths whose filesystem root is unavailable', () => {
     const test = fixture()
     const ownership = new BundleInputIsolation(test.root, 'fixture')
@@ -250,7 +264,7 @@ describe('bundler input ownership', () => {
     test.write('apps/web/node_modules/upstream/package.json', '{"name":"upstream"}')
     expect(() => { ownership.assertInput(file) }).toThrow(/is missing/)
     expect(() => { ownership.assertSourceMapInput(file) }).not.toThrow()
-    test.write('apps/web/node_modules/upstream/package.json', '{"name":"@x1a0f3n9/dsh-experimental-upstream"}')
+    test.write('apps/web/node_modules/upstream/package.json', '{"name":"@deepseek-ai/dsh-experimental-upstream"}')
     ownership.reset()
     expect(() => { ownership.assertSourceMapInput(file) }).toThrow(/belongs to experimental package/)
   })

@@ -3,7 +3,7 @@ description: "Workspace-directory picking seam for the web GUI host: the service
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-host-directory-picker
+# @deepseek-ai/dsh-host-directory-picker
 
 English | [中文](README.zh.md)
 
@@ -109,5 +109,3 @@ These limits define when the seam contract leaves a decision to a future consume
 None.
 
 </details>
-
-**Runtime invariant:** No companion is published. This stateless Service Definition owns the capability vocabulary, while backends and the Remote controller own observations.

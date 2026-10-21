@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { splitKeys } from '@x1a0f3n9/dsh-web-search-pool'
+import { splitKeys } from '@deepseek-ai/dsh-web-search-pool'
 
 describe('splitKeys', () => {
   it('returns an empty list for blank input', () => {

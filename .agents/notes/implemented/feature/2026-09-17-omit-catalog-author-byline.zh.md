@@ -6,7 +6,7 @@ Status: implemented
 
 ## Problem
 
-可选插件卡片在 `@scope/name` 下面再画一行目录 `author`。fork pin 上那一行会在 `@x1a0f3n9/dsh-session-timeline` 旁边再写 `LunFengChen`，所有者写了两遍，多出来的那一行像第二个身份。
+可选插件卡片在 `@scope/name` 下面再画一行目录 `author`。fork pin 上那一行会在 `@deepseek-ai/dsh-session-timeline` 旁边再写 `LunFengChen`，所有者写了两遍，多出来的那一行像第二个身份。
 
 ## Decision
 

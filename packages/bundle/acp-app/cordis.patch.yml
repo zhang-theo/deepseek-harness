@@ -2,7 +2,6 @@
 
 - id: system-prompt
   config:
-    personaSuffix: Your working directory is {{cwd}}.
     personaPrefix: >-
       You are a coding agent powered by the {{model}} model.
 
@@ -11,10 +10,10 @@
 
 - insert:
     - id: acp-app-startup
-      name: '@x1a0f3n9/dsh-acp-app'
+      name: '@deepseek-ai/dsh-acp-app'
 
     - id: acp
-      name: '@x1a0f3n9/dsh-acp'
+      name: '@deepseek-ai/dsh-acp'
       inject: [acpAppStartup]
       config:
         provider: deepseek-official

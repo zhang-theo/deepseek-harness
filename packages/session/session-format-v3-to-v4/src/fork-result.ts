@@ -1,6 +1,6 @@
 /** Native V4 fork-result identity and not-started error validation. */
 
-import { SessionFormatError, isSessionFormatJsonObject } from '@x1a0f3n9/dsh-session-format'
+import { SessionFormatError, isSessionFormatJsonObject } from '@deepseek-ai/dsh-session-format'
 
 /**
  * Validate fork-generated not-started results without changing their identity or text.

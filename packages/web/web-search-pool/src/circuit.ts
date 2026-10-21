@@ -1,7 +1,7 @@
 /**
  * Per-key/backend circuit: quota and auth open immediately; transients open
  * after a threshold inside a sliding window.
- * @module @x1a0f3n9/dsh-web-search-pool/circuit
+ * @module @deepseek-ai/dsh-web-search-pool/circuit
  */
 
 import type { SearchPoolCircuitConfig, SearchPoolFailureKind } from './types.ts'

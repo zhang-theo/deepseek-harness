@@ -14,10 +14,10 @@
 /x1a0f3n9-dsh-tool-skill/table-of-contents:
   en: d152484eb41ac6b4
   zh: 09388d293f9be9cb
-/x1a0f3n9-dsh-tool-skill/use-this-package:
-  en: 5c21d1ba71c1c3e1
-  zh: 3e2505d4625b57b4
-/x1a0f3n9-dsh-tool-skill/use-this-package/when-to-choose-it:
+/deepseek-ai-dsh-tool-skill/use-this-package:
+  en: 633cb494ab14a7ce
+  zh: 8647ccca09bf3e0a
+/deepseek-ai-dsh-tool-skill/use-this-package/when-to-choose-it:
   en: b7d33bd969826ee3
   zh: 4e155a0f14b41541
 /x1a0f3n9-dsh-tool-skill/use-this-package/mount-and-configure:
@@ -35,13 +35,13 @@
 /x1a0f3n9-dsh-tool-skill/understand-the-implementation/design-concept:
   en: ee4380c98437d699
   zh: 25f35ec8c8c47c00
-/x1a0f3n9-dsh-tool-skill/understand-the-implementation/source-map:
-  en: 9a8fa8b8305ef86a
-  zh: f80fbdfb2a8f1818
-/x1a0f3n9-dsh-tool-skill/understand-the-implementation/catalog-lifecycle:
-  en: b4e19723b4f1f8d4
-  zh: be3c88571cb5ba91
-/x1a0f3n9-dsh-tool-skill/understand-the-implementation/invocation-boundary:
+/deepseek-ai-dsh-tool-skill/understand-the-implementation/source-map:
+  en: 509699e3a467df41
+  zh: ff7fc30ec4998e5a
+/deepseek-ai-dsh-tool-skill/understand-the-implementation/catalog-lifecycle:
+  en: 847745cf78860904
+  zh: 55137ebef224ad48
+/deepseek-ai-dsh-tool-skill/understand-the-implementation/invocation-boundary:
   en: bb8543ea29cbc451
   zh: b1124fa489bf9ea4
 /x1a0f3n9-dsh-tool-skill/further-exploration:

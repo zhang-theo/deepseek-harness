@@ -2,28 +2,28 @@
  * The model-facing `workflow` tool: run a JavaScript orchestration script that fans out
  * subagents, and return the script's final value. It owns the model-facing schema and run lifecycle; script
  * parsing, execution, caps, and cancellation live behind `ctx.workflowEngine`
- * (`@x1a0f3n9/dsh-workflow`), so a hardened engine swaps in without touching what the model
+ * (`@deepseek-ai/dsh-workflow`), so a hardened engine swaps in without touching what the model
  * sees. Foreground execution awaits `run.result` and always disposes the run; non-completed reasons
  * become tool errors. `run_in_background: true` instead registers the run as an owned `ctx.jobs` job
  * and returns its id immediately — the job's output ring streams live progress, and the run's value
  * arrives with the job's completion notice. Presentation is an args-only generic card
  * titled from `meta.name`. Explicit-ask usage guidance is registered as the tool's own prompt
  * section rather than deployment persona prose.
- * @module @x1a0f3n9/dsh-tool-workflow
+ * @module @deepseek-ai/dsh-tool-workflow
  */
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { defineTool } from '@x1a0f3n9/dsh-tools'
-import type { ToolCallView, ToolResultView } from '@x1a0f3n9/dsh-tools'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import type { ContentBlock } from '@x1a0f3n9/dsh-llm'
-import type { JobId, JobOutcome } from '@x1a0f3n9/dsh-jobs'
-import type { Session, SessionEventMap } from '@x1a0f3n9/dsh-session'
-import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
+import { defineTool } from '@deepseek-ai/dsh-tools'
+import type { ToolCallView, ToolResultView } from '@deepseek-ai/dsh-tools'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import type { ContentBlock } from '@deepseek-ai/dsh-llm'
+import type { JobId, JobOutcome, JobToolCall } from '@deepseek-ai/dsh-jobs'
+import type { Session, SessionEventMap } from '@deepseek-ai/dsh-session'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 import type {
   WorkflowResult, WorkflowRun, WorkflowRunId, WorkflowStopReason,
-} from '@x1a0f3n9/dsh-workflow'
+} from '@deepseek-ai/dsh-workflow'
 import { createWorkflowRecordMirror } from './record.ts'
 import type { WorkflowRecordMirror } from './record.ts'
 import type {
@@ -31,7 +31,7 @@ import type {
   ToolWorkflowRunEndData, ToolWorkflowRunStartData,
 } from './types.ts'
 
-declare module '@x1a0f3n9/dsh-jobs' {
+declare module '@deepseek-ai/dsh-jobs' {
   interface JobKindMap {
     workflow: 'workflow'
   }
@@ -255,6 +255,7 @@ function renderResult(name: string, agentsStarted: number, value: JsonValue, max
  * @param ctx - plugin context (engine, optional jobs registry, logger).
  * @param args - the validated tool call.
  * @param parent - the calling agent; owns the job.
+ * @param toolCall - creating invocation, including its root call.
  * @param recordsRun - whether this top-level call records durable run events.
  * @param deps - the tool's recorder/mirror taps and the render cap.
  * @returns the background result for the tool's output schema.
@@ -263,18 +264,20 @@ function startBackgroundRun(
   ctx: Context,
   args: WorkflowCallArgs,
   parent: Agent,
+  toolCall: JobToolCall,
   recordsRun: boolean,
   deps: { recorder: WorkflowRecorder; mirror: WorkflowRecordMirror; maxResultChars: number },
 ): { kind: 'background'; jobId: JobId; runId: WorkflowRunId } {
   const jobs = ctx.get('jobs')
   if (jobs === undefined) {
-    throw new Error('background jobs unavailable: load @x1a0f3n9/dsh-jobs and @x1a0f3n9/dsh-tool-jobs')
+    throw new Error('background jobs unavailable: load @deepseek-ai/dsh-jobs and @deepseek-ai/dsh-tool-jobs')
   }
   let run!: WorkflowRun
   const jobId = jobs.start({
     kind: 'workflow',
     label: args.meta.name,
     owner: parent.id,
+    toolCall,
     run: (job) => {
       // A synchronous engine rejection (META_INVALID/SCRIPT_PARSE) propagates
       // out of the starter, so the registry registers nothing and the model
@@ -420,7 +423,7 @@ export function apply(ctx: Context, config: Config): void {
         // jobs.start synchronously from there. The shell tools await a
         // sandbox escalation approval before registering, which is the window
         // their check covers.
-        return startBackgroundRun(ctx, args, parent, exec.parent === undefined, {
+        return startBackgroundRun(ctx, args, parent, { callId: exec.callId, rootCallId: exec.rootCallId }, exec.parent === undefined, {
           recorder,
           mirror,
           maxResultChars,

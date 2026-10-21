@@ -2,10 +2,10 @@
  * HTML parsers for the keyless Bing and DuckDuckGo search backends.
  * Layout-sensitive: tests pin the selectors against fixture markup, not live pages.
  *
- * @module @x1a0f3n9/dsh-web-search-free/html
+ * @module @deepseek-ai/dsh-web-search-free/html
  */
 
-import type { WebSearchSource } from '@x1a0f3n9/dsh-web'
+import type { WebSearchSource } from '@deepseek-ai/dsh-web'
 
 const NAMED_ENTITIES: Readonly<Record<string, string>> = {
   amp: '&',

@@ -3,7 +3,7 @@ description: "ctx.web 的多密钥故障转移搜索提供方：部署如何把 
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-web-search-pool
+# @deepseek-ai/dsh-web-search-pool
 
 [English](README.md) | 中文
 
@@ -36,11 +36,11 @@ kind: "package-reference"
 加载 web 服务和搜索池；API 密钥回退到启动环境变量，`free` 作为最后一跳，因此无密钥部署仍能搜索。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-web'
+- name: '@deepseek-ai/dsh-web'
   config:
     searchProviderOrder: [search-pool, perplexity, exa, free]
     fetchProvider: http
-- name: '@x1a0f3n9/dsh-web-search-pool'
+- name: '@deepseek-ai/dsh-web-search-pool'
 ```
 
 | 字段 | 默认值 | 含义 |

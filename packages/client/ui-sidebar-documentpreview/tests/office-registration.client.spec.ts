@@ -1,18 +1,18 @@
 /** Authorized Host PDFs remain binary through Client reuse and disposal. */
-import type { OfficeToPdfGeneration } from '@x1a0f3n9/dsh-office-to-pdf/types'
+import type { OfficeToPdfGeneration } from '@deepseek-ai/dsh-office-to-pdf/types'
 import { Context } from '@deepseek-ai/cordis'
 import { expect, it, vi } from 'vitest'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { ClientRemote } from '@x1a0f3n9/dsh-api-remotes/client'
-import type {} from '@x1a0f3n9/dsh-office-to-pdf/remote'
-import { makeTranslate, RemoteError } from '@x1a0f3n9/dsh-client-test-runtime'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { ClientRemote } from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-office-to-pdf/remote'
+import { makeTranslate, RemoteError } from '@deepseek-ai/dsh-client-test-runtime'
 import { DocumentPreviewRegistry } from '../src/client/document/registry.ts'
 import { apply } from '../src/client/office/index.ts'
 import { officeFace } from '../src/client/office/face.ts'
 import { Config } from '../src/config.ts'
 import { OfficeBody, type OfficeBodyInjected } from '../src/client/office/OfficeBody.tsx'
 import type { OfficeStore } from '../src/client/office/store.ts'
-import type { TabId } from '@x1a0f3n9/dsh-client-ui-dockkit'
+import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import { en, zh } from '../src/client/office/locales.ts'
 import { en as documentEn } from '../src/client/locales.ts'
 
@@ -105,7 +105,7 @@ it.each(['remote', 'render', 'files'] as const)('keeps Word and PowerPoint regis
   expect(h.registry.getSnapshot()).toEqual([])
   expect(h.removeLocale).toHaveBeenCalledOnce()
   expect(h.register).toHaveBeenCalledWith(expect.objectContaining({
-    name: 'sidebar.right.tab.document', key: '@x1a0f3n9/dsh-client-ui-sidebar-documentpreview/office', locale: 'sidebarOffice',
+    name: 'sidebar.right.tab.document', key: '@deepseek-ai/dsh-client-ui-sidebar-documentpreview/office', locale: 'sidebarOffice',
   }), OfficeBody)
   expect(h.removeNotice).toHaveBeenCalledTimes(3)
 })

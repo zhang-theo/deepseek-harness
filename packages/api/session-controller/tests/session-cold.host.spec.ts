@@ -4,26 +4,26 @@
  * isolation, and prompt failure mapping.
  */
 
-import { SESSION_FORMAT_VERSION, SessionLogOffset, SessionSeq } from '@x1a0f3n9/dsh-session'
+import { SESSION_FORMAT_VERSION, SessionLogOffset, SessionSeq } from '@deepseek-ai/dsh-session'
 import { describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import SessionStore from '@x1a0f3n9/dsh-session'
-import AgentRegistry from '@x1a0f3n9/dsh-agent'
-import { SessionHistoryController } from '@x1a0f3n9/dsh-api-session-controller/src/history.ts'
-import { subagentIdentityProjectionDefinition } from '@x1a0f3n9/dsh-subagent/src/projection.ts'
-import TypertRegistry from '@x1a0f3n9/dsh-typert-registry'
-import { createUserMessage, MessageId } from '@x1a0f3n9/dsh-llm'
-import { snapshotSubagentDescriptor } from '@x1a0f3n9/dsh-subagent'
-import { createInboxStub, mountAgentLoopTestDependencies, mountAgentLoopTestHarness } from '@x1a0f3n9/dsh-agent-loop-testkit'
-import type { Agent, Inbox } from '@x1a0f3n9/dsh-agent'
-import type { SessionEvent, SessionHeader, SessionId } from '@x1a0f3n9/dsh-session'
-import AttachmentStore from '@x1a0f3n9/dsh-attachment'
+import SessionStore from '@deepseek-ai/dsh-session'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import { SessionHistoryController } from '@deepseek-ai/dsh-api-session-controller/src/history.ts'
+import { subagentIdentityProjectionDefinition } from '@deepseek-ai/dsh-subagent/src/projection.ts'
+import TypertRegistry from '@deepseek-ai/dsh-typert-registry'
+import { createUserMessage, MessageId } from '@deepseek-ai/dsh-llm'
+import { snapshotSubagentDescriptor } from '@deepseek-ai/dsh-subagent'
+import { createInboxStub, mountAgentLoopTestDependencies, mountAgentLoopTestHarness } from '@deepseek-ai/dsh-agent-loop-testkit'
+import type { Agent, Inbox } from '@deepseek-ai/dsh-agent'
+import type { SessionEvent, SessionHeader, SessionId } from '@deepseek-ai/dsh-session'
+import AttachmentStore from '@deepseek-ai/dsh-attachment'
 import type { SessionPromptRequest, SessionRequestId } from '../src/types.ts'
 import {
   SessionPersistenceRevision,
   type SessionPersistenceSnapshot,
   type SessionHandle, SessionAccess,
-} from '@x1a0f3n9/dsh-session-persistence'
+} from '@deepseek-ai/dsh-session-persistence'
 import {
   createSessionTestRemote,
   testSessionPersistence,
@@ -77,6 +77,53 @@ function conversationEvents(): SessionEvent[] {
 }
 
 describe('sessions.list cold merge', () => {
+  it('preserves listed format status and prefers live readiness without extra persistence reads', async () => {
+    const ctx = new Context()
+    try {
+      await ctx.plugin(SessionStore)
+      await ctx.plugin(AgentRegistry)
+      const historical = header('format-historical', 100)
+      const current = header('format-current', 200)
+      const unknown = header('format-unknown', 300)
+      const shared = ctx.sessions.create(sid('format-shared'), { meta: { createdAt: 400, cwd: '/proj' } }).header
+      const liveOnly = ctx.sessions.create(sid('format-live'), { meta: { cwd: '/proj' } })
+      const snapshots: SessionPersistenceSnapshot[] = [
+        { ...statSnapshot(historical), formatStatus: 'migration-required' },
+        { ...statSnapshot(current), formatStatus: 'current' },
+        statSnapshot(unknown),
+        { ...statSnapshot(shared), formatStatus: 'migration-required' },
+      ]
+      const list = vi.fn(async () => snapshots)
+      const stat = vi.fn()
+      const open = vi.fn()
+      ctx.provide('sessionPersistence', { list, stat, open } as never)
+      const remote = createSessionTestRemote(ctx, {
+        defaultModelSelection: () => ({ provider: 'p', model: 'm' }),
+        cwd: '/tmp',
+      })
+      const observe = vi.spyOn(ctx.sessionQuery, 'observeSession')
+      try {
+        const response = await remote.list(request({}))
+        if (!response.ok) throw new Error('list failed')
+        const byId = new Map(response.value.items.map(item => [item.sessionId, item]))
+        expect(byId.get(historical.id)).toMatchObject({ formatStatus: 'migration-required' })
+        expect(byId.get(current.id)).toMatchObject({ formatStatus: 'current' })
+        expect(byId.get(unknown.id)).toMatchObject({ sessionId: unknown.id })
+        expect(byId.get(unknown.id)).not.toHaveProperty('formatStatus')
+        expect(byId.get(shared.id)).toMatchObject({ formatStatus: 'current' })
+        expect(byId.get(liveOnly.id)).toMatchObject({ formatStatus: 'current' })
+        expect(list).toHaveBeenCalledTimes(1)
+        expect(stat).not.toHaveBeenCalled()
+        expect(open).not.toHaveBeenCalled()
+        expect(observe).not.toHaveBeenCalled()
+      } finally {
+        observe.mockRestore()
+      }
+    } finally {
+      await ctx.fiber.dispose()
+    }
+  })
+
   it('uses a predecessor title hint with zero cold stat or body reads', async () => {
     const ctx = new Context()
     await ctx.plugin(SessionStore)
@@ -371,7 +418,7 @@ describe('Remote Agent and Session lookup policy', () => {
       list: () => Promise.resolve([meta]),
       inspect,
     })
-    const resumedSession = { id: sessionId, header: meta, events: [] } as unknown as import('@x1a0f3n9/dsh-session').Session
+    const resumedSession = { id: sessionId, header: meta, events: [] } as unknown as import('@deepseek-ai/dsh-session').Session
     const resumedAgent = { id: sessionId, session: resumedSession, status: 'idle', ctx } as Agent
     const release = Promise.withResolvers<undefined>()
     const resume = vi.spyOn(ctx.agents, 'resume').mockImplementation(async () => {

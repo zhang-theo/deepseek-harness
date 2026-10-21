@@ -1,21 +1,18 @@
 // An enclosing `[data-conversation-scroll]` owns scrolling when present;
 // otherwise this view owns it. Each row subscribes to one stable node key.
 
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentProps } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
-  ConversationTimelineSnapshot, RenderMessageImages,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { SessionSeq } from '@x1a0f3n9/dsh-session/types'
-import type { InboxState } from '@x1a0f3n9/dsh-agent/types'
-import { Button, IconChevronDownOutlineRegular, MarkdownDelegateProvider, Modal } from '@x1a0f3n9/dsh-client-ui-primitives'
-import type { ChatViewSlotProps, OpenFileOptions } from '../contract/slots.ts'
-import type {
-  AssistantChatData, ChatConversationViewNode, RetryChatData, ToolChatData,
-} from '../contract/chat-nodes.ts'
-import { isRunningTool } from '../contract/chat-nodes.ts'
+  NodeKey, RenderEntry,
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { InboxState } from '@deepseek-ai/dsh-agent/types'
+import type { PendingSubmission } from '@deepseek-ai/dsh-api-session-controller/client'
+import {
+  Button, IconChevronDownOutlineRegular, MarkdownDelegateProvider, Modal,
+} from '@deepseek-ai/dsh-client-ui-primitives'
+import { isAtOrOutside } from '../contract/group-tree.ts'
+import type { ChatFlowHookContext, ChatViewSlotProps, OpenFileOptions } from '../contract/slots.ts'
 import type { ChatSnapshot } from '../contract/snapshot.ts'
-import { PendingSteeringBubble, PendingSubmissionBubble } from './MessageItem.tsx'
-import { ChatNodeSeat } from './ChatNodeSeat.tsx'
 import { TurnNavigator } from './TurnNavigator.tsx'
 import { mergeTurnRailItems, type TurnRailItem } from './turn-rail-items.ts'
 import { formatRunDuration } from './message-chrome.ts'
@@ -149,124 +146,34 @@ function observedRpcIds(
   const observed = new Set<string>()
   for (const key of order) {
     const node = nodes.get(key)
-    if (node === undefined || (node.kind !== 'user' && node.kind !== 'steering')) continue
-    const source = (node.data as { readonly source?: unknown }).source as
-      | { readonly kind?: unknown; readonly rpcId?: unknown }
-      | undefined
-    if (source?.kind === 'user' && typeof source.rpcId === 'string') observed.add(source.rpcId)
+    if (node === undefined || !isAtOrOutside(node, 'input')) continue
+    if (node.location.kind === 'turn' || node.location.kind === 'step') lastInputTurn = node.location.turn.turn
+    const data: unknown = node.data
+    const source = typeof data === 'object' && data !== null && 'source' in data ? data.source : undefined
+    if (typeof source === 'object' && source !== null && 'kind' in source && source.kind === 'user'
+      && 'rpcId' in source && typeof source.rpcId === 'string') observed.add(source.rpcId)
   }
-  for (const { source } of [...inbox?.['next-turn'] ?? [], ...inbox?.['next-step'] ?? []]) {
-    if (source.kind === 'user' && 'rpcId' in source) observed.add(source.rpcId)
-  }
-  return observed
+  return { rpcIds: observed, lastInputTurn }
 }
 
-function runningTurnStartTime(timeline: ConversationTimelineSnapshot): number | null {
-  let latest: number | null = null
-  for (const turn of timeline.turns.values()) {
-    if (turn.status === 'open') latest = turn.start?.time ?? null
-  }
-  return latest
-}
+type PendingInput = PendingSubmission | InboxState['next-step'][number]
 
-type TurnActivityPhase = 'preparing' | 'retrying' | 'generating'
-
-const ACTIVITY_COPY = {
-  preparing: 'chat.preparing',
-  retrying: 'chat.retrying',
-  generating: 'chat.deepDiving',
-} as const
-
-function lastStepOpen(timeline: ConversationTimelineSnapshot): boolean {
-  const turnId = timeline.turnOrder.at(-1)
-  if (turnId === undefined) return false
-  const turn = timeline.turns.get(turnId)
-  return turn?.status === 'open' && turn.steps.at(-1)?.status === 'open'
-}
-
-/** Derive the footer label from host running, a local transcript echo, and the timeline. */
-function turnActivityPhase(input: {
-  readonly running: boolean
-  readonly admitting: boolean
-  readonly timeline: ConversationTimelineSnapshot
-  readonly lastNode: ChatConversationViewNode | undefined
-}): TurnActivityPhase | null {
-  if (!input.running && !input.admitting) return null
-  if (!input.running) return 'preparing'
-  const last = input.lastNode
-  if (last?.kind === 'model-retry') {
-    const current = (last.data as RetryChatData).current
-    if (current.retryState === 'scheduled') return 'retrying'
-  }
-  if (lastStepOpen(input.timeline)) return 'generating'
-  if (last?.kind === 'assistant-step' && (last.data as AssistantChatData).status === 'running') {
-    return 'generating'
-  }
-  if (last?.kind === 'tool-call' && isRunningTool((last.data as ToolChatData).root)) {
-    return 'generating'
-  }
-  return 'preparing'
-}
-
-/** Turn-level activity label for preparing, retrying, and generating phases. */
-function TurnStatus({ startTime, label, t }: {
-  /** The running turn's logged `turn/start` time; null falls back to mount
-   *  time when that boundary is outside the window. */
-  startTime: number | null
-  /** Locale-owned activity copy for the current phase. */
-  label: string
-  /** The owning view's locale seat. */
-  t: ChatViewSlotProps['t']
-}) {
-  const [mountedAt] = useState(() => Date.now())
-  // Anchored to turn/start so a mid-turn reload keeps the real
-  // elapsed time and the final footer's Ran-for label matches this clock.
-  const anchor = startTime ?? mountedAt
-  const [elapsedMs, setElapsedMs] = useState(() => Math.max(0, Date.now() - anchor))
-  useEffect(() => {
-    const tick = (): void => {
-      setElapsedMs(Math.max(0, Date.now() - anchor))
-    }
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => { clearInterval(id) }
-  }, [anchor])
-  // Short turns keep the plain label; the clock only appears once the turn
-  // has clearly been running for a while.
-  const showClock = elapsedMs >= 15_000
-  return (
-    <div className={css.turnStatus} role="status" aria-live="polite">
-      {label}
-      {showClock && (
-        <span className={css.turnStatusClock} aria-hidden>
-          {formatRunDuration(elapsedMs, t)}
-        </span>
-      )}
-    </div>
-  )
-}
-
-type ChatNodeListProps = Omit<ComponentProps<typeof ChatNodeSeat>, 'nodeKey'> & {
-  readonly order: readonly string[]
-}
-
-const ChatNodeList = memo(function ChatNodeList({ order, ...seatProps }: ChatNodeListProps) {
-  return order.map(nodeKey => (
-    <ChatNodeSeat key={nodeKey} nodeKey={nodeKey} {...seatProps} />
-  ))
-})
+/** How long fold transitions stay enabled after a Turn stops running. */
+const MOTION_TAIL_MS = 800
 
 /**
  * The chat view slot entry: pure component over the composed props; each
  * ordered business Node crosses the keyed renderer seat.
  */
 export function ChatView({
-  useSession, useChat, useChatNode, useChatNodeProcess, useSessions, useStore, actions, renderSlot,
-  sessionId, openFile, openSkill, openExternalLink, loadOlder, loadThrough, loadImage, inspectCall, chatScroll, forkAt, fileMentions,
+  useSession, useChat, useConversation, useSessions, renderSlot,
+  sessionId, openFile, openExternalLink, loadOlder, loadThrough, loadImage, inspectCall, chatScroll, forkAt, fileMentions,
   usePresentation, useProjection, t,
 }: ChatViewSlotProps) {
   const order = useChat(s => s.order)
   const nodeStore = useChat(s => s.nodes)
+  const deferCompletedTurns = usePresentation(policy => policy.collapseTiming === 'next-input')
+  const transcriptView = usePresentation(policy => policy.mode)
   // The rail's items are accumulated in the Chat snapshot, so this selector is
   // both the data and its change signal: the array identity moves only when a
   // Turn enters, leaves, or changes its preview.
@@ -278,11 +185,24 @@ export function ChatView({
     () => mergeTurnRailItems(turnNavigationItems, turnOutline),
     [turnNavigationItems, turnOutline],
   )
-  const timeline = useChat(s => s.timeline)
-  const inbox = useProjection('inbox') as unknown as InboxState | undefined
+  const inbox = useProjection('inbox') as InboxState | undefined
   // Workspace root off the session list row: path summaries display relative to it.
   const cwd = useSessions(s => s.byId[sessionId]?.cwd)
   const running = useSession(s => s.running)
+  // Fold transitions run while a Turn is live, while an input is pending, and briefly after settling.
+  const [motionTail, setMotionTail] = useState(false)
+  useEffect(() => {
+    if (!deferCompletedTurns) {
+      setMotionTail(false)
+      return
+    }
+    if (running) {
+      setMotionTail(true)
+      return
+    }
+    const timer = setTimeout(() => { setMotionTail(false) }, MOTION_TAIL_MS)
+    return () => { clearTimeout(timer) }
+  }, [running, deferCompletedTurns])
   const openState = useSession(s => s.openState)
   const openError = useSession(s => s.openError)
   const hasMore = useSession(s => s.hasMore)
@@ -330,266 +250,47 @@ export function ChatView({
   // Submission echoes still awaiting their durable counterpart. `order` is the
   // recompute trigger: durable user material always arrives as an append, and
   // every append replaces the order array.
-  const visibleSubmissions = useMemo(() => {
-    if (pendingSubmissions.length === 0) return pendingSubmissions
-    const observed = observedRpcIds(order, nodeStore, inbox)
-    return pendingSubmissions.filter(submission => (
-      submission.placement !== 'queued' && !observed.has(submission.requestId)
-    ))
-  }, [pendingSubmissions, order, nodeStore, inbox])
-  const renderMessageImages = useCallback<RenderMessageImages>(
-    owner => renderSlot('conversation.message.images', { ...owner, loadImage }),
-    [loadImage, renderSlot],
-  )
-  const runningTurnStart = useMemo(() => runningTurnStartTime(timeline), [timeline])
-  const lastNode = useChat((snapshot) => {
-    const key = snapshot.order.at(-1)
-    return key === undefined ? undefined : snapshot.nodes.get(key)
-  })
-  const activityPhase = useMemo(() => turnActivityPhase({
-    running,
-    admitting: !running && visibleSubmissions.some(item => item.placement === 'transcript'),
-    timeline,
-    lastNode,
-  }), [running, visibleSubmissions, timeline, lastNode])
-
-  const listRef = useRef<HTMLDivElement | null>(null)
-  const columnRef = useRef<HTMLDivElement | null>(null)
-  // A saved position starts disarmed; the first layout effect synchronously
-  // restores it and normalizes a floor-clamped position back to following.
-  const [atBottom, setAtBottom] = useState(() => chatScroll.read() === null)
-  const atBottomRef = useRef(atBottom)
-  const scrollSamplePendingRef = useRef(false)
-  const [, setScrollSampleTick] = useState(0)
-  const [activeTurn, setActiveTurn] = useState<number | null>(
-    () => turnNavigationItems.at(-1)?.turn ?? null,
-  )
-  /** Last position delivered or written on the main thread. */
-  const observedTopRef = useRef(0)
-  /** Paging anchor: semantic row/position at click, updated by reader scrolls
-   * while the request is pending and restored after the prepend lands. */
-  const anchorRef = useRef<PagingAnchor | null>(null)
-  /** Unloaded-turn jump in flight: target turn plus its load-through seq. */
-  const pendingJumpRef = useRef<{ turn: number; seq: SessionSeq } | null>(null)
-  /** Whether the in-flight jump already landed mid-paging (settle then only corrects an untouched landing). */
-  const jumpLandedRef = useRef(false)
-  const [busyJumpTurn, setBusyJumpTurn] = useState<number | null>(null)
-  /** Bumped when a loadThrough completion settles, after its last page's commit. */
-  const [jumpSettleTick, setJumpSettleTick] = useState(0)
-  /** Window head at the last settle-time repage; an unmoved head falls back instead of repaging forever. */
-  const jumpRepageHeadRef = useRef<number | null>(null)
-  const firstSeqRef = useRef<number | null>(null)
-  const openedRef = useRef(false)
-  const lastKeyRef = useRef<string | null>(null)
-  const lastSteeringIdRef = useRef<string | null>(null)
-  const lastSubmissionIdRef = useRef<string | null>(null)
-  /** Flow tip signature — follow-scroll only when this moves, never on a
-   *  scroll-driven at-bottom chrome re-render (which would snap inertial
-   *  scrolls the rest of the way to the floor). */
-  const followSigRef = useRef<string | null>(null)
+  const [visibleSubmissions, lastInputTurn] = useMemo(() => {
+    if (pendingSubmissions.length === 0) return [pendingSubmissions, undefined] as const
+    const observed = observedInputs(order, nodeStore)
+    return [pendingSubmissions.filter(submission => (
+      submission.placement !== 'queued' && !observed.rpcIds.has(submission.requestId)
+    )), observed.lastInputTurn] as const
+  }, [pendingSubmissions, order, nodeStore])
+  const pendingInputs = useMemo(() => {
+    const local = new Map(visibleSubmissions.map(submission => [submission.requestId, submission]))
+    // Admitted local identities outlive their bubbles until the Inbox claim watermark.
+    const localIds = new Set(pendingSubmissions.filter(submission => submission.placement !== 'queued')
+      .map(submission => submission.requestId))
+    const pending = inboxSteering.flatMap<PendingInput>((item) => {
+      const source = item.source
+      if (source.kind !== 'user' || !('rpcId' in source)) return [item]
+      const submission = local.get(source.rpcId)
+      if (submission === undefined) return localIds.has(source.rpcId) ? [] : [item]
+      local.delete(source.rpcId)
+      return [submission]
+    })
+    return [...pending, ...local.values()]
+  }, [inboxSteering, pendingSubmissions, visibleSubmissions])
+  const deferCollapse = deferCompletedTurns
+    && !pendingInputs.some(item => 'requestId' in item && item.placement === 'transcript')
 
   const firstKey = order[0]
   const firstSeq = firstKey === undefined ? null : nodeStore.get(firstKey)?.anchorSeq ?? null
   const lastKey = order.at(-1) ?? null
-  const lastSteeringId = pendingSteering[pendingSteering.length - 1]?.id ?? null
-  const lastSubmissionId = visibleSubmissions[visibleSubmissions.length - 1]?.requestId ?? null
-  const followSig = `${openState}:${firstSeq}:${lastKey}:${order.length}:${running ? 1 : 0}:${lastSteeringId ?? ''}:${lastSubmissionId ?? ''}`
-
-  const syncActiveTurn = useCallback((): void => {
-    if (scrollSamplePendingRef.current) return
-    const local = listRef.current
-    const first = turnNavigationItems[0]
-    if (local === null || first === undefined) {
-      setActiveTurn(null)
-      return
-    }
-    const el = scrollerOf(local)
-    if (el.scrollHeight - el.scrollTop - el.clientHeight <= FOLLOW_THRESHOLD + 1) {
-      const latest = turnNavigationItems.at(-1)?.turn ?? first.turn
-      setActiveTurn(current => current === latest ? current : latest)
-      return
-    }
-    const readingLine = el.getBoundingClientRect().top + Math.min(96, el.clientHeight * 0.2)
-    const reading = turnAtLine(local, readingLine)
-    // No row reaches the line yet: the flow head still owns the mark. Otherwise
-    // the row's Turn may be one the rail does not offer (all its nodes hidden),
-    // so the newest offered Turn at or above it owns the mark.
-    let next = first.turn
-    if (reading !== null) {
-      for (const item of turnNavigationItems) {
-        if (item.turn > reading) break
-        next = item.turn
-      }
-    }
-    setActiveTurn(current => current === next ? current : next)
-  }, [turnNavigationItems])
-
-  const activeTurnRef = useRef<(() => void) | null>(null)
-  const activeFrameRef = useRef<number | null>(null)
-  const scheduleActiveTurn = useCallback((): void => {
-    if (activeFrameRef.current !== null) return
-    if (typeof requestAnimationFrame === 'undefined') {
-      syncActiveTurn()
-      return
-    }
-    activeFrameRef.current = requestAnimationFrame(() => {
-      activeFrameRef.current = null
-      syncActiveTurn()
-    })
-  }, [syncActiveTurn])
-
-  useEffect(() => () => {
-    if (activeFrameRef.current !== null && typeof cancelAnimationFrame !== 'undefined') {
-      cancelAnimationFrame(activeFrameRef.current)
-    }
-  }, [])
-
-  activeTurnRef.current = scheduleActiveTurn
-
-  useLayoutEffect(() => {
-    scheduleActiveTurn()
-  }, [scheduleActiveTurn])
-
-  const toBottom = (el: HTMLElement): void => {
-    anchorRef.current = null
-    // Returning to the live tail supersedes a jump still landing.
-    pendingJumpRef.current = null
-    setBusyJumpTurn(current => current === null ? current : null)
-    el.scrollTop = el.scrollHeight
-    observedTopRef.current = el.scrollTop
-    atBottomRef.current = true
-    setAtBottom(true)
-    chatScroll.save(null)
-    setActiveTurn(turnNavigationItems.at(-1)?.turn ?? null)
-  }
-
-  // Land a row at the reading line and republish scroll-derived state. A
-  // latest-ref, so navigateToTurn's identity stays stable for the memoized rail.
-  const landOnRowRef = useRef<(local: HTMLElement, el: HTMLElement, row: HTMLElement, turn: number) => void>(
-    () => {},
-  )
-  landOnRowRef.current = (local, el, row, turn) => {
-    el.scrollTop += flowTop(row, el) - 24
-    observedTopRef.current = el.scrollTop
-    const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= FOLLOW_THRESHOLD + 1
-    atBottomRef.current = isAtBottom
-    setAtBottom(isAtBottom)
-    setActiveTurn(turn)
-    const position = isAtBottom ? null : scrollPosition(local, el)
-    if (isAtBottom) chatScroll.save(null)
-    else if (position !== null) chatScroll.save(position)
-  }
-
-  /**
-   * Land the pending jump once its Turn has a rendered anchor row; false
-   * while it must keep waiting. Mid-jump landings (`settle` false) keep the
-   * jump armed with the target row as the paging anchor, so later chunks and
-   * the load-earlier button's unmount re-land on the same row; the settling
-   * call clears the jump.
-   */
-  const realizePendingJump = (local: HTMLElement, el: HTMLElement, settle: boolean): boolean => {
-    const pending = pendingJumpRef.current
-    if (pending === null) return true
-    const item = railItems.find(candidate => candidate.turn === pending.turn)
-    if (item === undefined || item.anchor.kind !== 'loaded') return false
-    const row = anchorElement(local, item.anchor.key)
-    if (row === null) return false
-    if (settle) {
-      pendingJumpRef.current = null
-      setBusyJumpTurn(null)
-      const held = anchorRef.current
-      const landedEarlier = jumpLandedRef.current
-      jumpLandedRef.current = false
-      anchorRef.current = null
-      // A reader who moved off an already-landed target mid-jump keeps their
-      // place; a first landing, or an untouched one, takes the correction.
-      if (!landedEarlier || held?.key === item.anchor.key) {
-        landOnRowRef.current(local, el, row, pending.turn)
-      }
-      return true
-    }
-    landOnRowRef.current(local, el, row, pending.turn)
-    jumpLandedRef.current = true
-    anchorRef.current = { key: item.anchor.key, top: flowTop(row, el) }
-    return true
-  }
-
-  useLayoutEffect(() => {
-    if (scrollSamplePendingRef.current) return
-    const local = listRef.current
-    /* v8 ignore next -- ref-null guard: React attaches the ref before layout effects run. */
-    if (local === null) return
-    const el = scrollerOf(local)
-    // Open completed: jump to the bottom once — unless a scroll position
-    // survives from a previous mount (view-tab switch away and back), which
-    // is restored instead of snapping the reader back to the floor.
-    if (openState === 'open' && !openedRef.current) {
-      openedRef.current = true
-      const saved = chatScroll.read()
-      if (saved === null) {
-        toBottom(el)
-      } else {
-        el.scrollTop = saved.scrollTop
-        const row = anchorElement(local, saved.anchorKey)
-        if (row !== null) el.scrollTop += flowTop(row, el) - saved.anchorTop
-        observedTopRef.current = el.scrollTop
-        const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= FOLLOW_THRESHOLD + 1
-        atBottomRef.current = isAtBottom
-        setAtBottom(isAtBottom)
-        const normalized = isAtBottom ? null : scrollPosition(local, el)
-        if (isAtBottom) chatScroll.save(null)
-        else if (normalized !== null) chatScroll.save(normalized)
-      }
-      firstSeqRef.current = firstSeq
-      lastKeyRef.current = lastKey
-      lastSteeringIdRef.current = lastSteeringId
-      lastSubmissionIdRef.current = lastSubmissionId
-      followSigRef.current = followSig
-      return
-    }
-    // Prepend (head seq decreased): preserve the same settled row at the
-    // position established by the reader's latest scroll. This excludes
-    // unrelated tail/composer growth while the request was in flight.
-    if (anchorRef.current !== null && firstSeq !== null && firstSeqRef.current !== null && firstSeq < firstSeqRef.current) {
-      const anchor = anchorRef.current
-      anchorRef.current = null
-      const row = anchorElement(local, anchor.key)
-      if (row !== null) el.scrollTop += flowTop(row, el) - anchor.top
-      observedTopRef.current = el.scrollTop
-      // A jump chunk lands here: scroll to the target once its rows exist;
-      // until then keep holding the reader's row for the next chunk.
-      if (!realizePendingJump(local, el, false) && row !== null) {
-        anchorRef.current = { key: anchor.key, top: flowTop(row, el) }
-      }
-      firstSeqRef.current = firstSeq
-      /* v8 ignore next -- ?? arm: a prepend adds nodes, so the flow list here is never empty. */
-      lastKeyRef.current = lastKey
-      lastSteeringIdRef.current = lastSteeringId
-      lastSubmissionIdRef.current = lastSubmissionId
-      followSigRef.current = followSig
-      return
-    }
-    firstSeqRef.current = firstSeq
-    // Own words must be visible: a new trailing user node force-scrolls
-    // (send lives in the composer, so arrival is detected here, not armed there).
-    const appendedUser = lastKey !== lastKeyRef.current && lastNode?.kind === 'user'
-    const appendedSteering = lastSteeringId !== null && lastSteeringId !== lastSteeringIdRef.current
-    const appendedSubmission = lastSubmissionId !== null && lastSubmissionId !== lastSubmissionIdRef.current
-    const tipMoved = followSigRef.current !== followSig
-    lastKeyRef.current = lastKey
-    lastSteeringIdRef.current = lastSteeringId
-    lastSubmissionIdRef.current = lastSubmissionId
-    followSigRef.current = followSig
-    // Follow new flow content while pinned; do NOT re-pin on every render
-    // merely because atBottomRef is true (scroll threshold → setState → snap).
-    if (appendedUser || appendedSteering || appendedSubmission || (tipMoved && atBottomRef.current)) {
-      toBottom(el)
-      return
-    }
-    // A jump whose target committed outside the anchored-prepend path (for
-    // example after a mid-jump toBottom dropped the held anchor) lands here.
-    if (pendingJumpRef.current !== null) realizePendingJump(local, el, false)
+  const latestSteering = pendingInputs.findLast(item => 'source' in item)
+  const steeringId = latestSteering?.source.kind === 'user' && 'rpcId' in latestSteering.source
+    ? latestSteering.source.rpcId : latestSteering?.id ?? null
+  const scroll = useChatScroll({
+    ready: openState === 'open',
+    order, firstSeq, lastKey, running, loadingOlder, hasMore, chatScroll, loadOlder, loadThrough, deferCompletedTurns,
+    lastIsUser: lastKey !== null && nodeStore.get(lastKey)?.kind === 'user',
+    steeringId,
+    submissionId: visibleSubmissions.at(-1)?.requestId ?? null,
+    loadedTurns: turnNavigationItems,
+    transcriptView,
   })
+  const flowContext = useMemo<ChatFlowHookContext>(() => ({ motion: scroll.motion }), [scroll.motion])
 
   const onScrollRef = useRef(() => {})
   onScrollRef.current = () => {
@@ -818,85 +519,38 @@ export function ChatView({
           onNavigate={navigateToTurn}
           t={t}
         />
-        <div ref={columnRef} className={css.column} data-chat-flow="">
-          {openState === 'loading' && <div className={css.hint}>{t('chat.loadingHistory')}</div>}
-          {openState === 'error' && openError !== null && (
-            <div className={css.openError}>
-              {t('chat.loadError', { message: openError.message, code: openError.code })}
-            </div>
-          )}
-          {hasMore && (
-            <div className={css.older}>
-              <button type="button" disabled={loadingOlder} onClick={loadOlderAnchored}>
-                {loadingOlder ? t('loading') : t('chat.loadOlder')}
-              </button>
-            </div>
-          )}
-          <MarkdownDelegateProvider openExternalLink={openExternalLink} openFile={requestOpenFile}>
-            <ChatNodeList
-              order={order}
-              useChatNode={useChatNode}
-              useChatNodeProcess={useChatNodeProcess}
-              usePresentation={usePresentation}
-              historyIncomplete={hasMore}
-              useStore={useStore}
-              actions={actions}
-              cwd={cwd}
-              openFile={requestOpenFile}
-              openSkill={openSkill}
-              inspectCall={inspectCall}
-              forkAt={forkAt}
-              loadImage={loadImage}
-              renderMessageImages={renderMessageImages}
-              fileMentions={fileMentions}
-              renderSlot={renderSlot}
-              t={t}
-            />
-          </MarkdownDelegateProvider>
-          {/* No pending placeholders: questions (ui-user-questions) and approvals
-              (ApprovalPanel) both take over the composer, so a flow card would
-              double-render the same wait. */}
-          {/* Turn-level activity: preparing, retrying, or generating. */}
-          {activityPhase !== null && (
-            <TurnStatus
-              startTime={runningTurnStart}
-              label={t(ACTIVITY_COPY[activityPhase])}
-              t={t}
-            />
-          )}
-          {pendingSteering.map(item => (
-            <PendingSteeringBubble
-              key={item.id}
-              content={item.content}
-              renderMessageImages={renderMessageImages}
-              t={t}
-            />
-          ))}
-          {visibleSubmissions.map(submission => (
-            <PendingSubmissionBubble
-              key={submission.requestId}
-              submission={submission}
-              renderMessageImages={renderMessageImages}
-              t={t}
-            />
-          ))}
-        </div>
-        {!atBottom && (
-          <div className={css.toBottomSlot}>
-            <button
-              type="button"
-              className={css.toBottom}
-              aria-label={t('chat.toBottom')}
-              onClick={() => {
-                const local = listRef.current
-                /* v8 ignore next -- ref-null guard: the button only renders alongside the mounted list. */
-                if (local !== null) toBottom(scrollerOf(local))
-              }}
-            >
-              <IconChevronDownOutlineRegular />
-            </button>
+      )}
+      <div className={css.root} data-chat-following-tail={scroll.followingTail ? '' : undefined}>
+        <div ref={scroll.listRef} className={css.scroll}>
+          <div ref={scroll.columnRef} className={css.column} data-chat-flow=""
+            data-chat-motion={deferCompletedTurns && scroll.initialized
+              && (running || motionTail || pendingInputs.length > 0) ? '' : undefined}>
+            {openState === 'loading' && <div className={css.hint}>{t('chat.loadingHistory')}</div>}
+            {openState === 'error' && openError !== null && (
+              <div className={css.openError}>
+                {t('chat.loadError', { message: openError.message, code: openError.code })}
+              </div>
+            )}
+            {hasMore && (
+              <div className={css.older}>
+                <button type="button" disabled={loadingOlder} onClick={scroll.loadEarlier}>
+                  {loadingOlder ? t('loading') : t('chat.loadOlder')}
+                </button>
+              </div>
+            )}
+            <MarkdownDelegateProvider openFile={requestOpenFile} openExternalLink={openExternalLink} fileImages={fileImages}>
+              {renderSlot('conversation.chat.flow', {
+                entries, pendingInputs, lastInputTurn, deferCollapse,
+                cwd, openFile: requestOpenFile, inspectCall, forkAt, loadImage, fileMentions,
+              }, { hookContext: flowContext })}
+            </MarkdownDelegateProvider>
+            {/* No pending placeholders: questions (ui-user-questions) and approvals
+                (ApprovalPanel) both take over the composer, so a flow card would
+                double-render the same wait. */}
           </div>
-        )}
+          {/* Fold room is reclaimed by viewport scroll, content-growth, and display-mode policies. */}
+          <div className={css.turnSpacer} data-chat-turn-spacer aria-hidden="true" />
+        </div>
       </div>
       {fileOpenError !== null && (
         <FileOpenErrorDialog

@@ -8,7 +8,7 @@ Status: implemented
 
 profile 从自己的包项目加载插件配置项，而 Harness 包和所选 bundle 携带的包可能位于该项目普通依赖树之外。通过共享 symlink、profile 自有链接或打包可执行文件的代理包连接两棵依赖树，会让选包结果跨进程和安装版本持续存在。这些文件需要协调和锁来维护，并向元数据读取方暴露生成的代理 manifest（元数据清单），也无法原子表示进程内变更。
 
-运行时设计保留安装优先、有序 bundle 和本地包优先于 fallback 的顺序。它覆盖插件模块内部的 import 以及 Loader 配置项的 import，并在主线程和 Harness 自有 Worker 中工作。generation 替换保留既有包映射和本地包名，允许调整 linked root 集合，不会逐项修改正在使用的表。
+运行时设计保留安装优先、有序 bundle 和本地包优先于 fallback 的顺序。它覆盖插件模块内部的 import 以及 Loader 配置项的 import，并在主线程和 Harness 自有 Worker 中工作。generation 替换保持保留包的身份不变，允许移除 profile 包和调整 linked root 集合，不会逐项修改正在使用的表。
 
 ## Decision
 
@@ -16,7 +16,7 @@ profile 启动生成一个不可变 `RuntimeResolution`，并将其安装到 Nod
 
 ### 唯一选包算法
 
-包遍历属于 `@x1a0f3n9/dsh-app-boot`，与 profile 加载代码放在一起。普通 Node、源码启动、打包可执行文件和 Electron Host 消费相同的 runtime resolution 与拦截。
+包遍历属于 `@deepseek-ai/dsh-app-boot`，与 profile 加载代码放在一起。普通 Node、源码启动、打包可执行文件和 Electron Host 消费相同的 runtime resolution 与拦截。
 
 安装 manifest 是第一个根。它按 BFS 依次遍历 `dependencies` 和 `peerDependencies`，每条边从声明它的 manifest 解析，同名包由第一次找到的已安装包占有。所选 bundle 随后按 profile 顺序逐根遍历；每个较早根的完整依赖图优先于所有较晚根。安装闭包中的名称被保留，bundle 包根本身不成为插件 fallback。已声明但未安装的包会被跳过。
 
@@ -60,7 +60,7 @@ ESM `import` 和 CommonJS `require` 都选中这些版本。在每种模块格�
 
 [源码启动器](2026-07-29-dsh-source-launch-tsx-esm.zh.md)使用 tsx 的 ESM-only 钩子。导入方 URL 含有 `/node_modules/` 时，tsx 会跳过 tsconfig `paths`。因此，把 workspace 软链接的逻辑路径用作 fallback 声明锚点，可能选中构建后的 `lib/` 导出，而这些模块在真实 workspace 路径中发起的 import 又通过 paths 映射选中 `src/`。真实声明锚点让 workspace import 一致遵循源码映射；没有匹配 workspace 映射的包仍使用普通包导出解析。
 
-例如，`@x1a0f3n9/dsh-tools` 使用 `Symbol()` 创建 scheduler 键。从 `lib/` 加载的 Tools 实例，无法通过另一个 `src/` 模块实例导入的键暴露该 scheduler。源码启动让 Tools 与 AgentLoop 都位于 `src/`；普通 Node 启动让两者都位于 `lib/`。scheduler 保留模块本地的 Symbol；正确的 import 共享同一个模块实例。
+例如，`@deepseek-ai/dsh-tools` 使用 `Symbol()` 创建 scheduler 键。从 `lib/` 加载的 Tools 实例，无法通过另一个 `src/` 模块实例导入的键暴露该 scheduler。源码启动让 Tools 与 AgentLoop 都位于 `src/`；普通 Node 启动让两者都位于 `lib/`。scheduler 保留模块本地的 Symbol；正确的 import 共享同一个模块实例。
 
 源码启动器不安装 CommonJS TypeScript 钩子。`createRequire().resolve()` 仍选择包发布的 JavaScript 入口，并要求该文件存在。因此，源码模式的解析测试使用 fixture 提供的 CommonJS 文件，真实安装包的 CommonJS 入口检查则在构建产物存在时运行。
 
@@ -75,7 +75,7 @@ linked root 集合在一个 generation 内不可变。后继 generation 可以�
 
 解析器在自身生命周期内保留每个已成功发布的 link 名称对应的真实目标，仅用于校验后继 generation。移除 root 不会抹掉该记录，也不会让其目录继续被拦截。同名、同目标可以重新加入；不同目标会被拒绝，因为 Node 缓存真实路径。发布失败时，当前 generation 和已记录目标均不变。
 
-launcher 只构造启动 generation。服务接受完整的后继 generation，但本实现没有包管理器事务调用替换操作。
+launcher 只构造启动 generation。`ProfileRuntimeResolution` 仅保留安装锚点、Harness home 和可选的 profile 目录作为重算输入；后继代重新读取磁盘上的选择与配置层，不继承传入 profile 的合成层。没有 profile 目录的 generation 可以重算安装包。[包操作刷新决策](2026-09-30-profile-package-refresh-and-manifest-invalidation.zh.md)规定由 Plugin Manager 的操作发布后继代。
 
 ### ESM 与 CommonJS 共用规则
 
@@ -93,7 +93,7 @@ runtime resolution 列出它提供的包；Loader entries 组成活动插件列�
 
 解析器不提供 `imported(entry)`，不观察 ModuleJob，不包装 Entry 方法，不把 fiber 与 import 调用关联，也不替换 registry、tree 或 HMR 方法。包目录查询使用相同选包规则，包括 linked importer 祖先当前的 peer 声明，但不校验所请求的子路径或加载文件。需要包元数据的非 Node importer 必须显式实现同一个 resolver 接口。
 
-实现集中在 `app-boot/src/profile-resolution/`。`service.ts` 提供长期存在的 `ctx.pluginPackages`，并拥有主线程拦截与 Worker runtime resolution 的生命周期；`resolver.ts` 实现 runtime resolution 查询和 Node Internal 适配器；`worker-bootstrap.ts` 在线程内安装继承的 runtime resolution。profile 选包和 runtime resolution 构造留在 `profile.ts`。Worker 只通过 `@x1a0f3n9/dsh-app-boot/worker/profile-resolution-bootstrap` 公开入口引用 bootstrap。
+实现集中在 `app-boot/src/profile-resolution/`。`service.ts` 提供长期存在的 `ctx.pluginPackages`，并拥有主线程拦截与 Worker runtime resolution 的生命周期；`resolver.ts` 实现 runtime resolution 查询和 Node Internal 适配器；`worker-bootstrap.ts` 在线程内安装继承的 runtime resolution。profile 选包和 runtime resolution 构造留在 `profile.ts`。Worker 只通过 `@deepseek-ai/dsh-app-boot/worker/profile-resolution-bootstrap` 公开入口引用 bootstrap。
 
 服务定义与提供方继续放在 `app-boot`，因为 profile boot 拥有 resolver 生命周期。出现与 launcher 无关的提供方或需要独立演进的消费方时，再抽出单独的能力 seam。
 
@@ -105,9 +105,9 @@ runtime resolution 列出它提供的包；Loader entries 组成活动插件列�
 
 ### 只增加包的变更
 
-添加包的调用方先完成 pnpm 事务，再构造下一代。替换操作会拒绝改变任何既有 package name 的目录或版本。调用方先发布只增加映射的后继 generation，再挂载新的 Loader 配置项；本实现不提供该包事务。挂载失败可以留下已安装但未启用的包。
+添加包的调用方先完成 pnpm 事务，再构造下一代。替换操作会拒绝改变任何保留包的目录或版本。Plugin Manager 先发布后继 generation，再挂载新的 Loader 配置项。挂载失败可以留下已安装但未启用的包。
 
-修改或删除既有运行时包映射，或删除已记录的 profile 本地包名，需要重启，因为 Node 的 ESM Module Map、CommonJS cache、现存对象引用和运行中的 Worker 都可能保留旧模块 identity。这些限制不禁止从拦截范围移除 linked root。generation 换代不声称卸载模块。
+保留包的规范化目录、版本和作用域必须不变；安装条目还必须保留声明锚点，且不能移除。违反这些限制需要重启，因为 Node 的 ESM Module Map、CommonJS cache、现存对象引用和运行中的 Worker 都可能保留旧模块 identity。profile 条目可以改变声明锚点：取消选入最先找到共享依赖的组合包后，另一个组合包仍可能选中同一物理包。profile 范围的映射和 profile 本地包名可以移除；调用方在删除包文件之前先停止相关插件。profile 映射只能通过卸载和重新安装移到其他目录；linked root 可以指向其他目标（[替换 Note](2026-10-01-replace-changed-package-modules-on-recomposition.zh.md)）。这些限制不禁止从拦截范围移除 linked root。generation 换代不声称卸载模块。
 
 ### 文件系统与运行时载体
 
@@ -142,7 +142,7 @@ generation 构造发生在启动或显式更新阶段，不属于单次 resolve�
 ## Verification
 
 - 一次 eager 计算供应 runtime resolution；启动既不写入也不退休模块解析数据。
-- [Generation 测试](../../../../packages/boot/app-boot/tests/profile-resolution.spec.ts)覆盖普通目录和递归软链接下的安装图与所选 bundle 图，包括逻辑锚点和真实锚点旁存在不同依赖版本的情况。测试还覆盖 linked root 移除、同目标恢复、重叠 root、原生缺包、已加载模块的新请求，以及移除后重新链接不同目标时的拒绝。
+- [Generation 测试](../../../../packages/boot/app-boot/tests/profile-resolution.spec.ts)覆盖普通目录和递归软链接下的安装图与所选 bundle 图，包括逻辑锚点和真实锚点旁存在不同依赖版本的情况。测试还覆盖同包 profile 声明者变更、保留包身份变更拒绝、捕获目录后的重算、linked root 移除、同目标恢复、重叠 root、原生缺包、已加载模块的新请求，以及移除后重新链接不同目标时的拒绝。
 - [源码启动测试](../../../../apps/cli/tests/source-launch.compat.spec.ts)与[构建入口测试](../../../../apps/cli/tests/built-bin.e2e.ts)通过真实 CLI 运行两种 profile 布局，断言 ESM/CJS 版本、加载路径、各模块格式内的依赖身份，以及一致的 Tools/AgentLoop 模块实例和可访问的 scheduler 键。
 - pkg 与 Electron 载体选择 runtime 解析；Electron 以 Node 模式从 ASAR 承载的 dsh 依赖树执行 Host，原生可执行条目保持 unpacked。
 - ESM 与 CommonJS 适配器共享同一个路由器，并把最终解析委托给 Node，不使用 `module.registerHooks` 或替换 `_findPath`。
@@ -152,4 +152,4 @@ generation 构造发生在启动或显式更新阶段，不属于单次 resolve�
 
 ## Consequences
 
-runtime 启动避免磁盘修改和代理 manifest，同时保留包优先级规则。真实目录锚点让依赖发现对齐 Node 默认加载与 tsx workspace 映射，也覆盖软链接逻辑路径会选中另一版本的情况。实现需要持续维护 Node Internal 兼容测试，并在每个自有 Worker 中尽早执行自包含 bootstrap；它不提供纯磁盘后端或 dual 对比模式。包映射和本地包名仍只允许新增；linked root 集合可以变化，而不卸载模块。
+runtime 启动避免磁盘修改和代理 manifest，同时保留包优先级规则。真实目录锚点让依赖发现对齐 Node 默认加载与 tsx workspace 映射，也覆盖软链接逻辑路径会选中另一版本的情况。实现需要持续维护 Node Internal 兼容测试，并在每个自有 Worker 中尽早执行自包含 bootstrap；它不提供纯磁盘后端或 dual 对比模式。profile 包记录和 linked root 集合可以移除，而不卸载模块；保留包的身份保持不变。

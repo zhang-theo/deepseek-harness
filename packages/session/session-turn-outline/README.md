@@ -3,7 +3,7 @@ description: "Whole-log turn outline for clients and maintainers composing or de
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-session-turn-outline
+# @deepseek-ai/dsh-session-turn-outline
 
 English | [中文](README.zh.md)
 
@@ -30,9 +30,9 @@ Mount the plugin beside the session store and the projection registry when clien
 ### Composition
 
 ```yaml
-- name: '@x1a0f3n9/dsh-session'
-- name: '@x1a0f3n9/dsh-session-projection'
-- name: '@x1a0f3n9/dsh-session-turn-outline'
+- name: '@deepseek-ai/dsh-session'
+- name: '@deepseek-ai/dsh-session-projection'
+- name: '@deepseek-ai/dsh-session-turn-outline'
 ```
 
 ### What an entry means
@@ -71,7 +71,6 @@ The unit is a pure fold over committed session events. `turn/start` — not the 
 | [`src/index.ts`](src/index.ts) | Plugin entry: `inject`, unit registration on the mounting fiber |
 | [`src/projection.ts`](src/projection.ts) | The fold: entry append, preview fill, wire view |
 | [`src/types.ts`](src/types.ts) | One home of the `turnOutline` projection-key declaration and entry types |
-| — | No runtime invariant companion is published: the package owns one pure projection fold, `session-projection` schema-validates its served values, and re-folding the same log would duplicate the implementation instead of comparing independently maintained observations; session and agent-loop own turn-boundary ordering. |
 
 ### Fold rules
 

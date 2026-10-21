@@ -1,9 +1,9 @@
 /** Read-only Host and Client runtime API discovery for plugin development. */
 import type { Context } from '@deepseek-ai/cordis'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import type { JsonValue } from '@x1a0f3n9/dsh-util-values'
-import { defineTool } from '@x1a0f3n9/dsh-tools'
-import type { ToolExecution } from '@x1a0f3n9/dsh-tools'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
+import { defineTool } from '@deepseek-ai/dsh-tools'
+import type { ToolExecution } from '@deepseek-ai/dsh-tools'
 import { presentInspectListCall, presentInspectQueryCall } from './present.ts'
 
 export const name = 'tool-cordis'
@@ -15,7 +15,7 @@ function requireAgent(exec: ToolExecution): Agent {
 }
 
 /** Register read-only runtime inspection tools over the Host providers that
- * `@x1a0f3n9/dsh-tool-cordis/host` registers once per process.
+ * `@deepseek-ai/dsh-tool-cordis/host` registers once per process.
  * @param ctx Agent-scoped registration context.
  */
 export function apply(ctx: Context): void {
@@ -44,9 +44,9 @@ export function apply(ctx: Context): void {
       'Run a read-only query declared by an Inspect Provider. platform, provider, and method must come from '
       + 'cordis_inspect_list, and input must satisfy that method\'s schema. Use this Tool before writing plugin code '
       + 'to read exact Service methods, Event modes, plugin Config schemas, Tool schemas, theme tokens, or live '
-      + 'Slot trees and props. Host queries run locally. A Client query waits for the first valid page response and '
-      + 'remains pending until a page answers or the Tool is cancelled. This Tool cannot invoke business Service '
-      + 'methods or modify the runtime.',
+      + 'Slot trees and props. Host queries run locally. A Client query waits for the first valid page response '
+      + 'within the configured timeout; otherwise it reports a Client failure or asks you to reconnect and retry. '
+      + 'This Tool cannot invoke business Service methods or modify the runtime.',
     parameters: {
       platform: { type: 'string', required: true, enum: ['host', 'client'], description: 'Runtime platform that owns the Provider.' },
       provider: { type: 'string', required: true, description: 'Exact Provider ID returned by cordis_inspect_list.' },

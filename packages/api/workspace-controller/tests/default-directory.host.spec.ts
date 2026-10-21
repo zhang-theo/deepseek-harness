@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { NativeCommandRunner } from '@x1a0f3n9/dsh-native-command'
+import type { NativeCommandRunner } from '@deepseek-ai/dsh-native-command'
 import { defaultWorkspaceDirectory, validateDocumentsDirectory } from '../src/default-directory.ts'
 
 describe('system Documents directory', () => {
@@ -11,7 +11,7 @@ describe('system Documents directory', () => {
     const run = vi.fn<NativeCommandRunner>(async () => ({ stdout, stderr: '' }))
     const signal = new AbortController().signal
     await expect(defaultWorkspaceDirectory(undefined, signal, { platform, run })).resolves.toBe(path)
-    expect(run).toHaveBeenCalledWith(command, expect.any(Array), signal)
+    expect(run).toHaveBeenCalledWith(command, expect.any(Array), signal, 'hidden')
   })
 
   it('uses the configured directory without a system lookup', async () => {

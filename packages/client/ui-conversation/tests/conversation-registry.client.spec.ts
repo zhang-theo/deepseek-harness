@@ -1,21 +1,21 @@
 import { Context } from '@deepseek-ai/cordis'
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest'
-import { SessionSeq } from '@x1a0f3n9/dsh-session/types'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import { createAssistantMessage, LlmAttemptId } from '@x1a0f3n9/dsh-llm'
-import { createSnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { SessionSeq } from '@deepseek-ai/dsh-session/types'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import { createAssistantMessage, LlmAttemptId } from '@deepseek-ai/dsh-llm'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 import {
   createScope, MutableSessionEventSource,
-} from '@x1a0f3n9/dsh-api-session-controller/client'
+} from '@deepseek-ai/dsh-api-session-controller/client'
 import type {
   ISessions, SessionBinding, SessionEventLike, SessionFace, SessionListState, SessionSnapshot,
-} from '@x1a0f3n9/dsh-api-session-controller/client'
+} from '@deepseek-ai/dsh-api-session-controller/client'
 import {
   ConversationEventRegistry, ConversationNodeAssembler, ConversationViewRegistry, UiConversation,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {
   ConversationNodeDefinition, ConversationViewDefinition, ConversationViewNode,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
 
 const SESSION_ID = 'resident' as SessionId
 
@@ -421,11 +421,13 @@ describe('Conversation registries', () => {
 
     expect(events.entries()).toHaveLength(1)
     expect(events.fallbackEntry()).toBeDefined()
+    expect(events.forEvent('turn/start').size).toBe(1)
     expect(views.entries()).toHaveLength(1)
 
     await feature.dispose()
     expect(events.entries()).toEqual([])
     expect(events.fallbackEntry()).toBeUndefined()
+    expect(events.forEvent('turn/start').size).toBe(0)
     expect(views.entries()).toEqual([])
   })
 

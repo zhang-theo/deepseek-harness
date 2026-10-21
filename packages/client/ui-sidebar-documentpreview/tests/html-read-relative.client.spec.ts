@@ -1,7 +1,7 @@
 /** HTML URL decoding stays local; workspace reads leave path resolution and authorization to the Host. */
 import { describe, expect, it, vi } from 'vitest'
-import { RemoteError } from '@x1a0f3n9/dsh-client-test-runtime'
-import { sessionFileAddress } from '@x1a0f3n9/dsh-util-workspace-path'
+import { RemoteError } from '@deepseek-ai/dsh-client-test-runtime'
+import { sessionFileAddress } from '@deepseek-ai/dsh-util-workspace-path'
 import { createReadHtmlRelative } from '../src/client/html/read-relative.ts'
 import type { ReadHtmlRelated } from '../src/client/html/read-relative.ts'
 

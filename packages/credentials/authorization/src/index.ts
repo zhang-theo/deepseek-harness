@@ -23,12 +23,12 @@
  * })
  * ```
  *
- * @module @x1a0f3n9/dsh-authorization
+ * @module @deepseek-ai/dsh-authorization
  */
 
 import { Context, Service } from '@deepseek-ai/cordis'
-import type { CredentialKey, CredentialRecord } from '@x1a0f3n9/dsh-credentials'
-import { HarnessError } from '@x1a0f3n9/dsh-llm'
+import type { CredentialKey, CredentialRecord } from '@deepseek-ai/dsh-credentials'
+import { HarnessError } from '@deepseek-ai/dsh-llm'
 
 import type {
   AuthorizationEntry, AuthorizationMethod, AuthorizationNotice, AuthorizationOutcome, AuthorizationPrompt,
@@ -329,14 +329,12 @@ export class AuthorizationService extends Service {
   /**
    * Fan `authorization/settled` out with contained listener failures: every
    * listener runs, and a sync throw or async rejection is logged without
-   * changing the finished attempt's own outcome — except `INVARIANT`-coded
-   * failures, which rethrow after every listener ran. The attempt is already
+   * changing the finished attempt's own outcome. The attempt is already
    * over and its key released when this fires, so a broken watcher (that
    * second browser tab) can never turn the caller's settled result into a
    * failure of its own.
    */
   private settle(key: CredentialKey, settlement: AuthorizationSettlement): void {
-    let invariantFailure: unknown
     const args = ['authorization/settled', key, settlement]
     for (const listener of this.ctx.events.dispatch('emit', args) as Array<(...listenerArgs: unknown[]) => unknown>) {
       try {
@@ -347,14 +345,9 @@ export class AuthorizationService extends Service {
           })
         }
       } catch (error) {
-        if ((error as { code?: unknown } | null)?.code === 'INVARIANT') {
-          invariantFailure ??= error
-          continue
-        }
         this.warnSettledListenerFailure(key, error)
       }
     }
-    if (invariantFailure !== undefined) throw invariantFailure as Error
   }
   /* jscpd:ignore-end */
 

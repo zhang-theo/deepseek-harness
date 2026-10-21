@@ -1,15 +1,15 @@
 /** Test-only direct Remote face over the Session Controller's internal controllers. */
 import type { SessionControllerInternals } from '../src/index.ts'
 
-import { SessionLogOffset } from '@x1a0f3n9/dsh-session'
+import { SessionLogOffset } from '@deepseek-ai/dsh-session'
 import type { Context } from '@deepseek-ai/cordis'
-import type { ModelSelection as AgentModelSelection } from '@x1a0f3n9/dsh-agent'
+import type { ModelSelection as AgentModelSelection } from '@deepseek-ai/dsh-agent'
 import type {
   AdmittedPromptContentPart,
   AttachmentAdmissionPart,
   ImageAttachmentLimits,
-} from '@x1a0f3n9/dsh-attachment'
-import type { SessionEvent, SessionHeader, SessionId } from '@x1a0f3n9/dsh-session'
+} from '@deepseek-ai/dsh-attachment'
+import type { SessionEvent, SessionHeader, SessionId } from '@deepseek-ai/dsh-session'
 import type { SessionProjectionsValue } from '../src/types.ts'
 import {
   SessionPersistenceNotFoundError,
@@ -22,15 +22,16 @@ import {
   type SessionPersistenceOpenOptions,
   type SessionPersistenceSnapshot,
   type SessionPersistenceStatOptions,
-} from '@x1a0f3n9/dsh-session-persistence'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import SessionQueryEngine from '@x1a0f3n9/dsh-session-query'
+} from '@deepseek-ai/dsh-session-persistence'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import SessionQueryEngine from '@deepseek-ai/dsh-session-query'
 import { vi } from 'vitest'
 import {
   RemoteError,
   remoteErrorOf,
   type RemoteResult,
-} from '@x1a0f3n9/dsh-typert-protocol'
+} from '@deepseek-ai/dsh-typert-protocol'
+import RemoteAccessService from '@deepseek-ai/dsh-api-remote-access'
 import SessionController from '../src/index.ts'
 import type {
   ModelCatalog,
@@ -246,6 +247,7 @@ function installControllers(
     ctx.provide('typert', {
       lookups: { configure: () => dispose },
       contexts: { configureHost: () => dispose },
+      resources: { register: () => dispose },
     } as never)
   }
   if (ctx.get('agentDefaultModel') === undefined) {
@@ -292,6 +294,7 @@ function installControllers(
     } as never)
   }
   installSessionReadTestServices(ctx)
+  if (ctx.get('remoteAccess') === undefined) new RemoteAccessService(ctx)
   const cwd = vi.spyOn(process, 'cwd').mockReturnValue(defaults.cwd)
   let controller: SessionController
   try {

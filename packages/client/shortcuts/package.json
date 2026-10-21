@@ -1,7 +1,7 @@
 {
-  "name": "@x1a0f3n9/dsh-client-shortcuts",
+  "name": "@deepseek-ai/dsh-client-shortcuts",
   "description": "Application keyboard command registry and physical-key routing",
-  "version": "0.1.7-rc.4",
+  "version": "0.2.1-rc.2",
   "publishConfig": {
     "access": "public"
   },
@@ -27,12 +27,13 @@
     "./protocol": {
       "types": "./lib/types/protocol.d.ts",
       "default": "./lib/protocol.js"
-    }
+    },
+    "./locale/*.json": "./locale/*.json"
   },
   "dsh": {
     "client": {
       "inject": [
-        "@x1a0f3n9/dsh-client-locale"
+        "@deepseek-ai/dsh-client-locale"
       ],
       "platform": "web"
     }
@@ -47,22 +48,23 @@
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:~",
-    "@x1a0f3n9/dsh-client-locale": "workspace:*",
-    "@x1a0f3n9/dsh-client-store": "workspace:*",
-    "@x1a0f3n9/dsh-client-ui-primitives": "workspace:*",
-    "@x1a0f3n9/dsh-brand": "workspace:*",
-    "@x1a0f3n9/dsh-client-test-runtime": "workspace:*",
-    "@x1a0f3n9/dsh-host-webserver": "workspace:*"
+    "@deepseek-ai/dsh-client-locale": "workspace:*",
+    "@deepseek-ai/dsh-client-store": "workspace:*",
+    "@deepseek-ai/dsh-client-ui-primitives": "workspace:*",
+    "@deepseek-ai/dsh-brand": "workspace:*",
+    "@deepseek-ai/dsh-client-test-runtime": "workspace:*",
+    "@deepseek-ai/dsh-host-webserver": "workspace:*"
   },
   "files": [
+    "locale/*.json",
     "lib/index.js",
     "lib/client.js",
     "lib/protocol.js",
     "lib/types/**/*.d.ts"
   ],
   "dependencies": {
-    "@x1a0f3n9/dsh-util-crypto": "workspace:*",
-    "@x1a0f3n9/dsh-util-values": "workspace:*",
+    "@deepseek-ai/dsh-util-crypto": "workspace:*",
+    "@deepseek-ai/dsh-util-values": "workspace:*",
     "@deepseek-ai/schemastery": "workspace:~"
   }
 }

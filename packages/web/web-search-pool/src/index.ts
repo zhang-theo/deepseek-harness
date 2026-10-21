@@ -4,13 +4,13 @@
  * live in this provider; leaf Exa/Perplexity/`free` packages stay independently
  * pin-able.
  *
- * @module @x1a0f3n9/dsh-web-search-pool
+ * @module @deepseek-ai/dsh-web-search-pool
  */
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { launchEnvironmentOf } from '@x1a0f3n9/dsh-launch-environment'
-import type {} from '@x1a0f3n9/dsh-web'
+import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
+import type {} from '@deepseek-ai/dsh-web'
 import { SEARCH_POOL_DEFAULT_CIRCUIT, SearchPoolProvider } from './provider.ts'
 import { splitKeys } from './keys.ts'
 import type {

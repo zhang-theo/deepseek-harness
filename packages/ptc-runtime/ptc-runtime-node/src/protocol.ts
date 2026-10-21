@@ -1,7 +1,7 @@
 /**
  * JSON message vocabulary carried by the bounded process channel. The host validates every
  * message because model code can write directly to the inherited descriptor.
- * @module @x1a0f3n9/dsh-ptc-runtime-node/src/protocol
+ * @module @deepseek-ai/dsh-ptc-runtime-node/src/protocol
  */
 
 import type { PtcJsonWire } from './json-wire.ts'

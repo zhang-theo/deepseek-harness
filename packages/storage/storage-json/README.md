@@ -3,7 +3,7 @@ description: "JSON storage backend for hosts and maintainers choosing, configuri
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-storage-json
+# @deepseek-ai/dsh-storage-json
 
 English | [中文](README.zh.md)
 
@@ -36,11 +36,11 @@ Choose the default `single` layout for small units that benefit from one complet
 The only plugin field is `root`, which holds the unit files and directories. It is required because the backend does not fall back to `process.cwd()`. The backend creates the root with mode `0o700` on demand. A domain specification selects its layout; this plugin has no layout override.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-storage'
-- name: '@x1a0f3n9/dsh-storage-json'
+- name: '@deepseek-ai/dsh-storage'
+- name: '@deepseek-ai/dsh-storage-json'
   config:
     root: /var/lib/dsh/data
-- name: '@x1a0f3n9/dsh-storage-domain'
+- name: '@deepseek-ai/dsh-storage-domain'
   config:
     backend: json
 ```
@@ -96,7 +96,6 @@ A `per-record` table document at `<root>/<unit>/<table>/<key>.json` has the form
 | [`src/per-record-unit.ts`](src/per-record-unit.ts) | One `per-record` unit: tree reads, path-safe records, and one-document writes |
 | [`src/format.ts`](src/format.ts) | Whole-unit and record serialization with version validation |
 | [`src/atomic.ts`](src/atomic.ts) | Atomic file replacement: temp write, fsync, rename, directory fsync |
-| — | No runtime invariant companion is published; correctness here is write-durability and publish-then-reparse equivalence, which require medium round-trip tests (the shared backend conformance suite); the backend exposes no continuously observable in-process relation. |
 
 </details>
 

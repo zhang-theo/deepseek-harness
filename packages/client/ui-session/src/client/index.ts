@@ -9,12 +9,13 @@ import type {
   SessionSnapshot,
   SessionSummary,
   UseProjection,
-} from '@x1a0f3n9/dsh-api-session-controller/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type {} from '@x1a0f3n9/dsh-api-remotes/client'
-import { notifySubscribers } from '@x1a0f3n9/dsh-client-store'
-import { WeakMapWithValues } from '@x1a0f3n9/dsh-util-values'
-import { standardHookPropName } from '@x1a0f3n9/dsh-client-ui-slots'
+} from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type { RemoteEndpoint } from '@deepseek-ai/dsh-api-remote-access/client'
+import { notifySubscribers } from '@deepseek-ai/dsh-client-store'
+import { WeakMapWithValues } from '@deepseek-ai/dsh-util-values'
+import { standardHookPropName } from '@deepseek-ai/dsh-client-ui-slots'
 import type {
   HostObservable,
   KeyedStandardSource,
@@ -24,9 +25,9 @@ import type {
   SlotScopeAdapter,
   SnapshotSelectorHook,
   StandardSourceBinding,
-} from '@x1a0f3n9/dsh-client-ui-slots'
+} from '@deepseek-ai/dsh-client-ui-slots'
 // Type-only service merge for ctx.slots.
-import type {} from '@x1a0f3n9/dsh-client-ui-renderer/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { renderSessionArea } from './session-provider.tsx'
 
 /** Selector hook over the Session Controller list and current selection. */
@@ -148,7 +149,7 @@ class PendingInteractionDomain<T extends SessionPendingInteractionBase> {
   }
 }
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotScopeTargetMap {
     session: SessionReference
   }
@@ -158,6 +159,8 @@ declare module '@x1a0f3n9/dsh-client-ui-slots' {
     useSessions: UseSessions
     useSessionStatus: UseSessionStatus
     useSessionRetainInfo: UseSessionRetainInfo
+    /** Whether the current Peer may call `action` on one Session resource. */
+    useSessionAccess: (sessionId: SessionId, action: RemoteEndpoint) => boolean
   }
 
   interface SessionStandardProps {
@@ -167,6 +170,8 @@ declare module '@x1a0f3n9/dsh-client-ui-slots' {
     sessionId: SessionId
     /** Host-computed projection values addressed by projection key. */
     useProjection: UseProjection
+    /** Whether the current Peer may call `action` on this Session resource. */
+    useAccess: (action: RemoteEndpoint) => boolean
   }
 
   interface SessionMaybeStandardProps {
@@ -176,10 +181,12 @@ declare module '@x1a0f3n9/dsh-client-ui-slots' {
     sessionId: SessionId | undefined
     /** Host-computed projection values; every key is absent without a Session. */
     useProjection: UseProjection
+    /** The bound Session's access answer; `undefined` without a Session, which callers treat as not allowed. */
+    useAccess: (action: RemoteEndpoint) => boolean | undefined
   }
 }
 
-declare module '@x1a0f3n9/dsh-api-session-controller/client' {
+declare module '@deepseek-ai/dsh-api-session-controller/client' {
   interface SessionReferenceSourceMap {
     mainView: unknown
   }
@@ -660,8 +667,8 @@ function claimStandardProp(kind: StandardMemberKind, name: string, finalProps: S
   finalProps.add(propName)
 }
 
-/** Required Controller and renderer services. */
-export const inject = ['sessions', 'slots', 'remote']
+/** Required Controller, renderer, Remote, and access services. */
+export const inject = ['sessions', 'slots', 'remote', 'remoteAccess']
 
 /**
  * Install the Session root source and scoped adapter.
@@ -676,9 +683,18 @@ export function apply(ctx: Context): void {
     },
     keyedHooks: {
       sessionRetainInfo: key => ctx.sessions.retainInfo(key as SessionId),
+      sessionAccess: (sessionId, action) => action === undefined
+        ? undefined
+        : ctx.remoteAccess.source('session', sessionId, action),
     },
   } satisfies RootStandardSourceContribution)
   ctx.slots.installScope('session', service.adapter)
+  service.provide({
+    keyedHooks: ['access'],
+    resolve: binding => ({
+      keyedHooks: { access: action => ctx.remoteAccess.source('session', binding.sessionId, action) },
+    }),
+  })
 }
 
 function sameSessionStatus(left: SessionStatusSnapshot, right: SessionStatusSnapshot): boolean {

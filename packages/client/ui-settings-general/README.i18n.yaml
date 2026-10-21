@@ -11,19 +11,19 @@
 /x1a0f3n9-dsh-client-ui-settings-general/summary:
   en: cd94b4a8dae32670
   zh: 333b8603e77f92d7
-/x1a0f3n9-dsh-client-ui-settings-general/table-of-contents:
-  en: aeb9c4bfdb19bc56
-  zh: 45a29bea90cff239
-/x1a0f3n9-dsh-client-ui-settings-general/use-this-package:
-  en: da896a9cf06fe5a5
-  zh: 27545af457695988
-/x1a0f3n9-dsh-client-ui-settings-general/use-this-package/the-general-section:
+/deepseek-ai-dsh-client-ui-settings-general/table-of-contents:
+  en: 2843d46e95311bce
+  zh: ec11bdeb5d3ce818
+/deepseek-ai-dsh-client-ui-settings-general/use-this-package:
+  en: 2bc21e57fe17eab9
+  zh: e441cd313f747b22
+/deepseek-ai-dsh-client-ui-settings-general/use-this-package/the-general-section:
   en: 8b8a7c6287bb303b
   zh: 19535112531aedd5
-/x1a0f3n9-dsh-client-ui-settings-general/use-this-package/opening-the-configuration-file:
-  en: ca2b4f5ccfbe2705
-  zh: bd1dc1d9879d0f0e
-/x1a0f3n9-dsh-client-ui-settings-general/use-this-package/onboarding-steps:
+/deepseek-ai-dsh-client-ui-settings-general/use-this-package/opening-the-configuration-file:
+  en: 597df68b5913e8d7
+  zh: bc9114f3e877679a
+/deepseek-ai-dsh-client-ui-settings-general/use-this-package/onboarding-steps:
   en: 27f0f6ec55f00228
   zh: 69b47ff1efd81c17
 /x1a0f3n9-dsh-client-ui-settings-general/understand-the-implementation:
@@ -35,10 +35,13 @@
 /x1a0f3n9-dsh-client-ui-settings-general/understand-the-implementation/connection-recovery:
   en: e37fb7df883ea356
   zh: c972524e56c6d6c2
-/x1a0f3n9-dsh-client-ui-settings-general/understand-the-implementation/document-availability:
-  en: 474168eef3339de0
-  zh: 254ea21415082dae
-/x1a0f3n9-dsh-client-ui-settings-general/understand-the-implementation/host-half:
+/deepseek-ai-dsh-client-ui-settings-general/understand-the-implementation/host-release-changes:
+  en: d464f726b026c39a
+  zh: c949e5f4d65a639f
+/deepseek-ai-dsh-client-ui-settings-general/understand-the-implementation/document-availability:
+  en: ff1aec9eb1a87a79
+  zh: eb91ab8bef59742d
+/deepseek-ai-dsh-client-ui-settings-general/understand-the-implementation/host-half:
   en: 5d722d055516f905
   zh: e7a236f0ff84f7ff
 /x1a0f3n9-dsh-client-ui-settings-general/further-exploration:
@@ -53,6 +56,6 @@
 /x1a0f3n9-dsh-client-ui-settings-general/known-limitations-and-deferred-work:
   en: 97dd637a320ac334
   zh: faa5c512c56a128e
-/x1a0f3n9-dsh-client-ui-settings-general/known-limitations-and-deferred-work/dev-note:
-  en: b36039e49a66b8e0
-  zh: 306682cd90cce1db
+/deepseek-ai-dsh-client-ui-settings-general/known-limitations-and-deferred-work/dev-note:
+  en: e67f633dc6fe7773
+  zh: 3bb0c20c93f16f98

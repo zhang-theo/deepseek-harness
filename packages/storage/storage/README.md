@@ -3,7 +3,7 @@ description: "Storage hub (ctx.storage) for compositions and maintainers choosin
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-storage
+# @deepseek-ai/dsh-storage
 
 English | [中文](README.zh.md)
 
@@ -34,11 +34,11 @@ Mount the hub whenever any package in the composition persists data that is not 
 ### A minimal composition
 
 ```yaml
-- name: '@x1a0f3n9/dsh-storage'
-- name: '@x1a0f3n9/dsh-storage-json'
+- name: '@deepseek-ai/dsh-storage'
+- name: '@deepseek-ai/dsh-storage-json'
   config:
     root: /var/lib/dsh/data
-- name: '@x1a0f3n9/dsh-storage-domain'
+- name: '@deepseek-ai/dsh-storage-domain'
   config:
     backend: json
 ```
@@ -86,7 +86,6 @@ The hub is a pure registration table with two faces, designed so backends and da
 | [`src/registry.ts`](src/registry.ts) | `BackendRegistry`: name → backend table, registration disposers |
 | [`src/backend.ts`](src/backend.ts) | The backend contract: facets, units, `UNIT_NAME_RE` |
 | [`src/error.ts`](src/error.ts) | `StorageError` codes shared by the hub and every backend |
-| — | No runtime invariant companion is published; the hub is a pure registration table (names → backends, forms → facilities) whose consistency is fully enforced at the call sites (duplicate/missing entries fail loud synchronously); it owns no event stream or mutable medium to cross-check. |
 | [`tests/contract.ts`](tests/contract.ts) | The shared conformance suite run against each backend |
 
 </details>

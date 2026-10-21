@@ -11,9 +11,10 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
 import Include from '@deepseek-ai/cordis-plugin-include'
-import SessionStore, { SessionId } from '@x1a0f3n9/dsh-session'
-import LocalSubprocessRuntime from '@x1a0f3n9/dsh-subprocess-local'
-import * as WorkspaceChangesPlugin from '@x1a0f3n9/dsh-workspace-changes'
+import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
+import LocalSubprocessRuntime from '@deepseek-ai/dsh-subprocess-local'
+import LocalFileSystem from '@deepseek-ai/dsh-fs-local'
+import * as WorkspaceChangesPlugin from '@deepseek-ai/dsh-workspace-changes'
 import { changes, endTurn, git, startTurn, toolCall } from './support.ts'
 
 let root: string | undefined
@@ -31,9 +32,10 @@ describe('real Loader composition', () => {
     root = await mkdtemp(join(tmpdir(), 'dsh-workspace-changes-loader-'))
     const cwd = join(root, 'ws')
     await writeFile(join(root, 'cordis.yml'), [
-      "- name: '@x1a0f3n9/dsh-session'",
-      "- name: '@x1a0f3n9/dsh-subprocess-local'",
-      "- name: '@x1a0f3n9/dsh-workspace-changes'",
+      "- name: '@deepseek-ai/dsh-session'",
+      "- name: '@deepseek-ai/dsh-subprocess-local'",
+      "- name: '@deepseek-ai/dsh-fs-local'",
+      "- name: '@deepseek-ai/dsh-workspace-changes'",
       '',
     ].join('\n'))
     context = new Context()
@@ -41,9 +43,10 @@ describe('real Loader composition', () => {
     await context.plugin(Loader)
     context.loader.builtins.include = Include
     const modules = new Map<string, unknown>([
-      ['@x1a0f3n9/dsh-session', SessionStore],
-      ['@x1a0f3n9/dsh-subprocess-local', LocalSubprocessRuntime],
-      ['@x1a0f3n9/dsh-workspace-changes', WorkspaceChangesPlugin],
+      ['@deepseek-ai/dsh-session', SessionStore],
+      ['@deepseek-ai/dsh-subprocess-local', LocalSubprocessRuntime],
+      ['@deepseek-ai/dsh-fs-local', LocalFileSystem],
+      ['@deepseek-ai/dsh-workspace-changes', WorkspaceChangesPlugin],
     ])
     context.loader.internal = {
       version: 'v2',

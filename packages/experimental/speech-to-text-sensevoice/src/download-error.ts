@@ -1,6 +1,6 @@
 /** Download failures retain their cause locally and expose only safe, structured diagnostics to clients. */
-import type { SpeechDownloadFailure } from '@x1a0f3n9/dsh-experimental-speech-to-text/types'
-import { TimeoutReason } from '@x1a0f3n9/dsh-timeout'
+import type { SpeechDownloadFailure } from '@deepseek-ai/dsh-experimental-speech-to-text/types'
+import { TimeoutReason } from '@deepseek-ai/dsh-timeout'
 
 type FailureKind = Pick<SpeechDownloadFailure, 'reason' | 'code'>
 

@@ -3,7 +3,7 @@ description: "The anonymous public HTTP(S) fetch backend for ctx.web: how deploy
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-web-fetch-http
+# @deepseek-ai/dsh-web-fetch-http
 
 English | [中文](README.zh.md)
 
@@ -36,8 +36,8 @@ Choose this backend when a deployment must fetch public pages with bounded outpu
 Load the web service and the provider; configurable limits have safe defaults and validate at plugin construction, so an invalid value fails loudly instead of building a provider with nonsensical caps. The URL security limit is fixed at 2,048 characters.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-web'
-- name: '@x1a0f3n9/dsh-web-fetch-http'
+- name: '@deepseek-ai/dsh-web'
+- name: '@deepseek-ai/dsh-web-fetch-http'
 ```
 
 | Field | Default | Meaning |
@@ -92,7 +92,6 @@ The package is built on one separation and one layered timeout:
 | [`src/provider.ts`](src/provider.ts) | The `HttpFetchProvider`: pinned transport, redirect following, capped reads, charset decoding |
 | [`src/network.ts`](src/network.ts) | Public-address resolution, DNS64 discovery, and connection pinning |
 | [`src/policy.ts`](src/policy.ts) | URL validation, same-origin checks, content-type classification, charset parsing |
-| — | No runtime invariant companion is published; this package exposes no independent event sequence or mutable data relation beyond contracts enforced at its owning seam. |
 
 ### Read path
 

@@ -3,7 +3,7 @@ description: "Run Cua Driver computer-use tools from its native npm SDK, with du
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-experimental-computer-use-cua-driver-native
+# @deepseek-ai/dsh-experimental-computer-use-cua-driver-native
 
 English | [中文](README.zh.md)
 
@@ -30,8 +30,8 @@ Mount the provider in a composition that already supplies the tool registry and 
 ### Minimal configuration
 
 ```yaml
-- name: '@x1a0f3n9/dsh-computer-use'
-- name: '@x1a0f3n9/dsh-experimental-computer-use-cua-driver-native'
+- name: '@deepseek-ai/dsh-computer-use'
+- name: '@deepseek-ai/dsh-experimental-computer-use-cua-driver-native'
 ```
 
 The provider has no configuration fields. It loads the exact Cua Driver npm version declared in [package.json](package.json) and uses its same-process defaults. Native import, runtime initialization, malformed catalog, duplicate tool name, or occupied computer-use registration failures reject activation and roll back owned resources. The registered provider name is `cua-driver-native`.
@@ -63,7 +63,6 @@ The provider reserves the shared computer-use registration before loading native
 | File | Role |
 |---|---|
 | [src/index.ts](src/index.ts) | Native runtime ownership, catalog validation, tool registration, and provider guidance |
-| — | No runtime invariant companion is published; resource ownership has no independently observed state to compare. |
 
 Tool definitions reuse the existing MCP result adapter. Cua Driver's JSON catalog determines the schemas; its raw result supplies canonical text, structured output, and image bytes. The computer-use service carries only the provider name and exclusive registration.
 

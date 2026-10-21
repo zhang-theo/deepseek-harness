@@ -12,7 +12,7 @@ host 与 client 属于独立 TypeScript project；把两者放进同一个 `ts.P
 
 ## Decision
 
-[`dsh-typert-generator`](../../../../packages/typert/generator/README.zh.md) 分别从 host 和 client project 建立 `ts.Program`，只把 compiler node、symbol 和 checker 当作提取工具。分析结束后，所有生成器和扫描器只消费 Typert 自有的 `WorkspaceModel`、`FaceModel` 与 `TypeGraph`，模型中不保留 AST 或 checker 对象。生成器不依赖 `@x1a0f3n9/dsh-typert-registry`。
+[`dsh-typert-generator`](../../../../packages/typert/generator/README.zh.md) 分别从 host 和 client project 建立 `ts.Program`，只把 compiler node、symbol 和 checker 当作提取工具。分析结束后，所有生成器和扫描器只消费 Typert 自有的 `WorkspaceModel`、`FaceModel` 与 `TypeGraph`，模型中不保留 AST 或 checker 对象。生成器不依赖 `@deepseek-ai/dsh-typert-registry`。
 
 TypeGraph 保存开发者写下的计算前类型结构，包括泛型参数与应用、显式继承、conditional、mapped、递归引用和 JSDoc。无法无损表示的可达类型使分析失败；某个 emitter 无法处理已经建模的节点时由该 emitter 失败，而不是把类型展平或降级为 `unknown`。
 
@@ -51,3 +51,5 @@ Zod emitter 对支持的节点和各类 literal 逐类执行成功与失败 pars
 新增生成目标或静态检查可复用同一 TypeGraph，业务类目也可在 PackageModel 上扩展，而无需再次解析 AST。保留计算前类型和独立 face 的代价是模型比打平后的 schema 更复杂，emitter 必须显式声明支持范围并对缺失能力失败。
 
 包级显式 opt-in 使产物发布与 exports 由各包自行管理。仓库编排仍可为每个已 opt-in 的包运行全仓 Host 约定 pass；该 pass 仍由后续 Remote Gateway Agent Note 负责说明。静态 Cordis catalog 可从标准模型复现，同时不把 `tool-cordis` 与运行时注册表状态耦合。`ctx.typert` 只反映当前运行时中已挂载的产物；对于消费方物化后仍持有的 Zod 实例，卸载流程无法控制。
+
+普通 Host 与 Remote 产物复用此模型，为每个端点生成一份静态方法 spec。每个参数都有从同一 checker 解析后类型模型派生的普通 `codec` 和 `strictCodec` 变体；分析过程与模型均不携带逐方法输入策略。纯 factory 返回惰性 info 实例，其直接方法索引与描述符列表共享对象；既有 Registry 保留这些描述符，而 `TYPERT_REMOTE.methods` 提供精确静态类型。[统一 Typert/Remote 元数据 note](../../proposed/architecture/2026-09-20-unified-typert-remote-metadata.zh.md)记录该交付机制及尚未完成的下游适配。声明与编译面隔离规则保持不变；独立 Program 和进程不共享对象身份。

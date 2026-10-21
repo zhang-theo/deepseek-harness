@@ -1,5 +1,5 @@
 /** File-extension preview registrations; component dispatch belongs to the keyed document slot. */
-import { notifySubscribers } from '@x1a0f3n9/dsh-client-store'
+import { notifySubscribers } from '@deepseek-ai/dsh-client-store'
 import { documentFileName, matchedSuffixLength, normalizeSuffix } from './suffix.ts'
 
 /** Shared text or byte reads, or content loading owned by the renderer. */

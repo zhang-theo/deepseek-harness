@@ -2,7 +2,7 @@
  * The context-pressure projection's O(1) surface-token fold.
  *
  * Its checkpoint keeps scalar totals rather than the retained surface used
- * by context breakdown. Replacements ride the compact
+ * by measurement. Replacements ride the compact
  * seam's shadow-price protocol: the metering event immediately before a
  * surface `replace` (`compaction/summary` or `compaction/prune`) states the
  * heuristic price of the exact replaced range, so the fold keeps a running
@@ -12,13 +12,13 @@
  * armed claim folds with zero delta because bounded state cannot reconstruct
  * the replaced range; this preserves replay at the cost of possible drift.
  *
- * @module @x1a0f3n9/dsh-token-meter/surface-projection
+ * @module @deepseek-ai/dsh-token-meter/surface-projection
  */
 
-import { deriveEventMessage, isSurfaceEvent, SessionSeq } from '@x1a0f3n9/dsh-session'
-import type { SessionEvent } from '@x1a0f3n9/dsh-session'
+import { deriveEventMessage, isSurfaceEvent, SessionSeq } from '@deepseek-ai/dsh-session'
+import type { SessionEvent } from '@deepseek-ai/dsh-session'
 // Type-only: the `compaction/*` SessionEventMap merges (shadow-price events).
-import type {} from '@x1a0f3n9/dsh-compaction'
+import type {} from '@deepseek-ai/dsh-compaction'
 import { estimateMessage } from './estimate.ts'
 
 /**

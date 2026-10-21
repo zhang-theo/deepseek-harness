@@ -3,7 +3,7 @@ description: "面向部署方与维护者的默认 POSIX Bash 执行器说明，
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-bash-local
+# @deepseek-ai/dsh-bash-local
 
 [English](README.md) | 中文
 
@@ -33,7 +33,7 @@ kind: "package-reference"
 
 ```yaml
 - id: bash
-  name: '@x1a0f3n9/dsh-bash-local'
+  name: '@deepseek-ai/dsh-bash-local'
   config:
     cwd: /path/to/workspace
     timeoutMs: 120000
@@ -88,7 +88,6 @@ if (result.timedOut) console.log('timed out after', result.timeoutMs)
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：`LocalBashExecutor`、`Config`、设置段接线 |
-| — | 不发布运行时不变式伴生入口；除由所属 seam 强制执行的约定外，本包不公开独立的事件序列或可变数据关系。 |
 | `tests/executor.spec.ts` | 已演练的行为：预算、分类、后台句柄、归属 |
 | `tests/settings.spec.ts` | 设置段叠加在组合条目之上 |
 

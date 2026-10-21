@@ -6,7 +6,7 @@
  * browser half-entry's re-export) for client aggregates — with zero content
  * duplication.
  *
- * @module @x1a0f3n9/dsh-permission-presets/types
+ * @module @deepseek-ai/dsh-permission-presets/types
  */
 
 /** Presentation for an available preset or the derived `custom` current value. */
@@ -49,7 +49,7 @@ declare module '@deepseek-ai/cordis' {
   }
 }
 
-declare module '@x1a0f3n9/dsh-session-projection/types' {
+declare module '@deepseek-ai/dsh-session-projection/types' {
   interface SessionProjectionMap {
     /**
      * The session's current permission, folded from the three whole-value

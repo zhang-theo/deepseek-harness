@@ -1,13 +1,13 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
-import { stubConfigForm } from '@x1a0f3n9/dsh-client-test-runtime'
+import { stubConfigForm } from '@deepseek-ai/dsh-client-test-runtime'
 import type { ChatSettings } from '../src/chat-settings.ts'
 import { PerformanceUsagePolicy } from '../src/client/performance-usage.ts'
 
 describe('PerformanceUsagePolicy', () => {
-  it('keeps explicit choices live when a memory-only scope cannot persist them', () => {
+  it('keeps an explicit choice live while the Host write is pending or refused', () => {
     const host = stubConfigForm<ChatSettings>()
-    host.publish({ mode: 'memory', status: 'ready' })
+    host.publish({ status: 'ready' })
     const policy = new PerformanceUsagePolicy(host.scope)
     expect(policy.mode.getSnapshot()).toBe('detailed')
     policy.setMode('compact')

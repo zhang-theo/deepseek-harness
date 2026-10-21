@@ -2,17 +2,18 @@
    the PowerShell counterpart shares the session registry, polling loop, and reset contract by design. */
 /**
  * Model-facing persistent `pwsh` tool over the owner-scoped PTY seam.
- * @module @x1a0f3n9/dsh-tool-pwsh-persistent
+ * @module @deepseek-ai/dsh-tool-pwsh-persistent
  */
 
+import type {} from '@deepseek-ai/dsh-working-directory'
 import { randomUUID } from 'node:crypto'
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import { truncateWithoutSplittingSurrogatePair } from '@x1a0f3n9/dsh-output-retention'
-import type { TerminalReadResult, TerminalSessionId } from '@x1a0f3n9/dsh-terminal'
-import { deadline, timeoutOf } from '@x1a0f3n9/dsh-timeout'
-import { defineTool } from '@x1a0f3n9/dsh-tools'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import { truncateWithoutSplittingSurrogatePair } from '@deepseek-ai/dsh-output-retention'
+import type { TerminalReadResult, TerminalSessionId } from '@deepseek-ai/dsh-terminal'
+import { deadline, timeoutOf } from '@deepseek-ai/dsh-timeout'
+import { defineTool } from '@deepseek-ai/dsh-tools'
 
 // TODO: Replace the file-search advice; arbitrary command output need not come from a searchable file.
 const TRUNCATED_MESSAGE = '<response clipped><NOTE>To save on context only part of this file has been shown to you. You should retry this tool after you have searched inside the file with Select-String in order to find the line numbers of what you are looking for.</NOTE>'
@@ -109,7 +110,8 @@ function commandOutput(
 ): CapturedOutput | undefined {
   const text = snapshot.text
   const end = text.lastIndexOf(marker.end)
-  const status = /^(\d+)\r?\n/.exec(text.slice(end + marker.end.length))?.[1]
+  // Terminal padding belongs to the status line, not to captured command output.
+  const status = /^(\d+) *\r?\n/.exec(text.slice(end + marker.end.length))?.[1]
   if (status === undefined) return undefined
   const startMarker = text.lastIndexOf(marker.start, end)
   const start = startMarker < 0 ? 0 : startMarker + marker.start.length
@@ -275,10 +277,10 @@ function persistentShells(ctx: Context, config: ResolvedConfig): PersistentShell
     const combinedSignal = AbortSignal.any([signal, lifecycle.signal])
     const creation = (async () => {
       try {
-        const cwd = owner.session.header.cwd
+        const cwd = await ctx.workingDirectory.ensure(owner, combinedSignal)
         const spawned = await ctx.terminals.spawn(owner, {
           type: config.backendType,
-          ...cwd === undefined ? {} : { cwd },
+          cwd,
         }, combinedSignal)
         live.set(owner, spawned.sessionId)
         if (!ownerCleanupInstalled.has(owner)) {
@@ -450,7 +452,7 @@ function registerPersistentPwsh(ctx: Context, config: ResolvedConfig): void {
 }
 
 export const name = 'tool-pwsh-persistent'
-export const inject = ['tools', 'terminals']
+export const inject = ['tools', 'terminals', 'workingDirectory']
 
 /** Configuration for the persistent pwsh tool. */
 export interface Config {

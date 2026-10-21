@@ -1,7 +1,7 @@
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { installProxyFromEnvironment } from '@x1a0f3n9/dsh-http-proxy'
+import { installProxyFromEnvironment } from '@deepseek-ai/dsh-http-proxy'
 
 let seen: string[] = []
 let proxy: Server
@@ -33,7 +33,7 @@ async function observe(run: () => Promise<unknown>): Promise<string[]> {
 }
 import { vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import LlmRuntime from '@x1a0f3n9/dsh-llm'
+import LlmRuntime from '@deepseek-ai/dsh-llm'
 import * as LlmPiAi from '../src/index.ts'
 import { discoverModels } from '../src/discovery.ts'
 
@@ -46,7 +46,7 @@ async function streamOnce(): Promise<void> {
     await ctx.plugin(LlmPiAi, {
       providers: { deepseek: { apiKeyEnv: 'PI_TEST_KEY', baseURL: 'http://pi-stream-probe.invalid' } },
     })
-    for await (const _chunk of ctx.llm.stream({ provider: 'deepseek', model: 'deepseek-v4-flash', messages: [] })) {
+    for await (const _chunk of ctx.llm.stream({ provider: 'deepseek', model: 'deepseek-flash', messages: [] })) {
       // The endpoint never answers; the proxy record is the assertion.
     }
   } finally {

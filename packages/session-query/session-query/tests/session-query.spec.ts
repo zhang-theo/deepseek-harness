@@ -1,32 +1,32 @@
-import { createUserMessage, createMessage } from '@x1a0f3n9/dsh-llm'
-import type { ContextFormed, MessageSource } from '@x1a0f3n9/dsh-llm'
+import { createUserMessage, createMessage } from '@deepseek-ai/dsh-llm'
+import type { ContextFormed, MessageSource } from '@deepseek-ai/dsh-llm'
 import { describe, expect, it, vi } from 'vitest'
 import { Context, type Fiber } from '@deepseek-ai/cordis'
-import SessionStore, { SessionLogOffset, SessionSeq, SESSION_FORMAT_VERSION, SessionId } from '@x1a0f3n9/dsh-session'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import type { SessionEvent, SessionHeader, SessionId as SessionIdType } from '@x1a0f3n9/dsh-session'
+import SessionStore, { SessionLogOffset, SessionSeq, SESSION_FORMAT_VERSION, SessionId } from '@deepseek-ai/dsh-session'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import type { SessionEvent, SessionHeader, SessionId as SessionIdType } from '@deepseek-ai/dsh-session'
 import SessionPersistence, {
   SessionPersistenceCorruptionError,
   SessionPersistenceNotFoundError,
   SessionPersistenceRevision,
   SessionReadOnlyError,
-} from '@x1a0f3n9/dsh-session-persistence'
+} from '@deepseek-ai/dsh-session-persistence'
 import type {
   SessionAccess,
   SessionHandle,
   SessionHandleReadOptions,
   SessionHandleReadResult,
   SessionPersistenceSnapshot,
-} from '@x1a0f3n9/dsh-session-persistence'
+} from '@deepseek-ai/dsh-session-persistence'
 import SessionQueryEngine, {
   SESSION_QUERY_DEFAULT_PERSISTED_INSPECT_CONCURRENCY,
   type SessionEventSurface,
   type SessionQueryErrorCode,
-} from '@x1a0f3n9/dsh-session-query'
-import { SessionTitleProviderId, SessionTitleService } from '@x1a0f3n9/dsh-session-title'
+} from '@deepseek-ai/dsh-session-query'
+import { SessionTitleProviderId, SessionTitleService } from '@deepseek-ai/dsh-session-title'
 import { TestSessionQueryEngine } from './test-service.ts'
 
-declare module '@x1a0f3n9/dsh-llm' {
+declare module '@deepseek-ai/dsh-llm' {
   interface MessageSourceMap {
     'test': { kind: 'test' } & ContextFormed
   }
@@ -565,7 +565,7 @@ describe('session-query exact reads', () => {
     await expect(ctx.sessionQuery.readTitle(shared.id)).resolves.toMatchObject({
       title: 'Live title', eventSeq: 0,
     })
-    expect(Object.keys((await ctx.sessionQuery.listSessions())[0]!)).toEqual(['header', 'live', 'persisted'])
+    expect(Object.keys((await ctx.sessionQuery.listSessions())[0]!)).toEqual(['header', 'live', 'persisted', 'formatStatus'])
   })
 
   it('batches unique persisted title observations through one cancellable corpus scan', async () => {
@@ -918,6 +918,45 @@ describe('session-query exact reads', () => {
     expect(older.header.createdAt).toBe(1)
   })
 
+  it('preserves listed format status with live precedence without opening stored logs', async () => {
+    const historical = header('format-historical', 1)
+    const current = header('format-current', 2)
+    const unknown = header('format-unknown', 3)
+    const shared = header('format-shared', 4)
+    TestPersistence.reset()
+    const ctx = await liveContext()
+    ctx.sessions.create(shared.id, { meta: { createdAt: shared.createdAt } })
+    const liveOnly = ctx.sessions.create(SessionId('format-live'), { meta: { createdAt: 5 } })
+    await ctx.plugin(TestPersistence)
+    const list = vi.spyOn(ctx.sessionPersistence, 'list').mockResolvedValue([
+      { header: historical, revision: SessionPersistenceRevision('historical'), formatStatus: 'migration-required' },
+      { header: current, revision: SessionPersistenceRevision('current'), formatStatus: 'current' },
+      { header: unknown, revision: SessionPersistenceRevision('unknown') },
+      { header: shared, revision: SessionPersistenceRevision('shared'), formatStatus: 'migration-required' },
+    ])
+    const stat = vi.spyOn(ctx.sessionPersistence, 'stat')
+    const open = vi.spyOn(ctx.sessionPersistence, 'open')
+    try {
+      const records = await ctx.sessionQuery.listSessions()
+      const byId = new Map(records.map(record => [record.header.id, record]))
+      expect(byId.get(historical.id)).toMatchObject({ live: false, persisted: true, formatStatus: 'migration-required' })
+      expect(byId.get(current.id)).toMatchObject({ live: false, persisted: true, formatStatus: 'current' })
+      expect(byId.get(unknown.id)).toMatchObject({ live: false, persisted: true })
+      expect(byId.get(unknown.id)).not.toHaveProperty('formatStatus')
+      expect(byId.get(shared.id)).toMatchObject({ live: true, persisted: true, formatStatus: 'current' })
+      expect(byId.get(liveOnly.id)).toMatchObject({ live: true, persisted: false, formatStatus: 'current' })
+      expect(list).toHaveBeenCalledTimes(1)
+      expect(stat).not.toHaveBeenCalled()
+      expect(open).not.toHaveBeenCalled()
+      expect(TestPersistence.readCalls).toEqual([])
+    } finally {
+      list.mockRestore()
+      stat.mockRestore()
+      open.mockRestore()
+      await ctx.fiber.dispose()
+    }
+  })
+
   it('filters sessions symmetrically and owns mutable filter values immediately', async () => {
     const durable = header('durable-filter', 1)
     TestPersistence.reset([{ meta: durable, events: eventLog('durable') }])
@@ -1140,7 +1179,7 @@ describe('session-query exact reads', () => {
     await expect(ctx.sessionQuery.listSessions()).rejects.toThrow(expectCode('SESSION_QUERY_SOURCE_CONFLICT'))
     await persistence.dispose()
     await expect(ctx.sessionQuery.listSessions()).resolves.toEqual([
-      { header: shared, live: true, persisted: false },
+      { header: shared, live: true, persisted: false, formatStatus: 'current' },
     ])
   })
 

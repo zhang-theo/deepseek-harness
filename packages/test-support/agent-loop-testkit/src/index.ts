@@ -2,23 +2,26 @@
  * Shared service mounting, real AgentLoop drivers, and structural Inbox stubs
  * for agent-loop tests. Callers retain ownership of their contexts, adapters,
  * optional plugins, agents, and teardown.
- * @module @x1a0f3n9/dsh-agent-loop-testkit
+ * @module @deepseek-ai/dsh-agent-loop-testkit
  */
 
 import type { Context } from '@deepseek-ai/cordis'
-import AgentRegistry from '@x1a0f3n9/dsh-agent'
-import type { Agent, AgentOptions, Inbox, InboxTarget } from '@x1a0f3n9/dsh-agent'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
-import LlmRuntime from '@x1a0f3n9/dsh-llm'
-import SessionStore from '@x1a0f3n9/dsh-session'
-import type { SessionHeader, SessionId, UserMessage } from '@x1a0f3n9/dsh-session'
-import SessionProjectionRegistry from '@x1a0f3n9/dsh-session-projection'
-import SystemPrompt from '@x1a0f3n9/dsh-system-prompt'
-import type { Config as SystemPromptConfig } from '@x1a0f3n9/dsh-system-prompt'
-import ToolRuntime from '@x1a0f3n9/dsh-tools'
-import type { Config as ToolRuntimeConfig } from '@x1a0f3n9/dsh-tools'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import type { Agent, AgentOptions, Inbox, InboxTarget } from '@deepseek-ai/dsh-agent'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
+import LlmRuntime from '@deepseek-ai/dsh-llm'
+import SessionStore from '@deepseek-ai/dsh-session'
+import type { SessionHeader, SessionId, UserMessage } from '@deepseek-ai/dsh-session'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
+import type { Config as SystemPromptConfig } from '@deepseek-ai/dsh-system-prompt'
+import ToolRuntime from '@deepseek-ai/dsh-tools'
+import type { Config as ToolRuntimeConfig } from '@deepseek-ai/dsh-tools'
+import FsLocal from '@deepseek-ai/dsh-fs-local'
+import WorkingDirectory from '@deepseek-ai/dsh-working-directory'
 
 export { createInboxStub, unsupportedInbox } from './inbox.ts'
+export { provideWorkingDirectoryFixture } from './working-directory-fixture.ts'
 
 interface DriverInbox extends Inbox {
   claim(target: InboxTarget, turn: number): UserMessage[]
@@ -46,6 +49,8 @@ export interface AgentLoopTestHarness {
 
 /** Configuration forwarded to the prerequisite service plugins. */
 export interface AgentLoopTestDependenciesOptions {
+  /** Mount the real directory owner and a local filesystem for directory-aware tests. */
+  readonly workingDirectory?: boolean
   /** Configuration for the system-prompt registry. */
   readonly systemPrompt?: SystemPromptConfig
   /** Configuration for the tool registry. */
@@ -72,6 +77,10 @@ export async function mountAgentLoopTestDependencies(
   await ctx.plugin(SessionStore)
   await ctx.plugin(SessionProjectionRegistry)
   await ctx.plugin(SystemPrompt, options.systemPrompt ?? {})
+  if (options.workingDirectory) {
+    if (ctx.get('fs') === undefined) await ctx.plugin(FsLocal)
+    await ctx.plugin(WorkingDirectory)
+  }
   await ctx.plugin(ToolRuntime, options.tools ?? {})
   await ctx.plugin(AgentRegistry)
 }

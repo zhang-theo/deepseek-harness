@@ -2,17 +2,17 @@ import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import clsx from 'clsx'
 import {
-  IconChevronDownOutlineRegular, Menu, PermissionIconFullAccessRegular,
+  IconChevronDownOutlineRegular, Menu, PermissionIconAutoReviewRegular, PermissionIconFullAccessRegular,
   PermissionIconReadOnlyRegular, PermissionIconWorkspaceWriteRegular, RiskConfirmation,
-} from '@x1a0f3n9/dsh-client-ui-primitives'
-import type { MenuEntry } from '@x1a0f3n9/dsh-client-ui-primitives'
+} from '@deepseek-ai/dsh-client-ui-primitives'
+import type { MenuEntry } from '@deepseek-ai/dsh-client-ui-primitives'
 import type {
   HostObservable, InjectFace, PropsLocale, PropsRuntime,
-} from '@x1a0f3n9/dsh-client-ui-slots'
-import type { PresetOption } from '@x1a0f3n9/dsh-permission-presets/client'
+} from '@deepseek-ai/dsh-client-ui-slots'
+import type { PresetOption } from '@deepseek-ai/dsh-permission-presets/client'
 // Type-only: pulls the conversation-owned permission slot declaration and
 // the standard session projection hook into this package's Client face.
-import type {} from '@x1a0f3n9/dsh-client-ui-conversation/client'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type { PermissionCatalogState } from './catalog.ts'
 import { PERMISSION_ACCESS_NS } from './locales.ts'
 import {
@@ -29,6 +29,7 @@ const permissionGlyphs = new Map<string, ReactNode>([
   ['read-only', <PermissionIconReadOnlyRegular />],
   ['workspace-write', <PermissionIconWorkspaceWriteRegular />],
   [FULL_ACCESS, <PermissionIconFullAccessRegular />],
+  [AUTO_REVIEW, <PermissionIconAutoReviewRegular />],
 ])
 
 /** Glyph for a permission option value; host-configured names outside the design set get none. */
@@ -112,7 +113,7 @@ export function PermissionSelect({
         : (
           <span className={css.optionLabel} aria-label={`${label} ${badge}`}>
             <span className={css.optionLabelText}>{label}</span>
-            <sup className={css.badge}>{badge}</sup>
+            <span className={css.badge}>{badge}</span>
           </span>
         ),
       ...icon === undefined ? {} : { icon },
@@ -159,8 +160,6 @@ export function PermissionSelect({
   const confirmationEnable = confirmation === AUTO_REVIEW
     ? t('auto.confirm.enable')
     : t('confirm.enable')
-  const currentBadge = optionBadge(currentValue, t)
-  const currentAccessibleLabel = currentBadge === undefined ? currentLabel : `${currentLabel} ${currentBadge}`
 
   return (
     <>
@@ -176,7 +175,7 @@ export function PermissionSelect({
           <button
             type="button"
             className={css.trigger}
-            aria-label={t('mode', { name: currentAccessibleLabel })}
+            aria-label={t('mode', { name: currentLabel })}
             title={current === undefined ? undefined : optionDescription(current, t)}
             disabled={locked || busy}
             onClick={() => { setOpen(!open) }}
@@ -185,9 +184,6 @@ export function PermissionSelect({
               <span className={css.triggerIcon} aria-hidden>{permissionGlyph(currentValue)}</span>
             )}
             <span className={css.triggerLabel}>{currentLabel}</span>
-            {currentBadge !== undefined && (
-              <sup className={css.badge}>{currentBadge}</sup>
-            )}
             <span className={clsx(css.chevron, open && css.chevronOpen)} aria-hidden>
               <IconChevronDownOutlineRegular />
             </span>

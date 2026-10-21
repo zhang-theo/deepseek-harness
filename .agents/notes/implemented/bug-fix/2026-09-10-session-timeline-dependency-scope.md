@@ -10,7 +10,7 @@ English | [中文](2026-09-10-session-timeline-dependency-scope.zh.md)
 
 ## Decision
 
-`@x1a0f3n9/dsh-session-timeline` is an external plugin at [LunFengChen/dsh-session-timeline](https://github.com/LunFengChen/dsh-session-timeline). It is not a workspace package, so it is not in `clientFaceExclude` and Host dependency flattening does not apply. Do not add those five exports to the global Host allowlists.
+`@deepseek-ai/dsh-session-timeline` is an external plugin at [LunFengChen/dsh-session-timeline](https://github.com/LunFengChen/dsh-session-timeline). It is not a workspace package, so it is not in `clientFaceExclude` and Host dependency flattening does not apply. Do not add those five exports to the global Host allowlists.
 
 ## Verification
 

@@ -4,16 +4,16 @@
  * and snippets onto the seam vocabulary and omits `content` because neither
  * engine returns a generated answer.
  *
- * @module @x1a0f3n9/dsh-web-search-free/provider
+ * @module @deepseek-ai/dsh-web-search-free/provider
  */
 
-import { WebError } from '@x1a0f3n9/dsh-web'
+import { WebError } from '@deepseek-ai/dsh-web'
 import type {
   WebSearchProvider,
   WebSearchRequest,
   WebSearchResult,
   WebSearchSource,
-} from '@x1a0f3n9/dsh-web'
+} from '@deepseek-ai/dsh-web'
 import { parseBingHtml, parseDdgHtml } from './html.ts'
 
 /** Stable id this provider registers under. */

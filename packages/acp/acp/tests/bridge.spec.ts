@@ -4,12 +4,12 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { AttachmentError } from '@x1a0f3n9/dsh-attachment'
-import { ToolCallId, type StreamChunk } from '@x1a0f3n9/dsh-llm'
-import { SESSION_FORMAT_VERSION, SessionId } from '@x1a0f3n9/dsh-session'
-import type { SessionHeader } from '@x1a0f3n9/dsh-session'
-import { SessionPersistenceRevision, type SessionPersistenceSnapshot } from '@x1a0f3n9/dsh-session-persistence'
-import { defineContentToolFixture } from '@x1a0f3n9/dsh-tools'
+import { AttachmentError } from '@deepseek-ai/dsh-attachment'
+import { ToolCallId, type StreamChunk } from '@deepseek-ai/dsh-llm'
+import { SESSION_FORMAT_VERSION, SessionId } from '@deepseek-ai/dsh-session'
+import type { SessionHeader } from '@deepseek-ai/dsh-session'
+import { SessionPersistenceRevision, type SessionPersistenceSnapshot } from '@deepseek-ai/dsh-session-persistence'
+import { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
 import { makeBridgeHarness, textResponse, type BridgeHarness } from './harness.ts'
 import { startHttpMcpFixture } from '../../../mcp/mcp-client/tests/http-fixture.ts'
 
@@ -938,13 +938,13 @@ describe('automation-only ACP bridge', () => {
   })
 
   it('renders the deployment persona for an ACP-created agent', async () => {
-    harness = await makeBridgeHarness({ persona: 'Automation persona for {{model}} in {{cwd}}.', script: [textResponse('ok')] })
+    harness = await makeBridgeHarness({ persona: 'Automation persona for {{model}}.', script: [textResponse('ok')] })
     await harness.client.initialize({ protocolVersion: PROTOCOL_VERSION, clientCapabilities: {} })
     const { sessionId } = await harness.client.newSession({ cwd: process.cwd(), mcpServers: [] })
     await harness.client.prompt({ sessionId, prompt: [{ type: 'text', text: 'go' }] })
     const head = harness.adapter.requests[0]?.messages[0]
     expect(head?.role).toBe('system')
-    expect(head?.content).toContainEqual({ type: 'text', text: expect.stringContaining(`Automation persona for mock in ${process.cwd()}.`) as unknown })
+    expect(head?.content.some(part => part.type === 'text' && part.text.includes('Automation persona for mock.'))).toBe(true)
   })
 
   it('requires one absolute primary workspace', async () => {

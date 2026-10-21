@@ -3,7 +3,7 @@ description: "The keyless Bing/DuckDuckGo search provider for ctx.web: how deplo
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-web-search-free
+# @deepseek-ai/dsh-web-search-free
 
 English | [中文](README.zh.md)
 
@@ -36,8 +36,8 @@ Choose this backend when search must work without a vendor API key, including Gr
 Load the web service and the provider; bases and the user agent have public defaults, and no environment key is read.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-web'
-- name: '@x1a0f3n9/dsh-web-search-free'
+- name: '@deepseek-ai/dsh-web'
+- name: '@deepseek-ai/dsh-web-search-free'
 ```
 
 | Field | Default | Meaning |

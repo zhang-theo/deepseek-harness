@@ -2,7 +2,7 @@
 
 English | [中文](goal.zh.md)
 
-Types shared by the event-sourced goal service and its policy consumers. The [goal-domain Agent Note](../../.agents/notes/implemented/feature/2026-07-19-persisted-same-session-goal-domain.md) owns the persistence and activation decisions; this page records the exact fields and variants from [`packages/goal/goal/src/types.ts`](../../packages/goal/goal/src/types.ts).
+Types shared by the event-sourced goal service and its policy consumers. The [goal-domain reference](../../packages/goal/goal/README.md) owns the persistence and activation decisions; this page records the exact fields and variants from [`packages/goal/goal/src/types.ts`](../../packages/goal/goal/src/types.ts).
 
 ## Identity and lifecycle
 
@@ -293,18 +293,18 @@ Source: [`packages/goal/goal/src/types.ts`](../../packages/goal/goal/src/types.t
 
 #### `goal/changed` — emit
 
-Goal mutation accepted by one live agent. The matching `goal/change` session event has already committed. Listener failures are contained. Scope-filtered dispatch (`@x1a0f3n9/dsh-scope`): agent-scoped listeners receive only that agent.
+Goal mutation accepted by one live agent. The matching `goal/change` session event has already committed. Listener failures are contained. Scope-filtered dispatch (`@deepseek-ai/dsh-scope`): agent-scoped listeners receive only that agent.
 
 ```ts cordis-catalog
 /**
  * Goal mutation accepted by one live agent. The matching `goal/change`
  * session event has already committed. Listener failures are contained.
- * Scope-filtered dispatch (`@x1a0f3n9/dsh-scope`): agent-scoped listeners receive only that agent.
+ * Scope-filtered dispatch (`@deepseek-ai/dsh-scope`): agent-scoped listeners receive only that agent.
  * @param payload.agent - agent whose session owns the goal.
  * @param payload.change - fresh current projection or clear tombstone.
  * @mode emit
  */
-'goal/changed'(this: import('@x1a0f3n9/dsh-scope').Scoped<Agent>, payload: { agent: Agent; change: GoalChanged }): void
+'goal/changed'(this: import('@deepseek-ai/dsh-scope').Scoped<Agent>, payload: { agent: Agent; change: GoalChanged }): void
 ```
 
 Types: [Agent](core.md) · [Scoped](scope.md)

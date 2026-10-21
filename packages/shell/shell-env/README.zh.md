@@ -3,7 +3,7 @@ description: "受管 DSH_* shell 环境，供选择、配置或扩展每次模�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-shell-env
+# @deepseek-ai/dsh-shell-env
 
 [English](README.md) | 中文
 
@@ -37,7 +37,7 @@ kind: "package-reference"
 
 ```ts
 import type { Context } from '@deepseek-ai/cordis'
-import type {} from '@x1a0f3n9/dsh-shell-env'
+import type {} from '@deepseek-ai/dsh-shell-env'
 
 export const inject = ['shellEnv']
 
@@ -87,7 +87,6 @@ contributor 必须声明它返回的每个键；返回未声明或非字符串�
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口、`ShellEnvRegistry` 服务与内置事实 |
-| — | 不发布运行时不变式伴生入口；环境注册表会在每次注册和收集时校验所有权与收集值，也不发布可供伴生入口交叉检查的独立快照。 |
 
 ### 收集
 

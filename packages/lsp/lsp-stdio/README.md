@@ -3,7 +3,7 @@ description: "The stdio language-server provider for ctx.lsp: configured server 
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-lsp-stdio
+# @deepseek-ai/dsh-lsp-stdio
 
 English | [中文](README.zh.md)
 
@@ -32,10 +32,10 @@ Mount this provider when a deployment has local language servers — for example
 The `servers` record maps each stable provider id to one server command. The provider resolves every executable at load after credential scrubbing, so a bad entry prevents every provider from registering; processes launch lazily on the first matching query.
 
 ```yaml
-- name: '@x1a0f3n9/dsh-fs-local'
-- name: '@x1a0f3n9/dsh-subprocess-local'
-- name: '@x1a0f3n9/dsh-lsp'
-- name: '@x1a0f3n9/dsh-lsp-stdio'
+- name: '@deepseek-ai/dsh-fs-local'
+- name: '@deepseek-ai/dsh-subprocess-local'
+- name: '@deepseek-ai/dsh-lsp'
+- name: '@deepseek-ai/dsh-lsp-stdio'
   config:
     servers:
       typescript:
@@ -43,7 +43,7 @@ The `servers` record maps each stable provider id to one server command. The pro
         args: ['--stdio']
         extensionToLanguage:
           '.ts': typescript
-- name: '@x1a0f3n9/dsh-tool-lsp'
+- name: '@deepseek-ai/dsh-tool-lsp'
 ```
 
 | Field | Default | Meaning |
@@ -106,7 +106,6 @@ This section explains the design decisions behind the provider and where the cod
 | [`src/protocol.ts`](src/protocol.ts) | Wire-type subset: capabilities, locations, hover, text-document synchronization |
 | [`src/translate.ts`](src/translate.ts) | Capability checks, UTF-16 negotiation, `Location`/`LocationLink`/hover normalization |
 | [`src/abort.ts`](src/abort.ts) | Cancellation helpers fusing caller and disposal signals |
-| — | No runtime invariant companion is published; process pools and per-workspace queues are private implementation state, and this provider publishes no independent lifecycle event stream or enumerable snapshot. |
 
 ### Protocol behavior
 

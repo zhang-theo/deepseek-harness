@@ -23,10 +23,10 @@
 /x1a0f3n9-dsh-session-title/use-this-package/minimal-configuration:
   en: f72239b38a91783b
   zh: 07e22375c09906a6
-/x1a0f3n9-dsh-session-title/use-this-package/adding-a-provider:
-  en: 2e1e7b56a1f26478
-  zh: 750800b2d9e73595
-/x1a0f3n9-dsh-session-title/use-this-package/reading-titles:
+/deepseek-ai-dsh-session-title/use-this-package/adding-a-provider:
+  en: cda41e431e48f914
+  zh: c6347ef731b0036e
+/deepseek-ai-dsh-session-title/use-this-package/reading-titles:
   en: 34148c23c20ee6f4
   zh: b0d10677722f3f63
 /x1a0f3n9-dsh-session-title/use-this-package/failures-and-recovery:
@@ -47,10 +47,10 @@
 /x1a0f3n9-dsh-session-title/understand-the-implementation/normalization:
   en: 0fa22531683cc824
   zh: c6379873eb809e76
-/x1a0f3n9-dsh-session-title/further-exploration:
-  en: 8b405b3bb2abf7cd
-  zh: 71e8a58bfae99a36
-/x1a0f3n9-dsh-session-title/model-experience:
+/deepseek-ai-dsh-session-title/further-exploration:
+  en: 80d2f64367af8bda
+  zh: cfdd94b628fc4d8d
+/deepseek-ai-dsh-session-title/model-experience:
   en: 215e7ba838619b7b
   zh: a311da3843709f90
 /x1a0f3n9-dsh-session-title/model-experience/session-title-state:

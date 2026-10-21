@@ -10,7 +10,7 @@ import {
   createUserMessage,
   freezeMessage,
   MessageId,
-} from '@x1a0f3n9/dsh-llm'
+} from '@deepseek-ai/dsh-llm'
 
 describe('message construction', () => {
   it('detaches and freezes developer tool names without copying their definitions', () => {

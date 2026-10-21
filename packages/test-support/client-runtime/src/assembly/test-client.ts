@@ -2,22 +2,33 @@
  * Whole-client test carrier: boots an {@link AssemblyPlan} through the
  * production `bootClient` over an in-process module table, with a
  * `RemoteMock` bound to that client's Connection plugin instance.
- * @module @x1a0f3n9/dsh-client-test-runtime/src/assembly/test-client
+ * @module @deepseek-ai/dsh-client-test-runtime/src/assembly/test-client
  */
 import { Context, type Plugin } from '@deepseek-ai/cordis'
 import type { Entry } from '@deepseek-ai/cordis-plugin-loader'
-import { tearDownEntryFiber } from '@x1a0f3n9/dsh-client-modules/client'
+import { tearDownEntryFiber } from '@deepseek-ai/dsh-client-modules/client'
 import {
   installConnection,
   type ConnectionHandle,
-} from '@x1a0f3n9/dsh-client-connection/client'
-import { bootClient } from '@x1a0f3n9/dsh-client-web/src/boot-client.ts'
-import { mountClient } from '@x1a0f3n9/dsh-client-web/src/mount.ts'
-import type { RemoteMock } from '@x1a0f3n9/dsh-remote-mock'
+} from '@deepseek-ai/dsh-client-connection/client'
+import { bootClient } from '@deepseek-ai/dsh-client-web/src/boot-client.ts'
+import { mountClient } from '@deepseek-ai/dsh-client-web/src/mount.ts'
+import type { RemoteMock } from '@deepseek-ai/dsh-remote-mock'
 import { act } from '@testing-library/react'
 import { createInProcessModules, loadPluginModules } from './modules.ts'
 import { assertPlan, graphFromRoster, type AssemblyPlan } from './roster.ts'
 import { REMOTES_PACKAGE, remoteNamespacesOf, remoteProxiesPlugin } from './remote-proxies.ts'
+import { allowAllAccessPlugin } from '../access.ts'
+
+/** The remote-access row: it mounts its own generated Remote contribution and publishes the access Hooks. */
+const REMOTE_ACCESS_PACKAGE = '@deepseek-ai/dsh-api-remote-access'
+
+/**
+ * Rows whose generated Remote contributions exist only in built `lib/`. The
+ * tier drops them: `remote.<ns>` proxies stand in for the namespaces and
+ * allow-all access Hooks stand in for remote-access.
+ */
+const GENERATED_REMOTE_PACKAGES: readonly string[] = [REMOTES_PACKAGE, REMOTE_ACCESS_PACKAGE]
 
 /** Carrier options. */
 export interface TestClientOptions {
@@ -60,7 +71,7 @@ class SharedJsdomShims {
 
 const sharedJsdomShims = new SharedJsdomShims()
 
-const CONNECTION_PACKAGE = '@x1a0f3n9/dsh-client-connection'
+const CONNECTION_PACKAGE = '@deepseek-ai/dsh-client-connection'
 
 /** Default readiness budget; the mock answers `$events` immediately, so a miss means a boot-time fixture is absent. */
 const DEFAULT_CONNECT_TIMEOUT_MS = 5_000
@@ -177,12 +188,14 @@ export class TestClient {
    * `installConnection`, while this path supplies the mock carrier, uses
    * default recovery timings, and captures the current page hostname once for
    * later reloads. A caller-provided Connection row remains unchanged and owns
-   * its readiness behavior. The `@x1a0f3n9/dsh-api-remotes` row is
+   * its readiness behavior. The `@deepseek-ai/dsh-api-remotes` row is
    * dropped from the roster: its generated Remote clients exist only in built
    * `lib/`, and the `remote.<ns>` services the roster injects (plus the
    * namespaces the mock has rules for at this point) are provided as
-   * contract-free proxies over the same Connection instead; a `provide` entry
-   * for that row is refused. On any failure the context is disposed, an owned
+   * contract-free proxies over the same Connection instead. The
+   * `@deepseek-ai/dsh-api-remote-access` row, which mounts its own generated
+   * contribution, is dropped too, and allow-all access Hooks replace it. A
+   * `provide` entry for either row is refused. On any failure the context is disposed, an owned
    * mount removed, and this client's hold on the shims released before the
    * original error is rethrown.
    * @param plan - roster and annotations.
@@ -196,12 +209,13 @@ export class TestClient {
     options: TestClientOptions = {},
   ): Promise<TestClient> {
     assertPlan(plan)
-    if (plan.provide?.[REMOTES_PACKAGE] !== undefined) {
-      throw new Error(`client-test-runtime: ${REMOTES_PACKAGE} cannot be provided; its remote.<ns> services are the tier's proxies`)
+    for (const name of GENERATED_REMOTE_PACKAGES) {
+      if (plan.provide?.[name] !== undefined) {
+        throw new Error(`client-test-runtime: ${name} cannot be provided; the tier replaces its generated Remote mount`)
+      }
     }
-    const roster = plan.roster.rows.some(row => row.name === REMOTES_PACKAGE)
-      ? plan.roster.without([REMOTES_PACKAGE])
-      : plan.roster
+    const generated = GENERATED_REMOTE_PACKAGES.filter(name => plan.roster.rows.some(row => row.name === name))
+    const roster = generated.length > 0 ? plan.roster.without(generated) : plan.roster
     const ctx = new Context()
     const pageLocation = typeof location === 'undefined'
       ? undefined
@@ -220,6 +234,7 @@ export class TestClient {
           ...connection,
           apply: (connectionCtx) => {
             installConnection(connectionCtx, {
+              interactions: 'answer',
               transport: { rpc: mock.rpc },
               ...(pageLocation === undefined ? {} : { location: pageLocation }),
             })
@@ -230,6 +245,8 @@ export class TestClient {
       release = sharedJsdomShims.acquire()
       const system = createInProcessModules(graphFromRoster(roster.rows), modules)
       ctx.plugin(remoteProxiesPlugin(remoteNamespacesOf(modules.values(), mock), mock) as Plugin)
+      // The dropped remote-access row's Hooks: every action is allowed on every resource.
+      if (generated.includes(REMOTE_ACCESS_PACKAGE)) ctx.plugin(allowAllAccessPlugin)
       await bootClient({ ctx, modules: system, manifest: system.manifest })
       if (mountPoint.element !== undefined) {
         if (ctx.get('uiRenderer') === undefined) {

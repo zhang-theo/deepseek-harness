@@ -11,10 +11,10 @@ describe('release dist-tag', () => {
   })
 
   it('builds npm dist-tag add argv', () => {
-    expect(distTagAddArgs('@x1a0f3n9/dsh', '0.1.5-rc.4', 'latest')).toEqual([
+    expect(distTagAddArgs('@deepseek-ai/dsh', '0.1.5-rc.4', 'latest')).toEqual([
       'dist-tag',
       'add',
-      '@x1a0f3n9/dsh@0.1.5-rc.4',
+      '@deepseek-ai/dsh@0.1.5-rc.4',
       'latest',
     ])
   })

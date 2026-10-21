@@ -2,12 +2,12 @@
  * Keyless Bing/DuckDuckGo `WebSearchProvider` plugin. It contributes to the
  * `ctx.web` registry without owning the service.
  *
- * @module @x1a0f3n9/dsh-web-search-free
+ * @module @deepseek-ai/dsh-web-search-free
  */
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import type {} from '@x1a0f3n9/dsh-web'
+import type {} from '@deepseek-ai/dsh-web'
 import {
   FreeSearchProvider,
   FREE_DEFAULT_BING_BASE_URL,

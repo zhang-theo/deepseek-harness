@@ -10,7 +10,7 @@ Status: implemented
 
 ## Decision
 
-`@x1a0f3n9/dsh-session-timeline` 是外部插件，仓库是 [LunFengChen/dsh-session-timeline](https://github.com/LunFengChen/dsh-session-timeline)。它不是工作区包，因此不在 `clientFaceExclude` 里，也不会做 Host 依赖扁平化。不要把这五个导出加进全局 Host allowlist。
+`@deepseek-ai/dsh-session-timeline` 是外部插件，仓库是 [LunFengChen/dsh-session-timeline](https://github.com/LunFengChen/dsh-session-timeline)。它不是工作区包，因此不在 `clientFaceExclude` 里，也不会做 Host 依赖扁平化。不要把这五个导出加进全局 Host allowlist。
 
 ## Verification
 

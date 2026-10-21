@@ -1,10 +1,10 @@
 /** Authorized source identity and cancellation survive Host rendering. */
 import { Context } from '@deepseek-ai/cordis'
-import { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { WorkspaceFiles } from '@x1a0f3n9/dsh-api-workspace-files'
-import type { FileSystem, FsInfo, FsTarget } from '@x1a0f3n9/dsh-fs'
+import { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { WorkspaceFiles } from '@deepseek-ai/dsh-api-workspace-files'
+import type { FileSystem, FsInfo, FsTarget } from '@deepseek-ai/dsh-fs'
 import { OfficeToPdfError, OfficeToPdfKey, type OfficeToPdfResult } from '../src/index.ts'
-import { RemoteError } from '@x1a0f3n9/dsh-typert-protocol'
+import { RemoteError } from '@deepseek-ai/dsh-typert-protocol'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import OfficeToPdf from '../src/index.ts'
 

@@ -5,18 +5,18 @@
 
 import { afterEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import AgentLoop from '@x1a0f3n9/dsh-agent-loop'
-import type { Agent } from '@x1a0f3n9/dsh-agent'
-import BasicCompactionEngine from '@x1a0f3n9/dsh-compaction-basic'
-import TokenMeter from '@x1a0f3n9/dsh-token-meter'
-import { ImageVariantId } from '@x1a0f3n9/dsh-attachment'
-import { resolveAdapterOptions } from '@x1a0f3n9/dsh-llm-deepseek'
-import { inlineImages } from '@x1a0f3n9/dsh-llm-deepseek/src/images.ts'
-import { mountAgentLoopTestDependencies } from '@x1a0f3n9/dsh-agent-loop-testkit'
-import { createAssistantMessage, createToolResultMessage, createUserMessage, projectOffloadedImages, offloadedImageText, IMAGE_OFFLOAD_REQUIRED_CODE, LlmAdapter, LlmError, ToolCallId } from '@x1a0f3n9/dsh-llm'
-import type { ContentBlock, GenerateOptions, StreamChunk } from '@x1a0f3n9/dsh-llm'
-import { isReplacementSurfaceEvent, SessionId } from '@x1a0f3n9/dsh-session'
-import type { Session } from '@x1a0f3n9/dsh-session'
+import AgentLoop from '@deepseek-ai/dsh-agent-loop'
+import type { Agent } from '@deepseek-ai/dsh-agent'
+import BasicCompactionEngine from '@deepseek-ai/dsh-compaction-basic'
+import TokenMeter from '@deepseek-ai/dsh-token-meter'
+import { ImageVariantId } from '@deepseek-ai/dsh-attachment'
+import { resolveAdapterOptions } from '@deepseek-ai/dsh-llm-deepseek'
+import { inlineImages } from '@deepseek-ai/dsh-llm-deepseek/src/images.ts'
+import { mountAgentLoopTestDependencies } from '@deepseek-ai/dsh-agent-loop-testkit'
+import { createAssistantMessage, createToolResultMessage, createUserMessage, projectOffloadedImages, offloadedImageText, IMAGE_OFFLOAD_REQUIRED_CODE, LlmAdapter, LlmError, ToolCallId } from '@deepseek-ai/dsh-llm'
+import type { ContentBlock, GenerateOptions, StreamChunk } from '@deepseek-ai/dsh-llm'
+import { isReplacementSurfaceEvent, SessionId } from '@deepseek-ai/dsh-session'
+import type { Session } from '@deepseek-ai/dsh-session'
 import * as offload from '../src/index.ts'
 
 type ScriptEntry = StreamChunk[] | (() => never)
@@ -223,6 +223,48 @@ describe('summary image offload', () => {
 })
 
 describe('compaction-image-offload', () => {
+  it('cancelling at failed-attempt settlement preserves images for later turns', async () => {
+    const adapter = new ScriptedAdapter([offloadRequired(1), textResponse('continued')])
+    const ctx = await harness(adapter)
+    const agent = await ctx.agentLoop.create(SessionId('offload-cancel-before-record'), { provider: 'mock', model: 'mock' })
+    ctx.on('session/event', (session, event) => {
+      if (session === agent.session && event.type === 'assistant/attempt') agent.cancel({ kind: 'user' })
+    })
+    agent.followup(createUserMessage({ content: [image('original')], source: { kind: 'user' } }))
+    await agent.whenIdle()
+    expect(agent.session.snapshotEvents().find(event => event.type === 'turn/end'))
+      .toMatchObject({ data: { reason: { kind: 'aborted' } } })
+    expect(adapter.requests).toHaveLength(1)
+    expect(decisions(agent.session)).toEqual([])
+
+    agent.followup(createUserMessage({ content: [{ type: 'text', text: 'continue' }], source: { kind: 'user' } }))
+    await agent.whenIdle()
+    expect(adapter.requests).toHaveLength(2)
+    expect(offloadedNames(adapter.requests[1]!)).toEqual([])
+    expect(agent.session.deriveMessages().flatMap(message => message.content)).toContainEqual(image('original'))
+  })
+
+  it('cancelling after an image omission stops retry and retains the committed selection', async () => {
+    const adapter = new ScriptedAdapter([offloadRequired(1), textResponse('continued')])
+    const ctx = await harness(adapter)
+    const agent = await ctx.agentLoop.create(SessionId('offload-cancel-after-record'), { provider: 'mock', model: 'mock' })
+    ctx.on('session/event', (session, event) => {
+      if (session === agent.session && event.type === 'image/offload') agent.cancel({ kind: 'user' })
+    })
+    agent.followup(createUserMessage({ content: [image('original')], source: { kind: 'user' } }))
+    await agent.whenIdle()
+    expect(agent.session.snapshotEvents().find(event => event.type === 'turn/end'))
+      .toMatchObject({ data: { reason: { kind: 'aborted' } } })
+    expect(adapter.requests).toHaveLength(1)
+    expect(decisions(agent.session)).toHaveLength(1)
+
+    agent.followup(createUserMessage({ content: [{ type: 'text', text: 'continue' }], source: { kind: 'user' } }))
+    await agent.whenIdle()
+    expect(adapter.requests).toHaveLength(2)
+    expect(offloadedNames(adapter.requests[1]!)).toEqual(['original'])
+    expect(decisions(agent.session)).toHaveLength(1)
+  })
+
   it('logs one exact image selection and retries without replacing the message', async () => {
     const adapter = new ScriptedAdapter([offloadRequired(2), textResponse('sent')])
     const ctx = await harness(adapter)

@@ -1,20 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import type {
   ChatConversationViewNode, ChatSnapshot,
-} from '@x1a0f3n9/dsh-client-ui-chat/client'
+} from '@deepseek-ai/dsh-client-ui-chat/client'
 import type {
   SessionEventLikeEntry, SessionLiveEventEntry,
-} from '@x1a0f3n9/dsh-api-session-controller/client'
+} from '@deepseek-ai/dsh-api-session-controller/client'
 import {
   ConversationNodeAssembler,
   type ConversationNodeDefinition,
   type ConversationViewDefinition,
-} from '@x1a0f3n9/dsh-client-ui-conversation/client'
-import type { SessionEvent } from '@x1a0f3n9/dsh-session/types'
+} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { SessionEvent } from '@deepseek-ai/dsh-session/types'
 import { inspectSystemPrompt } from '../../ui-conversation/src/client/contract/system-prompt.ts'
-import { AssistantStreamAccumulator } from '@x1a0f3n9/dsh-llm/assistant-stream'
-import { LlmAttemptId } from '@x1a0f3n9/dsh-llm/brand'
-import type { StreamChunk } from '@x1a0f3n9/dsh-llm'
+import { AssistantStreamAccumulator } from '@deepseek-ai/dsh-llm/assistant-stream'
+import { LlmAttemptId } from '@deepseek-ai/dsh-llm/brand'
+import type { StreamChunk } from '@deepseek-ai/dsh-llm'
 import { hasAssistantReplyContent } from '../src/client/contract/assistant-content.ts'
 import { assistantDefinition } from '../src/client/conversation-nodes/assistant.ts'
 import { chatViewDefinition } from '../src/client/conversation-nodes/chat-snapshot-builder.ts'
@@ -23,7 +23,7 @@ import { compactionDefinition } from '../src/client/conversation-nodes/compactio
 import { unknownFallbackDefinition } from '../src/client/conversation-nodes/fallback.ts'
 import { nextStepInboxDefinition, nextTurnInboxDefinition } from '../src/client/conversation-nodes/inbox.ts'
 import { developerMessageDefinition, messageDefinition } from '../src/client/conversation-nodes/message.ts'
-import { inspectRequestPrompt } from '@x1a0f3n9/dsh-client-ui-conversation/client'
+import { inspectRequestPrompt } from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { requestPromptDefinition, systemMessageDefinition } from '../src/client/conversation-nodes/request-prompt.ts'
 import { retryDefinition } from '../src/client/conversation-nodes/retry.ts'
 import { toolDefinition } from '../src/client/conversation-nodes/tool.ts'
@@ -659,6 +659,62 @@ describe('built-in conversation node Definitions', () => {
     }
   })
 
+  it('opens exchanges only for human input claimed for Step 1; every other input stays an input', () => {
+    const human = textMessage('block-human', 'first task')
+    const steer = textMessage('block-steer', 'adjust course')
+    const notice = { ...textMessage('block-notice', 'background work finished'), source: { kind: 'schedule' } }
+    const idle = textMessage('block-idle', 'next task')
+    const bottomTurns = (current: ChatSnapshot): number[] => [...new Set(current.order.flatMap((key) => {
+      const location = current.nodes.get(key)?.location
+      return current.nodes.bottomSource(key).getSnapshot() && (location?.kind === 'turn' || location?.kind === 'step')
+        ? [location.turn.turn]
+        : []
+    }))]
+    const inputs = (current: ChatSnapshot) => current.order
+      .map(key => current.nodes.get(key))
+      .filter(candidate => candidate?.kind === 'user' || candidate?.kind === 'steering' || candidate?.kind === 'turn-trigger')
+      .map(candidate => [candidate?.kind, candidate?.groupTree ?? null])
+    const value = assembler([
+      at(1, 'agent/inbox/spliced', { target: 'next-turn', start: 0, inserted: [human] }),
+      at(2, 'turn/start', { turn: 1 }),
+      at(3, 'agent/inbox/spliced', { target: 'next-turn', start: 0, removedCount: 1, inserted: [] }),
+      at(4, 'step/start', { turn: 1, step: 1 }),
+      at(5, 'user/message', human, { surfaceOp: 'append' }),
+      at(6, 'step/end', { turn: 1, step: 1 }),
+      at(7, 'agent/inbox/spliced', { target: 'next-step', start: 0, inserted: [steer] }),
+      at(8, 'agent/inbox/spliced', { target: 'next-step', start: 0, removedCount: 1, inserted: [] }),
+      at(9, 'step/start', { turn: 1, step: 2 }),
+      at(10, 'user/message', steer, { surfaceOp: 'append' }),
+      at(11, 'assistant/message', { turn: 1, step: 2, message: assistantMessage('block-answer-1', 'done') }, { surfaceOp: 'append' }),
+      at(12, 'step/end', { turn: 1, step: 2 }),
+      at(13, 'turn/end', { turn: 1, reason: { kind: 'completed' } }),
+      // The host assembles the system prompt between the waking claim and Step 1.
+      at(14, 'agent/inbox/spliced', { target: 'next-turn', start: 0, inserted: [notice] }),
+      at(15, 'turn/start', { turn: 2 }),
+      at(16, 'agent/inbox/spliced', { target: 'next-turn', start: 0, removedCount: 1, inserted: [] }),
+    ])
+    expect(inputs(snapshot(value))).toEqual([['user', 'exchange'], ['steering', 'input']])
+    expect(bottomTurns(snapshot(value))).toEqual([1, 2])
+
+    value.append(at(17, 'step/start', { turn: 2, step: 1 }))
+    value.append(at(18, 'user/message', notice, { surfaceOp: 'append' }))
+    value.append(at(19, 'assistant/message', { turn: 2, step: 1, message: assistantMessage('block-answer-2', 'noted') }, { surfaceOp: 'append' }))
+    value.append(at(20, 'step/end', { turn: 2, step: 1 }))
+    value.append(at(21, 'turn/end', { turn: 2, reason: { kind: 'completed' } }))
+    value.flush()
+    expect(inputs(snapshot(value))).toEqual([['user', 'exchange'], ['steering', 'input'], ['turn-trigger', 'input']])
+    expect(bottomTurns(snapshot(value))).toEqual([1, 2])
+
+    value.append(at(22, 'agent/inbox/spliced', { target: 'next-step', start: 0, inserted: [idle] }))
+    value.append(at(23, 'turn/start', { turn: 3 }))
+    value.append(at(24, 'agent/inbox/spliced', { target: 'next-step', start: 0, removedCount: 1, inserted: [] }))
+    value.append(at(25, 'step/start', { turn: 3, step: 1 }))
+    value.append(at(26, 'user/message', idle, { surfaceOp: 'append' }))
+    value.flush()
+    expect(inputs(snapshot(value)).at(-1)).toEqual(['steering', 'exchange'])
+    expect(bottomTurns(snapshot(value))).toEqual([3])
+  })
+
   it('replays pending splice chains and scopes steering to the current claim', () => {
     const first = textMessage('claim-first', 'first')
     const second = textMessage('claim-second', 'second')
@@ -1276,7 +1332,7 @@ describe('built-in conversation node Definitions', () => {
       blocks: [
         { kind: 'text', text: '   \tanswer' },
         { kind: 'reasoning', text: 'thinking' },
-        { kind: 'tool-call', callId: 'call-1', name: '', argsRaw: '{"x":1}' },
+        { kind: 'tool-call', callId: 'call-1', name: '', argsRaw: '' },
       ],
     })
     expect(snapshot(packed).legacy.partial).toBeNull()
@@ -1420,6 +1476,7 @@ describe('built-in conversation node Definitions', () => {
         isError: true,
         error: { name: 'AutoReviewDeniedError', code: 'AUTO_REVIEW_DENIED', reason: 'blocked' },
         content: [{ type: 'text', text: 'contents' }],
+        meta: { cwd: '/selected', path: '/selected/README.md' },
       }),
       at(16, 'tool/result', {
         turn: 2,
@@ -1432,6 +1489,7 @@ describe('built-in conversation node Definitions', () => {
       {
         kind: 'tool-result', callId: 'child', parentCallId: 'history-root', call: { name: 'read' },
         error: { name: 'AutoReviewDeniedError', code: 'AUTO_REVIEW_DENIED', reason: 'blocked' },
+        meta: { cwd: '/selected', path: '/selected/README.md' },
       },
     ])
 
@@ -1454,6 +1512,7 @@ describe('built-in conversation node Definitions', () => {
       {
         kind: 'tool-result', callId: 'child', parentCallId: 'history-root', call: { name: 'read' },
         error: { name: 'AutoReviewDeniedError', code: 'AUTO_REVIEW_DENIED', reason: 'blocked' },
+        meta: { cwd: '/selected', path: '/selected/README.md' },
       },
     ])
 
@@ -2796,4 +2855,28 @@ it('retains a sign-out cancellation notice when reopening a partial turn', () =>
   expect(node(snapshot(value), 'turn-error')?.data).toMatchObject({
     code: 'ACCOUNT_SIGNED_OUT', message: 'Stopped because you signed out of DeepSeek.',
   })
+})
+
+it('reports a turn closed after its process exited as a stopped turn', () => {
+  const value = assembler([
+    at(7, 'turn/end', { turn: 1, reason: { kind: 'interrupted' } }),
+  ], true)
+  expect(node(snapshot(value), 'turn-error')?.data).toMatchObject({
+    code: 'INTERRUPTED', message: 'The DSH process exited before this turn finished.',
+  })
+})
+
+it('reports an interrupted ending on a turn observed from its start', () => {
+  const value = assembler([
+    at(1, 'turn/start', { turn: 1 }),
+    at(2, 'turn/end', { turn: 1, reason: { kind: 'interrupted' } }),
+  ])
+  expect(node(snapshot(value), 'turn-error')?.data).toMatchObject({ seq: 2, turn: 1, code: 'INTERRUPTED' })
+})
+
+it('keeps user cancellations and forked endings free of a failure row', () => {
+  for (const reason of [{ kind: 'aborted', reason: { kind: 'user' } }, { kind: 'forked' }] as const) {
+    const value = assembler([at(7, 'turn/end', { turn: 1, reason })], true)
+    expect(node(snapshot(value), 'turn-error')).toBeUndefined()
+  }
 })

@@ -24,7 +24,7 @@ Status: implemented
 
 **按模型或提供方 id 猜策略。** 否决：默认就是省略，自定义就是明确的数字。
 
-**让客户端导入 `@x1a0f3n9/dsh-llm` 来拿适配器默认值。** 否决：source-plane 拆分禁止这样做；卡片复制数字默认值。
+**让客户端导入 `@deepseek-ai/dsh-llm` 来拿适配器默认值。** 否决：source-plane 拆分禁止这样做；卡片复制数字默认值。
 
 ## Consequences
 

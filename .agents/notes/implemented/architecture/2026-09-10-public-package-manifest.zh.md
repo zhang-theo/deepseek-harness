@@ -14,7 +14,7 @@ Status: implemented
 
 运行时要求位于顶层 `engines`：`dsh`、`node` 和 `npm` 均为可选版本字符串，也允许其他 engine 名称。`dsh.manifestVersion` 标识声明格式 `1`。当前安装器和加载器不强制检查格式与 DSH 兼容性声明。
 
-镜像打包器拥有 `configTrees`，工作区目录生成器拥有 Session 迁移声明。这些内部工具仍可读取既有磁盘字段，但公共 manifest 类型不暴露这些字段。此范围细化了[共享声明归属决策](2026-09-05-package-manifest-types.zh.md)，后者的包位置与依赖规则仍然有效。
+镜像打包器拥有 `configTrees`，工作区目录生成器拥有 Session 迁移声明。这些内部工具仍可读取既有磁盘字段，但公共 manifest 类型不暴露这些字段。
 
 各消费方负责 JSON 解析、字段校验、默认值解析和运行时数据适配。接口不会校验已解析的 JSON。只有多个消费方需要相同校验或归一化时，helper 才属于共享包；重复属性访问的 getter 不提供共享策略。
 
@@ -24,7 +24,7 @@ Status: implemented
 
 **将 DSH 兼容性放在 `dsh.engines` 下。** [VS Code](https://code.visualstudio.com/api/references/extension-manifest) 将宿主要求放在顶层 `engines.vscode`。顶层 `engines.dsh` 让作者在同一位置声明运行时要求；自定义键的检查仍由 DSH 负责。
 
-**仅用 peer dependency 声明宿主要求。** Peer dependency 约束已安装的 npm 包，包括 CLI 包 `@x1a0f3n9/dsh`。插件位于独立 profile 项目时，它们无法标识当前运行的 DSH 进程。
+**仅用 peer dependency 声明宿主要求。** Peer dependency 约束已安装的 npm 包，包括 CLI 包 `@deepseek-ai/dsh`。插件位于独立 profile 项目时，它们无法标识当前运行的 DSH 进程。
 
 **通过统一的强制解析器解析所有领域。** 现有读取方消费不同字段子集，并各自拥有错误与默认值。合并它们会让客户端读取方校验无关的 profile 声明。公共类型保持独立于文件系统访问和解析策略。
 

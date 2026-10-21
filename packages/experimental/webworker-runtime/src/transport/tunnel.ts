@@ -13,7 +13,7 @@
  *
  * A boot failure rejects the whole queue with 503 rather than leaving the page
  * waiting.
- * @module @x1a0f3n9/dsh-experimental-webworker-runtime/src/transport/tunnel
+ * @module @deepseek-ai/dsh-experimental-webworker-runtime/src/transport/tunnel
  */
 import {
   parseInboundFrame, type TunnelOutboundFrame, type TunnelRequestFrame, type TunnelRequestId,
@@ -300,6 +300,15 @@ export class TunnelServer {
     const message = describeFailure(reason)
     this.failure = message
     for (const frame of this.queue.splice(0)) this.refuse(frame, message)
+  }
+
+  /**
+   * Ask the page to show one text file in its read-only viewer.
+   * @param path - Absolute VFS path the viewer names.
+   * @param text - File contents.
+   */
+  viewText(path: string, text: string): void {
+    this.send({ t: 'view-text', path, text })
   }
 
   private send(frame: TunnelOutboundFrame, transfer?: Transferable[]): void {

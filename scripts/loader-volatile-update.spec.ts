@@ -10,8 +10,8 @@ import Include from '@deepseek-ai/cordis-plugin-include'
 import Timer from '@deepseek-ai/cordis-plugin-timer'
 import z from '@deepseek-ai/schemastery'
 import { Config } from './volatile-config.fixture.ts'
-import Hmr from '@x1a0f3n9/dsh-hmr'
-import { boot, reconcileProfilePatches } from '@x1a0f3n9/dsh-app-boot'
+import Hmr from '@deepseek-ai/dsh-hmr'
+import { boot, reconcileProfilePatches } from '@deepseek-ai/dsh-app-boot'
 
 function context() {
   const ctx = new Context()

@@ -3,7 +3,7 @@ description: "浏览器操作 提供方 注册服务，供一次启用一个浏�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-browser-use
+# @deepseek-ai/dsh-browser-use
 
 [English](README.md) | 中文
 
@@ -28,10 +28,10 @@ kind: "package-reference"
 在 Cordis 组合中，将服务与所选 提供方 一起挂载一次：
 
 ```yaml
-- name: '@x1a0f3n9/dsh-browser-use'
+- name: '@deepseek-ai/dsh-browser-use'
 ```
 
-服务没有配置。提供方 插件注入 `browserUse` 并调用 `ctx.browserUse.register(BrowserUseProviderName(name))`；品牌类型从 `@x1a0f3n9/dsh-browser-use/brand` 导出。返回的 effect 清理器释放该注册。
+服务没有配置。提供方 插件注入 `browserUse` 并调用 `ctx.browserUse.register(BrowserUseProviderName(name))`；品牌类型从 `@deepseek-ai/dsh-browser-use/brand` 导出。返回的 effect 清理器释放该注册。
 
 提供方 在释放注册前停止接收工具调用、关闭资源并等待自己拥有的工作结束。`ctx.browserUse.providerName` 在释放之前持续报告已注册名称。
 
@@ -44,8 +44,6 @@ kind: "package-reference"
 <summary>实现内部机制 — 点击展开</summary>
 
 一个私有名称拥有该注册位。Cordis effect 在插件卸载时移除贡献；重复调用清理器不能移除后续注册。[源码](src/index.ts) 不包含浏览器对象、操作接口、资源生命周期或 提供方 选择器。
-
-不发布运行时不变量伴随入口：注册表只有一个权威字段，不暴露可能与之偏离的独立维护观测值。所属测试覆盖重复注册拒绝与插件清理。
 
 </details>
 

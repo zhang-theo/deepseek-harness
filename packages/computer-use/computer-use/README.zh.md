@@ -3,7 +3,7 @@ description: "计算机操作提供方注册：供每次启用一个桌面驱动
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-computer-use
+# @deepseek-ai/dsh-computer-use
 
 [English](README.md) | 中文
 
@@ -28,10 +28,10 @@ kind: "package-reference"
 在 Cordis 组合中，将服务与选定的提供方一起挂载一次：
 
 ```yaml
-- name: '@x1a0f3n9/dsh-computer-use'
+- name: '@deepseek-ai/dsh-computer-use'
 ```
 
-服务没有配置项。提供方插件注入 `computerUse` 并调用 `ctx.computerUse.register(ComputerUseProviderName(name))`；该品牌类型从 `@x1a0f3n9/dsh-computer-use/brand` 导出。返回的 effect 清理函数释放此次注册。
+服务没有配置项。提供方插件注入 `computerUse` 并调用 `ctx.computerUse.register(ComputerUseProviderName(name))`；该品牌类型从 `@deepseek-ai/dsh-computer-use/brand` 导出。返回的 effect 清理函数释放此次注册。
 
 提供方先停止接收工具调用、关闭资源并等待自有工作结束，再释放注册。释放前，`ctx.computerUse.providerName` 始终报告已注册的名称。
 
@@ -44,8 +44,6 @@ kind: "package-reference"
 <summary>实现细节 — 点击展开</summary>
 
 一个私有名称占用注册位置。Cordis effect 在插件卸载时移除贡献；重复调用清理函数不会移除后续注册。[源码](src/index.ts)不包含驱动对象、操作接口或提供方选择器。
-
-不发布 `./invariant` 伴随入口：注册表只有一个权威字段，没有可能与之分歧的独立维护观测值。所属测试覆盖重复注册拒绝和插件卸载。
 
 </details>
 

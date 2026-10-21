@@ -3,7 +3,7 @@ description: "工具结果保留：文字和图片共享 token 预算，并通�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-spill-policy
+# @deepseek-ai/dsh-spill-policy
 
 [English](README.md) | 中文
 
@@ -32,8 +32,8 @@ kind: "package-reference"
 挂载 spill 后端，并以估算 token 数设置 `maxInlineTokens`：
 
 ```yaml
-- name: '@x1a0f3n9/dsh-spill-local'
-- name: '@x1a0f3n9/dsh-spill-policy'
+- name: '@deepseek-ai/dsh-spill-local'
+- name: '@deepseek-ai/dsh-spill-policy'
   config:
     maxInlineTokens: 12500
 ```
@@ -98,7 +98,6 @@ PTC 程序收到完整的规范值。含图片的子结果在转发给模型前�
 | [`src/index.ts`](src/index.ts) | 插件入口：`Config` 校验、两个 waterfall 监听器、共享替换辅助函数 |
 | [`src/notice.ts`](src/notice.ts) | 浏览器安全的通知格式化与识别，以 `./notice` 发布 |
 | [`src/retention.ts`](src/retention.ts) | 有序图文首尾保留的纯函数 |
-| — | 不发布运行时不变式伴生入口；除在所属 seam 处强制执行的约定外，本包不公开独立的事件序列或可变数据关系。 |
 
 ### 故障模式
 

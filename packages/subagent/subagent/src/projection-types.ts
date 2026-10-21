@@ -1,10 +1,10 @@
 /**
  * Pure client-safe subagent projection vocabulary.
  *
- * @module @x1a0f3n9/dsh-subagent/projection-types
+ * @module @deepseek-ai/dsh-subagent/projection-types
  */
 
-import type { SessionId, SessionSeq } from '@x1a0f3n9/dsh-session/types'
+import type { SessionId, SessionSeq } from '@deepseek-ai/dsh-session/types'
 
 /** One current direct-child discovery row materialized from parent facts. */
 export type SubagentCatalogEntry =
@@ -14,6 +14,7 @@ export type SubagentCatalogEntry =
   }
   & (
     | { readonly mode: 'one-shot'; readonly label?: string }
+    | { readonly mode: 'external'; readonly label?: string }
     | { readonly mode: 'continuable'; readonly label: string }
     | { readonly mode: 'unknown'; readonly label?: string }
   )
@@ -65,7 +66,7 @@ export type SubagentIdentityProjection =
     seq: SessionSeq
   }
 
-declare module '@x1a0f3n9/dsh-session-projection/types' {
+declare module '@deepseek-ai/dsh-session-projection/types' {
   interface SessionProjectionMap {
     /** Direct children in parent catalog event order, excluding fork-inherited facts. */
     subagentCatalog: SubagentCatalogEntry[]

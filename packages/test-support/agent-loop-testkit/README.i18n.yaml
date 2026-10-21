@@ -14,10 +14,10 @@
 /x1a0f3n9-dsh-agent-loop-testkit/table-of-contents:
   en: d152484eb41ac6b4
   zh: 09388d293f9be9cb
-/x1a0f3n9-dsh-agent-loop-testkit/use-this-package:
-  en: c0e407323250d8a9
-  zh: 0d0d6c7862c3d61e
-/x1a0f3n9-dsh-agent-loop-testkit/use-this-package/drive-a-production-agent:
+/deepseek-ai-dsh-agent-loop-testkit/use-this-package:
+  en: 6286160c69aaf1d2
+  zh: 79571cbf96335b02
+/deepseek-ai-dsh-agent-loop-testkit/use-this-package/drive-a-production-agent:
   en: 55af6e8dcc16bf46
   zh: 9e1a6a7f70fde817
 /x1a0f3n9-dsh-agent-loop-testkit/use-this-package/build-a-structural-agent-stub:
@@ -32,10 +32,10 @@
 /x1a0f3n9-dsh-agent-loop-testkit/understand-the-implementation:
   en: b2297e57abf5258a
   zh: 4595256c059896ce
-/x1a0f3n9-dsh-agent-loop-testkit/understand-the-implementation/design:
-  en: 8fd7577505e2efa7
-  zh: 6bbf46bcf9e3f5bc
-/x1a0f3n9-dsh-agent-loop-testkit/further-exploration:
+/deepseek-ai-dsh-agent-loop-testkit/understand-the-implementation/design:
+  en: 88506ae955e07c17
+  zh: 9d09a35a9286105d
+/deepseek-ai-dsh-agent-loop-testkit/further-exploration:
   en: 60f39b14b0ccbcf6
   zh: f193710189d3cc10
 /x1a0f3n9-dsh-agent-loop-testkit/model-experience:

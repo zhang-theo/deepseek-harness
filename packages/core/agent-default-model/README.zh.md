@@ -3,7 +3,7 @@ description: "面向用户与维护者的部署默认模型选择说明，用于
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-agent-default-model
+# @deepseek-ai/dsh-agent-default-model
 
 [English](README.md) | 中文
 
@@ -32,7 +32,7 @@ kind: "package-reference"
 组合要求提供 provider 和模型。即使没有挂载配置编辑器，消费者也可读取即时引用。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-agent-default-model'
+- name: '@deepseek-ai/dsh-agent-default-model'
   config:
     provider: deepseek
     model: deepseek-chat
@@ -75,7 +75,6 @@ await ctx.agentDefaultModel.saveSelection({ provider, model, reasoningEffort: 'h
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 即时默认选择与 profile 写入 |
-| — | 不发布 invariant 配套模块，因为 Config 引用是唯一由此包维护的值。 |
 
 ### 行为说明
 

@@ -1,12 +1,12 @@
 /** Serialized Team transactions over the exact live Lead Session log. */
 
-import type { Agent } from '@x1a0f3n9/dsh-agent'
+import type { Agent } from '@deepseek-ai/dsh-agent'
 import type { Context } from '@deepseek-ai/cordis'
-import type { SessionEventMap, SessionId } from '@x1a0f3n9/dsh-session'
+import type { SessionEventMap, SessionId } from '@deepseek-ai/dsh-session'
 import type { TeamEventType, TeamState } from './projection.ts'
 
 type AppendTeamEvent = <T extends TeamEventType>(type: T, data: SessionEventMap[T]) => void
-type MutableTeamEventType = 'team/member' | 'team/task' | 'team/message/queued' | 'team/message/delivered'
+type MutableTeamEventType = 'team/member' | 'team/task'
 
 /** Owns per-Lead transaction order and committed Team event publication. */
 export class TeamJournal {

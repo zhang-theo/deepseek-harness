@@ -1,7 +1,7 @@
 {
-  "name": "@x1a0f3n9/dsh-sdk-client",
+  "name": "@deepseek-ai/dsh-sdk-client",
   "description": "TypeScript client SDK for driving a DeepSeek Harness runtime subprocess over stdio JSON-RPC: the DeepSeekHarness high-level turns API and the lower-level HarnessClient",
-  "version": "0.1.7-rc.4",
+  "version": "0.2.1-rc.2",
   "publishConfig": {
     "access": "public"
   },
@@ -26,18 +26,19 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@x1a0f3n9/dsh": "workspace:*"
+    "@deepseek-ai/dsh": "workspace:*"
   },
   "peerDependencies": {
-    "@x1a0f3n9/dsh-llm": "workspace:*",
-    "@x1a0f3n9/dsh-sdk-protocol": "workspace:*",
-    "@x1a0f3n9/dsh-session": "workspace:*",
+    "@deepseek-ai/dsh-llm": "workspace:*",
+    "@deepseek-ai/dsh-sdk-protocol": "workspace:*",
+    "@deepseek-ai/dsh-session": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~"
   },
   "devDependencies": {
-    "@x1a0f3n9/dsh-llm": "workspace:*",
-    "@x1a0f3n9/dsh-sdk-protocol": "workspace:*",
-    "@x1a0f3n9/dsh-session": "workspace:*",
-    "@deepseek-ai/cordis": "workspace:~"
+    "@deepseek-ai/dsh-llm": "workspace:*",
+    "@deepseek-ai/dsh-sdk-protocol": "workspace:*",
+    "@deepseek-ai/dsh-session": "workspace:*",
+    "@deepseek-ai/cordis": "workspace:~",
+    "@deepseek-ai/dsh-experimental-translator": "workspace:*"
   }
 }

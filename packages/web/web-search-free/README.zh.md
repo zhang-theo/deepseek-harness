@@ -3,7 +3,7 @@ description: "ctx.web 的无需密钥 Bing/DuckDuckGo 搜索提供方：部署�
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-web-search-free
+# @deepseek-ai/dsh-web-search-free
 
 [English](README.md) | 中文
 
@@ -36,8 +36,8 @@ kind: "package-reference"
 加载 web 服务与本提供方；源站和 User-Agent 都有公开默认值，不读取任何环境密钥。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-web'
-- name: '@x1a0f3n9/dsh-web-search-free'
+- name: '@deepseek-ai/dsh-web'
+- name: '@deepseek-ai/dsh-web-search-free'
 ```
 
 | 字段 | 默认值 | 含义 |

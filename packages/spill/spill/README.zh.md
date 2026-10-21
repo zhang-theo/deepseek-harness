@@ -3,7 +3,7 @@ description: "spill 存储服务：保存超大工具文本或已捕获的会话
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-spill
+# @deepseek-ai/dsh-spill
 
 [English](README.md) | 中文
 
@@ -36,8 +36,8 @@ kind: "package-reference"
 把后端与策略一起挂载；设置 `maxInlineTokens` 后，过大的图文工具结果都会自动变成预览加定位信息。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-spill-local'
-- name: '@x1a0f3n9/dsh-spill-policy'
+- name: '@deepseek-ai/dsh-spill-local'
+- name: '@deepseek-ai/dsh-spill-policy'
   config:
     maxInlineTokens: 12500
 ```
@@ -89,7 +89,6 @@ const ref = await ctx.spillStore.saveText({
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：抽象 `SpillStore` 服务及其 `saveText` 约定 |
 | [`src/types.ts`](src/types.ts) | 词汇：`SaveTextSpill`、`SpillRef`、带品牌类型 `SpillLocator`、`SpillOwner`、`SpillSource` |
-| — | 不发布运行时不变式伴生入口；除归属 seam 强制执行的约定外，本包不暴露独立的事件序列或可变数据关系。 |
 
 ### 数据模型
 

@@ -1,6 +1,6 @@
 /**
  * Agent-scoped model selection shared by runtime entry points.
- * @module @x1a0f3n9/dsh-agent/model-selection
+ * @module @deepseek-ai/dsh-agent/model-selection
  */
 
 import type { Context } from '@deepseek-ai/cordis'
@@ -9,10 +9,10 @@ import {
   createUserMessage,
   type LlmCallConfig,
   type ReasoningEffortId,
-} from '@x1a0f3n9/dsh-llm'
+} from '@deepseek-ai/dsh-llm'
 import type { PreStepDecision } from './runtime-types.ts'
-import type { ContextFormed } from '@x1a0f3n9/dsh-llm'
-declare module '@x1a0f3n9/dsh-llm' {
+import type { ContextFormed } from '@deepseek-ai/dsh-llm'
+declare module '@deepseek-ai/dsh-llm' {
   interface MessageSourceMap {
     'model-selection': { kind: 'model-selection' } & ContextFormed
   }

@@ -11,16 +11,16 @@ import { Context } from '@deepseek-ai/cordis'
 import { stubConfigForm } from '../src/config-form.ts'
 import { act, cleanup } from '@testing-library/react'
 import { useSyncExternalStore } from 'react'
-import { createSnapshotStore, defineStore } from '@x1a0f3n9/dsh-client-store'
-import { createScope, type SessionReference } from '@x1a0f3n9/dsh-api-session-controller/client'
-import type { WorkspaceId } from '@x1a0f3n9/dsh-api-workspace-controller/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
+import { createSnapshotStore, defineStore } from '@deepseek-ai/dsh-client-store'
+import { createScope, type SessionReference } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { WorkspaceId } from '@deepseek-ai/dsh-api-workspace-controller/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {
   PropsRenderSlots, SessionStandardProps, SlotRendererHost,
-} from '@x1a0f3n9/dsh-client-ui-slots'
-import { SlotTestRuntime } from '@x1a0f3n9/dsh-client-test-runtime'
+} from '@deepseek-ai/dsh-client-ui-slots'
+import { SlotTestRuntime } from '@deepseek-ai/dsh-client-test-runtime'
 
-declare module '@x1a0f3n9/dsh-client-ui-slots' {
+declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotMap {
     'trt.panel': { kind: 'single'; scope: 'root'; owner: { label?: string } }
     'trt.chat': { kind: 'single'; scope: 'session' }
@@ -238,6 +238,7 @@ describe('sessions', () => {
           values: { subagentCatalog: [
             { createdAt: 1, id: 'other' as SessionId, mode: 'one-shot' },
             { createdAt: 2, id: 'child' as SessionId, mode: 'continuable', label: 'Child' },
+            { createdAt: 3, id: 'external' as SessionId, mode: 'external' },
           ] },
         },
       }
@@ -247,6 +248,7 @@ describe('sessions', () => {
       parentSessionId: parentId, childSessionId: 'child', mode: 'continuable',
     })
     expect(runtime.sessions.subagentAddress('missing' as SessionId)).toBeUndefined()
+    expect(runtime.sessions.subagentAddress('external' as SessionId)).toBeUndefined()
     expect(runtime.sessions.binding(parentId)).toBeUndefined()
     expect(runtime.sessions.binding('child')).toBeUndefined()
     await runtime.dispose()

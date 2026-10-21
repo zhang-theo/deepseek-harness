@@ -20,25 +20,25 @@
 /x1a0f3n9-dsh-session-projection/use-this-package/when-to-choose-it:
   en: 90b7c26cb45be52a
   zh: 386e294ec09607c1
-/x1a0f3n9-dsh-session-projection/use-this-package/define-a-projection-unit:
-  en: 69b638e196c9f6e4
-  zh: cb5ece1b76a95b5e
-/x1a0f3n9-dsh-session-projection/use-this-package/register-and-read:
-  en: 5e754e67dff07b02
-  zh: 2ba1bda464abaa45
-/x1a0f3n9-dsh-session-projection/use-this-package/persisted-checkpoints:
+/deepseek-ai-dsh-session-projection/use-this-package/define-a-projection-unit:
+  en: 09758d1475fad86e
+  zh: 473637cb34aebe72
+/deepseek-ai-dsh-session-projection/use-this-package/register-and-read:
+  en: 6a19c075f826b3f7
+  zh: c200277cb58062be
+/deepseek-ai-dsh-session-projection/use-this-package/persisted-checkpoints:
   en: 45f1c05fb7e08180
   zh: f8d62c749899651a
 /x1a0f3n9-dsh-session-projection/understand-the-implementation:
   en: 3397f58d6f49bfda
   zh: efb85d382e25574d
-/x1a0f3n9-dsh-session-projection/understand-the-implementation/design-concept:
-  en: 274b4b5f7cf63a9f
-  zh: ba054a536f0bb93a
-/x1a0f3n9-dsh-session-projection/understand-the-implementation/source-map:
-  en: 8b6672b48e7607d6
-  zh: 33611e7ea13219f1
-/x1a0f3n9-dsh-session-projection/understand-the-implementation/drive-and-checkpoint-flow:
+/deepseek-ai-dsh-session-projection/understand-the-implementation/design-concept:
+  en: 8afa0fdb49898f6d
+  zh: 6b2da34455963935
+/deepseek-ai-dsh-session-projection/understand-the-implementation/source-map:
+  en: b0263d26c5a65d7a
+  zh: 2e58d3181dde901c
+/deepseek-ai-dsh-session-projection/understand-the-implementation/drive-and-checkpoint-flow:
   en: 00136880bb586403
   zh: bd35f645111c068c
 /x1a0f3n9-dsh-session-projection/further-exploration:

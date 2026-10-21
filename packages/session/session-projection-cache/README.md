@@ -3,7 +3,7 @@ description: "The persisted session-projection cache for deployments and maintai
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-session-projection-cache
+# @deepseek-ai/dsh-session-projection-cache
 
 English | [中文](README.zh.md)
 
@@ -39,7 +39,7 @@ The cache opens its domain through the storage stack, so base mounts `storage`, 
 
 ```yaml
 - id: session-projection-cache
-  name: '@x1a0f3n9/dsh-session-projection-cache'
+  name: '@deepseek-ai/dsh-session-projection-cache'
   config:
     writeEveryEvents: 200
     writeIntervalMs: 5000
@@ -90,7 +90,6 @@ The cache stores one version-stamped document per session in the `session_projca
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry: `SessionProjectionCache` service, write-behind listeners, cache reads |
 | [`src/spec.ts`](src/spec.ts) | The `session_projcache` domain spec and record identity types |
-| — | No runtime invariant companion is published; the cache's correctness relation (a stored row equals the registry fold at its `seq` watermark) is only checkable by re-running the fold over the persisted log — duplicating the implementation rather than detecting drift — and its staleness is by design (fail-soft writes). The durable boundary is schema-validated by the cache's own zod parse on every read, and the read ladder's version/watermark guards are proven by the package spec. |
 
 </details>
 

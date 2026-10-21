@@ -40,12 +40,12 @@
  *    the CALLER owns the DACLs (the sandbox seam's grant reuse):
  *    init()/dispose() skip grant/revoke entirely and the caller must not
  *    revoke under live children.
- * @module @x1a0f3n9/dsh-sandbox-windows-acl
+ * @module @deepseek-ai/dsh-sandbox-windows-acl
  */
 
 import { existsSync, statSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { Win32Error } from '@x1a0f3n9/dsh-win32-process'
+import { Win32Error } from '@deepseek-ai/dsh-win32-process'
 
 import { grantWrite, revokeWrite } from './acl.ts'
 import { allocPtrSlot, decodePtr, isNullPtr, throwLastError, win32 } from './ffi.ts'
@@ -58,6 +58,7 @@ import * as abi from './win32-abi.ts'
 export { AclWriteGrant } from './grant.ts'
 export { assertTempRootOutsideWorkspace } from './path-boundary.ts'
 export { tempWriteSid, workspaceWriteSid } from './workspace-sid.ts'
+export { ACL_DIAGNOSIS_SKILL, registerAclDiagnosisSkill } from './acl-skill.ts'
 /** Construction options: the workspace/temp allowlists and their distinct SID identities. */
 export interface AclSandboxOptions {
   /** Directories the confined child may write into (must exist and be caller-owned). */

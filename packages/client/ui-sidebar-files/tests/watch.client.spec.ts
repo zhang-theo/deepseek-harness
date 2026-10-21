@@ -1,8 +1,8 @@
 /** Directory notifications and disposal through the shared scripted Remote transport. */
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
-import type { ClientRemote } from '@x1a0f3n9/dsh-api-remotes/client'
-import type { SessionId } from '@x1a0f3n9/dsh-session/types'
-import type { SupervisedStreamOptions } from '@x1a0f3n9/dsh-api-workspace-files/src/client/remote.ts'
+import type { ClientRemote } from '@deepseek-ai/dsh-api-remotes/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { SupervisedStreamOptions } from '@deepseek-ai/dsh-api-workspace-files/src/client/remote.ts'
 import { FakeRemote } from '../../../api/workspace-files/tests/fake-remote.client.ts'
 import { createWatch } from '../src/client/face.ts'
 

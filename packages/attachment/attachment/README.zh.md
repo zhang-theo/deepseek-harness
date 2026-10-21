@@ -3,7 +3,7 @@ description: "持久图片与文件附件，供用户与维护者在提示词与
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-attachment
+# @deepseek-ai/dsh-attachment
 
 [English](README.md) | 中文
 
@@ -32,7 +32,7 @@ kind: "package-reference"
 在客户端 UI 中向用户提示词附加一张或多张图片。每个源图都会在你的消息被处理前接受检查、规范化为提供方无关的 8-bit sRGB/sRGBA 光栅并保存；如果任何一张图片被拒绝，整条消息都会失败且不会发布任何内容。支持的源格式为 PNG、JPEG、WebP 与 GIF；部署方分别控制源图限制、规范化存储限制与路由专用请求限制。下面这一个插件即可启用持久图片附件（随附的 base 组合已经挂载它）：
 
 ```yaml
-- name: '@x1a0f3n9/dsh-attachment-local'
+- name: '@deepseek-ai/dsh-attachment-local'
 ```
 
 ### 在提示词中附加任意其他文件
@@ -83,7 +83,6 @@ kind: "package-reference"
 | [`src/admission.ts`](src/admission.ts) | 对编码图片和文件上传强制执行规范 base64 并委托存储 |
 | [`src/error.ts`](src/error.ts) | `AttachmentError` 类与 `isImageAdmissionError` 运行时子集 |
 | [`src/brand.ts`](src/brand.ts) | `AttachmentId` 带类型标记的不透明标识符 |
-| — | 不发布运行时不变式伴生入口；这个无状态 seam 承载类型，实现则负责强制执行不可变存储检查。 |
 
 </details>
 

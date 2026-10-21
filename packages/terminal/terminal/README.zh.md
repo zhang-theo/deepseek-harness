@@ -3,7 +3,7 @@ description: "面向部署方与消费方的持久终端会话说明，用于选
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-terminal
+# @deepseek-ai/dsh-terminal
 
 [English](README.md) | 中文
 
@@ -25,7 +25,7 @@ kind: "package-reference"
 <a id="use-this-package"></a>
 ## 使用本包
 
-当组合需要状态跨工具调用存活的终端会话时，挂载 `@x1a0f3n9/dsh-terminal`。单独的服务本身没有用处：请与 `@x1a0f3n9/dsh-terminal-bash` 之类的后端、`@x1a0f3n9/dsh-tool-terminal` 之类的工具包配对，并在同一个组合中一起加载。
+当组合需要状态跨工具调用存活的终端会话时，挂载 `@deepseek-ai/dsh-terminal`。单独的服务本身没有用处：请与 `@deepseek-ai/dsh-terminal-bash` 之类的后端、`@deepseek-ai/dsh-tool-terminal` 之类的工具包配对，并在同一个组合中一起加载。
 
 ### 何时选择
 
@@ -36,9 +36,9 @@ kind: "package-reference"
 将会话服务与后端、工具包一起加载：
 
 ```yaml
-- name: '@x1a0f3n9/dsh-terminal'
-- name: '@x1a0f3n9/dsh-terminal-bash'
-- name: '@x1a0f3n9/dsh-tool-terminal'
+- name: '@deepseek-ai/dsh-terminal'
+- name: '@deepseek-ai/dsh-terminal-bash'
+- name: '@deepseek-ai/dsh-tool-terminal'
 ```
 
 后端提供一个稳定类型——随附的 shell 后端提供 `shell`——工具按该类型打开会话。shell 后端还额外要求沙箱、沙箱策略与子进程提供方；完整组合见其 [README](../terminal-bash/README.zh.md)。
@@ -75,7 +75,6 @@ kind: "package-reference"
 |---|---|
 | [`src/index.ts`](src/index.ts) | `TerminalSessionService`：后端注册表、spawn/send/read/signal/kill/list、所有者清理与 dispose |
 | [`src/types.ts`](src/types.ts) | 共享约定：后端接口、会话类型、等待原因、信号集合、错误码 |
-| — | 不发布运行时不变式伴生入口；后端与限定所有者范围的会话注册表均为私有可变状态，且服务既不暴露独立的生命周期流，也不暴露不限定范围的快照。 |
 
 ### 数据模型与生命周期
 
@@ -103,7 +102,7 @@ kind: "package-reference"
 - [终端子系统参考](../../../docs/subsystems/terminal.zh.md)——共享类型、后端与会话约定，以及生成的 `ctx.terminals` 接口面。
 - [terminal/ 包映射](../README.zh.md)——三包家族及其组合方式。
 - [terminal-bash 后端](../terminal-bash/README.zh.md)——提供 `shell` 类型的随附 shell 后端。
-- [tool-terminal 工具](../tool-terminal/README.zh.md)——操作会话的 6 个面向模型工具。
+- [tool-terminal 工具](../../experimental/tool-terminal/README.zh.md)——操作会话的 6 个面向模型工具。
 - [持久 PTY Agent Note](../../../.agents/notes/implemented/feature/2026-07-16-persistent-pty-sessions.zh.md)——设计理由、备选方案与暂缓边界。
 
 -----
@@ -115,7 +114,7 @@ kind: "package-reference"
 
 #### 模型看到什么
 
-没有直接可见内容。此包不注册提示词或工具；可见 schema 与结果文本由 `@x1a0f3n9/dsh-tool-terminal` 负责。
+没有直接可见内容。此包不注册提示词或工具；可见 schema 与结果文本由 `@deepseek-ai/dsh-tool-terminal` 负责。
 
 #### Token 影响
 
@@ -123,7 +122,7 @@ kind: "package-reference"
 
 #### KV Cache 影响
 
-不会直接失效；请求前缀变更由 `@x1a0f3n9/dsh-tool-terminal` 负责。
+不会直接失效；请求前缀变更由 `@deepseek-ai/dsh-tool-terminal` 负责。
 
 ## 已知限制与延期工作
 

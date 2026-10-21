@@ -3,7 +3,7 @@ description: "基于 `ctx.fs` 的独立 str_replace_editor 工具：供为 agent
 kind: "package-reference"
 ---
 
-# @x1a0f3n9/dsh-tool-str-replace-editor
+# @deepseek-ai/dsh-tool-str-replace-editor
 
 [English](README.md) | 中文
 
@@ -25,6 +25,8 @@ kind: "package-reference"
 <a id="use-this-package"></a>
 ## 使用本包
 
+此非实验性的独立插件面向自定义组合。Plugins 页面不将它作为可选 bundle 提供。
+
 当模型应通过熟悉的 `view`/`create`/`str_replace`/`insert` 命令词汇在绝对路径上编辑文件时，把工具与 `ctx.fs` 后端（以及需要防护变更时的策略插件）一起挂载。
 
 ### 最小组合
@@ -32,9 +34,9 @@ kind: "package-reference"
 一个后端、可选地加策略插件，然后是工具；编辑器可与任何终端接口组合。
 
 ```yaml
-- name: '@x1a0f3n9/dsh-fs-local'
-- name: '@x1a0f3n9/dsh-fs-observation-policy'
-- name: '@x1a0f3n9/dsh-tool-str-replace-editor'
+- name: '@deepseek-ai/dsh-fs-local'
+- name: '@deepseek-ai/dsh-fs-observation-policy'
+- name: '@deepseek-ai/dsh-tool-str-replace-editor'
 ```
 
 ### 配置
@@ -145,5 +147,3 @@ kind: "package-reference"
 无。
 
 </details>
-
-**运行时不变式：** 不发布伴生入口。工具适配器不持有独立持久状态；文件系统修改关系属于提供方与策略插件。

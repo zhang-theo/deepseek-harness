@@ -43,12 +43,14 @@ const MAX_DECL_CHARS = 1200
 /**
  * Line budget for ONE slot's expanded report. The whole point of narrowing to a
  * single slot is to spend less context, so a report a model cannot finish
- * reading is a defect rather than a detail. The widest measured slot renders 60
- * lines, so this leaves room to document a slot properly while catching the two
- * ways a report runs away: an owner share that hands down a subsystem instead of
- * a share, and prose that grew into a manual.
+ * reading is a defect rather than a detail. The budget leaves room to document
+ * a slot properly while catching the two ways a report runs away: an owner
+ * share that hands down a subsystem instead of a share, and prose that grew
+ * into a manual. Every report also lists one line per standard prop seat of its
+ * scope, so the widest Session-scope slot (`tool.call.toolview`, with the
+ * global and Session access seats) sets the current 122.
  */
-const MAX_ENTRY_LINES = 120
+const MAX_ENTRY_LINES = 122
 
 /** One register-call option as the catalog teaches it. */
 interface OptionDoc {
@@ -255,7 +257,8 @@ function standardKits(files: readonly ScannedFile[]): ReadonlyMap<string, readon
   const kits = new Map<string, readonly string[]>()
   for (const scope of SCOPES) {
     const extra = SCOPE_KIT[scope]
-    kits.set(scope, [...global, ...extra === undefined ? [] : standardKitMembers(files, extra)])
+    // A scope-kit member replaces the global member of the same name, so each seat is listed once.
+    kits.set(scope, [...new Set([...global, ...extra === undefined ? [] : standardKitMembers(files, extra)])])
   }
   return kits
 }
@@ -392,9 +395,9 @@ const KIND_EXAMPLE: Readonly<Record<string, readonly string[]>> = {
   chain: ['select: owner => null'],
 }
 
-/** Drop the `@x1a0f3n9/dsh-` prefix so rows stay readable. */
+/** Drop the `@deepseek-ai/dsh-` prefix so rows stay readable. */
 function shortPackage(name: string): string {
-  return name.replace('@x1a0f3n9/dsh-', '')
+  return name.replace('@deepseek-ai/dsh-', '')
 }
 
 /** Truncate an over-long declaration, naming the truncation. */
@@ -453,7 +456,7 @@ export function renderClientCatalog(entries: readonly SlotEntry[]): string {
     ' * mounted for the seat to exist. Data only — this module is the one legitimate',
     ' * meeting point of the two planes, so it carries strings, never client imports.',
     ' *',
-    ' * @module @x1a0f3n9/dsh-cordis-client-runner/client/slot-catalog',
+    ' * @module @deepseek-ai/dsh-cordis-client-runner/client/slot-catalog',
     ' */',
     '',
     '/* jscpd:ignore-start */',

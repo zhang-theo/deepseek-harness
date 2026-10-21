@@ -1,6 +1,6 @@
 /** Persisted Browser tab snapshots shared by the body and title slots. */
-import { defineStore, type EngineStoreHandle } from '@x1a0f3n9/dsh-client-store'
-import type { TabId } from '@x1a0f3n9/dsh-client-ui-dockkit'
+import { defineStore, type EngineStoreHandle } from '@deepseek-ai/dsh-client-store'
+import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { BrowserTabState } from './BrowserPersistence.ts'
 
 /** All Browser tabs in one Session-scoped store. */

@@ -1,7 +1,7 @@
 /** Per-job observation generations: anchor, coalesced output, terminal status. */
 
-import type { JobId } from '@x1a0f3n9/dsh-jobs/brand'
-import type { JobChunk, JobRegistry, JobStatus, JobView } from '@x1a0f3n9/dsh-jobs'
+import type { JobId } from '@deepseek-ai/dsh-jobs/brand'
+import type { JobChunk, JobRegistry, JobStatus, JobView } from '@deepseek-ai/dsh-jobs'
 import type { JobFollowFrame, JobFollowRequest } from './types.ts'
 import { OutputWaiter, sleep } from './wake.ts'
 

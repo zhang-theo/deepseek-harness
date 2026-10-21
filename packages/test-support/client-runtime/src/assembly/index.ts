@@ -1,8 +1,8 @@
 /**
  * Whole-client tier entry (deep import only:
- * `@x1a0f3n9/dsh-client-test-runtime/src/assembly/index.ts`). Kept out of
+ * `@deepseek-ai/dsh-client-test-runtime/src/assembly/index.ts`). Kept out of
  * the package root so slot-tier specs do not load the assembly machinery.
- * @module @x1a0f3n9/dsh-client-test-runtime/src/assembly
+ * @module @deepseek-ai/dsh-client-test-runtime/src/assembly
  */
 export { ClientRoster } from './roster.ts'
 export type { AssemblyPlan, ClientPluginModule, ClientRosterRow } from './roster.ts'

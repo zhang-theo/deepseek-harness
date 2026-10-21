@@ -17,16 +17,16 @@
 /x1a0f3n9-dsh-client-ui-jobs/use-this-package:
   en: 60f6d05d870f6518
   zh: dddf3f532d828b78
-/x1a0f3n9-dsh-client-ui-jobs/use-this-package/one-row-per-job:
-  en: 2b0bb648937cd7b9
-  zh: ce3104a27132ead5
-/x1a0f3n9-dsh-client-ui-jobs/use-this-package/the-expanded-panel:
+/deepseek-ai-dsh-client-ui-jobs/use-this-package/one-row-per-job:
+  en: 64c1f55b35e73295
+  zh: 4d93594923cf787f
+/deepseek-ai-dsh-client-ui-jobs/use-this-package/the-expanded-panel:
   en: c34dad62fee63306
   zh: 167d9da7928a9488
-/x1a0f3n9-dsh-client-ui-jobs/understand-the-implementation:
-  en: f6f5d497ab340b9e
-  zh: 94832761177f12ca
-/x1a0f3n9-dsh-client-ui-jobs/further-exploration:
+/deepseek-ai-dsh-client-ui-jobs/understand-the-implementation:
+  en: 4b520a2726f1a600
+  zh: e0324fd12713be6e
+/deepseek-ai-dsh-client-ui-jobs/further-exploration:
   en: 01eaaecb5850f391
   zh: 2eabd14cde191ab8
 /x1a0f3n9-dsh-client-ui-jobs/model-experience:
@@ -38,6 +38,6 @@
 /x1a0f3n9-dsh-client-ui-jobs/known-limitations-and-deferred-work:
   en: 8be824a877852373
   zh: bf4ae00ee70273b5
-/x1a0f3n9-dsh-client-ui-jobs/known-limitations-and-deferred-work/dev-note:
-  en: 2e50937c500fbfd6
-  zh: 8b86762471d56dcc
+/deepseek-ai-dsh-client-ui-jobs/known-limitations-and-deferred-work/dev-note:
+  en: e67f633dc6fe7773
+  zh: b532016223ceceef

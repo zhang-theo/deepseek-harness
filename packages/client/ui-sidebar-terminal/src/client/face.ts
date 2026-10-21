@@ -1,8 +1,8 @@
 /** Injected terminal commands and keyed observable state. */
-import type { WebTerminalId } from '@x1a0f3n9/dsh-api-terminal-controller/types'
-import type { TerminalView, TerminalViewState } from '@x1a0f3n9/dsh-api-terminal-controller/client'
-import type { HostObservable } from '@x1a0f3n9/dsh-client-ui-slots'
-import type { ThemeSnapshot } from '@x1a0f3n9/dsh-client-ui-theme/client'
+import type { WebTerminalId } from '@deepseek-ai/dsh-api-terminal-controller/types'
+import type { TerminalView, TerminalViewState } from '@deepseek-ai/dsh-api-terminal-controller/client'
+import type { HostObservable } from '@deepseek-ai/dsh-client-ui-slots'
+import type { ThemeSnapshot } from '@deepseek-ai/dsh-client-ui-theme/client'
 
 /** The terminal's React-free model is resolved by sidebar occurrence. */
 export interface TerminalInjected {
@@ -17,7 +17,7 @@ export interface TerminalBodyInjected extends TerminalInjected {
   readonly hooks: { readonly theme: HostObservable<ThemeSnapshot> }
 }
 
-declare module '@x1a0f3n9/dsh-client-ui-sidebar-right/client' {
+declare module '@deepseek-ai/dsh-client-ui-sidebar-right/client' {
   interface SidebarRightTabParamsMap {
     /** An existing Host terminal selected from the Session terminal list. */
     terminal: { terminalId: WebTerminalId } | { shellPath: string }

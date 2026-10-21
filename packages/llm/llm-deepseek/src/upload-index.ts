@@ -3,10 +3,10 @@
 import { createHash } from 'node:crypto'
 import { readFile, mkdir } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { withFileLock, writeFileAtomic } from '@x1a0f3n9/dsh-atomic-write'
-import { resolveDshHome } from '@x1a0f3n9/dsh-home-paths'
-import { ImageVariantId } from '@x1a0f3n9/dsh-attachment'
-import type { AttachmentId, ImageVariantId as ImageVariantIdType } from '@x1a0f3n9/dsh-attachment'
+import { withFileLock, writeFileAtomic } from '@deepseek-ai/dsh-atomic-write'
+import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
+import { ImageVariantId } from '@deepseek-ai/dsh-attachment'
+import type { AttachmentId, ImageVariantId as ImageVariantIdType } from '@deepseek-ai/dsh-attachment'
 import { DeepSeekFileId, DeepSeekFileScope } from './file-id.ts'
 import type { DeepSeekFileId as DeepSeekFileIdType, DeepSeekFileScope as DeepSeekFileScopeType } from './file-id.ts'
 
@@ -190,21 +190,20 @@ export class DeepSeekUploadIndex {
   }
 
   /**
-   * Remove one exact mapping without deleting a concurrently installed successor.
+   * Remove exact mappings in one locked rewrite without deleting concurrently installed successors.
    * @param scope - endpoint/API-key namespace.
-   * @param variantId - complete request-image transformation identity.
-   * @param fileId - exact remote generation being invalidated.
+   * @param generations - exact remote generations being invalidated; pairs absent from the index are ignored.
    */
   async remove(
     scope: DeepSeekFileScopeType,
-    variantId: ImageVariantIdType,
-    fileId: DeepSeekFileIdType,
+    generations: readonly Pick<DeepSeekUploadRecord, 'variantId' | 'fileId'>[],
   ): Promise<void> {
+    const invalidated = new Set(generations.map(generation => `${generation.variantId}\0${generation.fileId}`))
     await mkdir(dirname(this.path), { recursive: true, mode: 0o700 })
     await withFileLock(this.path, async () => {
       const index = await this.load()
       const records = index.records.filter(record => !(
-        record.scope === scope && record.variantId === variantId && record.fileId === fileId
+        record.scope === scope && invalidated.has(`${record.variantId}\0${record.fileId}`)
       ))
       if (records.length !== index.records.length) await this.save({ formatVersion: 3, records })
     })

@@ -4,12 +4,12 @@
  * layer — consumers depend on this package and never touch backends directly.
  * Plugin `Config` is schemastery; record schemas inside domain specs are zod
  * (see `src/spec.ts` for the split rationale).
- * @module @x1a0f3n9/dsh-storage-domain
+ * @module @deepseek-ai/dsh-storage-domain
  */
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { storageBackendServiceKey } from '@x1a0f3n9/dsh-storage'
+import { storageBackendServiceKey } from '@deepseek-ai/dsh-storage'
 import { DomainError } from './error.ts'
 import { descriptorOf } from './spec.ts'
 import type { DomainSpec } from './spec.ts'
@@ -26,7 +26,7 @@ export type {
 export type { DomainChanged } from './events.ts'
 export type { Domain, DomainGlobal, DomainGlobalHandleOf, KvTable } from './domain.ts'
 
-declare module '@x1a0f3n9/dsh-storage' {
+declare module '@deepseek-ai/dsh-storage' {
   interface StorageForms {
     domain: DomainFacility
   }
@@ -150,9 +150,8 @@ export class DomainFacility {
             ? globalSpec.initial
             : parseRecord(spec.name, '', '', () => globalSpec.schema.parse(snapshot.global))
         // The onClosed hook runs strictly after teardown completes: writes
-        // landing during the drain still emit domain/changed, and the domain
-        // stays resolvable (the package invariant cross-checks each event)
-        // until fully closed — only then does the name free up for reopening.
+        // landing during the drain still emit domain/changed, and the name
+        // frees up for reopening only once the domain is fully closed.
         const domain: DomainImpl = new DomainImpl(this.ctx, spec, unit, tables, globalValue, () => {
           this.domains.delete(spec.name)
           this.reserved.delete(spec.name)
@@ -175,8 +174,7 @@ export class DomainFacility {
   }
 
   /**
-   * Look up an open domain by name, untyped. Diagnostic surface (the package
-   * invariant cross-checks change events against live domain state); typed
+   * Look up an open domain by name, untyped. Diagnostic surface; typed
    * consumers hold the handle returned by {@link open}.
    * @param name - Domain name.
    * @returns the open domain runtime, or `undefined` when not open.
@@ -228,7 +226,7 @@ export function apply(ctx: Context, config: Config): Promise<void> {
       const unmount = domainCtx.storage.mount('domain', facility)
       return async () => {
         // Close leftovers before unmounting: draining writes still emit
-        // domain/changed, whose invariant resolves the facility through the hub.
+        // domain/changed.
         await facility.closeAll()
         unmount()
       }

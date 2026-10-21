@@ -13,7 +13,7 @@
  * override equal to the composition default is still an override.
  */
 
-import { createSnapshotStore, type SnapshotStore } from '@x1a0f3n9/dsh-client-store'
+import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-store'
 
 /** What the model reads of one Host entry's form. */
 export interface SettingsFormScopeSnapshot<T> {
