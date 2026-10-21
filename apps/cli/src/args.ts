@@ -89,14 +89,14 @@ function rejectElectronProfile(program: Command, profile: string): void {
 /** The launcher's own help text; each app prints its own. */
 const HELP_EXAMPLES = `
 Examples:
-  dsh web                                   boot the web profile (same as: dsh --profile web)
-  dsh rescue --from-default-profile web
+  xfdsh web                                 boot the web profile (same as: xfdsh --profile web)
+  xfdsh rescue --from-default-profile web
                                             recreate rescue from the shipped web template, then boot it
-  dsh headless "run the tests"              answer one task, print the result, and exit
-  dsh tui --patch ./extra.yml               boot a custom profile with one extra overlay
-  dsh tui --resume <session>                arguments after the launcher flags reach the app
-  dsh web --help                            the web app's own flags and help
-  dsh plugin --profile tui add <package>    install a plugin into the tui profile
+  xfdsh headless "run the tests"            answer one task, print the result, and exit
+  xfdsh tui --patch ./extra.yml             boot a custom profile with one extra overlay
+  xfdsh tui --resume <session>              arguments after the launcher flags reach the app
+  xfdsh web --help                          the web app's own flags and help
+  xfdsh plugin --profile tui add <package>  install a plugin into the tui profile
 `
 
 /**
@@ -164,7 +164,7 @@ export function parseDshArgs(argv: readonly string[], version: string, manageDes
     .allowUnknownOption()
     .passThroughOptions()
     .enablePositionalOptions()
-    .argument('[args...]', 'arguments for the booted profile\'s app (see: dsh --profile <name> --help)')
+    .argument('[args...]', 'arguments for the booted profile\'s app (see: xfdsh --profile <name> --help)')
     .option('--profile <name>', 'the profile under $DSH_HOME/profiles to boot', selectProfile)
     .option('--from-default-profile <name>', 'replace a custom profile with a fresh copy of a shipped profile template')
     .option('--patch <path>', 'extra patch-list overlay applied after the profile layer (repeatable)', collect)

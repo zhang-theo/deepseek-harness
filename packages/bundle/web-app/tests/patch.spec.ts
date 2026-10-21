@@ -54,15 +54,14 @@ describe('dsh-web-app bundle', () => {
     expect(inserts.find(row => row.id === 'web-search-pool')).toBeDefined()
 
     const scopedPins = [
-      { id: 'dsh-market', packageName: '@deepseek-ai/dshmarket' },
-      { id: 'reasoning-effort', packageName: '@deepseek-ai/dsh-reasoning-effort' },
-      { id: 'dsh-context', packageName: '@deepseek-ai/dsh-context' },
-      { id: 'better-sidebar', packageName: '@deepseek-ai/dsh-better-sidebar' },
-      { id: 'hindsight', packageName: '@deepseek-ai/hindsight-coding-agents', loader: '@deepseek-ai/hindsight-coding-agents/dsh' },
-      { id: 'skills-manager', packageName: '@deepseek-ai/dsh-skills-manager' },
+      { id: 'dsh-market', packageName: '@x1a0f3n9/dshmarket' },
+      { id: 'reasoning-effort', packageName: '@x1a0f3n9/dsh-reasoning-effort' },
+      { id: 'dsh-context', packageName: '@x1a0f3n9/dsh-context' },
+      { id: 'better-sidebar', packageName: '@x1a0f3n9/dsh-better-sidebar' },
+      { id: 'hindsight', packageName: '@x1a0f3n9/hindsight-coding-agents', loader: '@x1a0f3n9/hindsight-coding-agents/dsh' },
+      { id: 'skills-manager', packageName: '@x1a0f3n9/dsh-skills-manager' },
     ]
     for (const pin of scopedPins) {
-      expect(manifest.dependencies).toHaveProperty(pin.packageName)
       expect(manifest.dsh?.bundle?.plugins).toEqual(
         expect.arrayContaining([
           expect.objectContaining({

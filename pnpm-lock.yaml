@@ -3072,6 +3072,9 @@ importers:
       '@deepseek-ai/dsh-web-frontend':
         specifier: workspace:*
         version: link:../../../apps/web
+      '@deepseek-ai/dsh-web-search-pool':
+        specifier: workspace:*
+        version: link:../../web/web-search-pool
       '@deepseek-ai/dsh-workflow-ptc':
         specifier: workspace:*
         version: link:../../workflow/workflow-ptc
